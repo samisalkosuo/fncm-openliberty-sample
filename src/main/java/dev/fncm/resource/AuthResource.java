@@ -12,6 +12,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.json.JSONObject;
 
 /**
@@ -36,6 +37,10 @@ public class AuthResource {
     @Inject
     TokenCache tokenCache;
 
+    @Inject
+    @ConfigProperty(name = "token.ttl.seconds", defaultValue = "3600")
+    long tokenTtlSeconds;
+
     @POST
     @Path("/login")
     public Response login(LoginRequest req) {
@@ -53,12 +58,12 @@ public class AuthResource {
 
             // Register token → username in the server-side cache so the
             // BearerTokenFilter can resolve the username on subsequent requests.
-            tokenCache.put(zenToken, req.getUsername(), iamToken);
+            tokenCache.put(zenToken, req.getUsername(), iamToken, tokenTtlSeconds);
 
             LoginResponse body = new LoginResponse(
-                    zenToken,   // appToken  – Bearer for /api/* calls
-                    zenToken,   // accessToken – raw Zen token for direct GraphQL calls
-                    3600        // expiresIn (seconds) – adjust or read from the IdP
+                    zenToken,           // appToken  – Bearer for /api/* calls
+                    zenToken,           // accessToken – raw Zen token for direct GraphQL calls
+                    (int) tokenTtlSeconds  // expiresIn (seconds)
             );
             return Response.ok(body).build();
 
