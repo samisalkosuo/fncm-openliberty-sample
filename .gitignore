@@ -1,3 +1,8 @@
+lib/*.jar
+samples/
+TODO.md
+config.env
+
 target/
 pom.xml.tag
 pom.xml.releaseBackup

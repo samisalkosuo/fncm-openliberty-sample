@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FileNet App</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      background: #f7f8fa;
+      color: #1f2328;
+    }
+
+    /* ── Layout ── */
+    #app { min-height: 100vh; display: flex; flex-direction: column; }
+
+    header {
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 0 1.5rem;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 { font-size: 1rem; font-weight: 600; }
+    header #user-info { font-size: 0.85rem; color: #57606a; }
+
+    main { flex: 1; max-width: 1200px; width: 100%; margin: 2rem auto; padding: 0 1rem; }
+
+    /* ── Views ── */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ── Card grid – 3 columns, wraps automatically ── */
+    /*
+     * HOW TO ADD A NEW CARD:
+     *   1. Add a <div class="card"> ... </div> inside #view-app .card-grid
+     *   2. Add its JS in the matching "── Card: <Name> ──" section below
+     * Cards flow left-to-right, wrapping every 3 columns automatically.
+     */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 1.5rem;
+    }
+    .card h2 { font-size: 1rem; margin-bottom: 1rem; }
+
+    /* ── Forms ── */
+    .form-group { margin-bottom: 1rem; }
+    label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: .3rem; }
+    input[type=text], input[type=password] {
+      width: 100%;
+      padding: .45rem .65rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      font-size: 0.95rem;
+    }
+    input:focus { outline: 2px solid #3b82d4; border-color: transparent; }
+
+    button {
+      padding: .45rem 1.1rem;
+      background: #3b82d4;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    button:hover { background: #2563ab; }
+    button.secondary { background: #fff; color: #3b82d4; border: 1px solid #3b82d4; }
+    button.secondary:hover { background: #f0f6ff; }
+
+    /* ── Notifications ── */
+    .alert {
+      padding: .6rem 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+    }
+    .alert-error   { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+    .alert-success { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+    .hidden { display: none !important; }
+
+    /* ── Table ── */
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th, td { text-align: left; padding: .5rem .75rem; border-bottom: 1px solid #e5e7eb; }
+    th { font-weight: 600; background: #f7f8fa; }
+    tr:last-child td { border-bottom: none; }
+
+    /* ── Spinner ── */
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid #e5e7eb;
+      border-top-color: #3b82d4;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      vertical-align: middle;
+      margin-right: .4rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #logout-btn { background: none; color: #57606a; border: none; font-size: 0.85rem; cursor: pointer; }
+    #logout-btn:hover { color: #1f2328; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>FileNet App</h1>
+    <span id="user-info" class="hidden">
+      <span id="user-name"></span>
+      &nbsp;|&nbsp;
+      <button id="logout-btn">Log out</button>
+    </span>
+  </header>
+
+  <main>
+    <!-- ── Login view ── -->
+    <div id="view-login" class="view active">
+      <div class="card" style="max-width:380px;margin:3rem auto;">
+        <h2>Sign in</h2>
+        <div id="login-alert" class="alert alert-error hidden"></div>
+        <form id="login-form" novalidate>
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input id="username" type="text" autocomplete="username" required/>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input id="password" type="password" autocomplete="current-password" required/>
+          </div>
+          <button type="submit" id="login-btn">Sign in</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ── App view (shown after login) ── -->
+    <!--
+      ADD A NEW CARD: insert a <div class="card"> block inside .card-grid below,
+      then add its JS in the matching section at the bottom of the <script> block.
+    -->
+    <div id="view-app" class="view">
+      <div class="card-grid">
+
+        <!-- ── Card: GraphQL Query ── -->
+        <div class="card">
+          <h2>GraphQL Query</h2>
+          <div class="form-group">
+            <label for="gql-query">Query</label>
+            <textarea id="gql-query" rows="4"
+                      style="width:100%;font-family:monospace;font-size:0.85rem;
+                             padding:.45rem;border:1px solid #e5e7eb;border-radius:4px;">
+{ domain { objectStores { objectStores { symbolicName } }} }
+            </textarea>
+          </div>
+          <button id="gql-run-btn">Run</button>
+          <pre id="gql-result"
+               style="margin-top:1rem;background:#f7f8fa;padding:.75rem;
+                      border:1px solid #e5e7eb;border-radius:4px;
+                      font-size:0.82rem;overflow:auto;min-height:3rem;"></pre>
+        </div>
+
+        <div class="card">
+            <h2>Connection Test</h2>
+          <button id="card1-btn">Load</button>
+          <div id="card1-spinner" class="hidden" style="margin-top:.75rem;">
+            <span class="spinner"></span> Loading…
+          </div>
+          <div id="card1-container" style="margin-top:1rem;"></div>
+          </div>
+
+              <div class="card">
+            <h2>List Folders</h2>
+          <button id="card2-btn">Load</button>
+          <div id="card2-spinner" class="hidden" style="margin-top:.75rem;">
+            <span class="spinner"></span> Loading…
+          </div>
+          <div id="card2-container" style="margin-top:1rem;"></div>
+          </div>
+
+        <!-- ── Card: Documents (REST) ── -->
+        <div class="card">
+          <h2>Documents <small style="font-weight:400;color:#57606a;font-size:0.8rem;">(via REST)</small></h2>
+          <button id="load-docs-btn">Load</button>
+          <div id="docs-spinner" class="hidden" style="margin-top:.75rem;">
+            <span class="spinner"></span> Loading…
+          </div>
+          <div id="docs-container" style="margin-top:1rem;"></div>
+        </div>
+
+
+        <!-- ── Card: <New card here> ──
+          <div class="card">
+            <h2>My New Section</h2>
+            ...content...
+          </div>
+        ── -->
+
+      </div><!-- /card-grid -->
+    </div><!-- /view-app -->
+  </main>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+//  Configuration – adjust to your environment
+// ═══════════════════════════════════════════════════════════════════
+const CONFIG = {
+  loginUrl:     '/api/auth/login',   // POST – returns { appToken, accessToken }
+  documentsUrl: '/api/documents',    // GET  – secured with appToken
+  graphqlUrl:   '/api/graphql',       // proxied server-side – no CORS
+  connectionTestUrl: '/api/connectiontest',
+  listfoldersUrl: '/api/listfolders'
+};
+
+// ═══════════════════════════════════════════════════════════════════
+//  Session helpers
+// ═══════════════════════════════════════════════════════════════════
+const session = {
+  appToken:    null,
+  accessToken: null,
+  username:    null,
+
+  save(data) {
+    this.appToken    = data.appToken;
+    this.accessToken = data.accessToken;
+    this.username    = data.username;
+    sessionStorage.setItem('session', JSON.stringify(data));
+  },
+  load() {
+    const raw = sessionStorage.getItem('session');
+    if (raw) {
+      const d = JSON.parse(raw);
+      this.appToken    = d.appToken;
+      this.accessToken = d.accessToken;
+      this.username    = d.username;
+      return true;
+    }
+    return false;
+  },
+  clear() {
+    this.appToken = this.accessToken = this.username = null;
+    sessionStorage.removeItem('session');
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════
+//  View routing
+// ═══════════════════════════════════════════════════════════════════
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  Login
+// ═══════════════════════════════════════════════════════════════════
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const alert    = document.getElementById('login-alert');
+  alert.classList.add('hidden');
+
+  if (!username || !password) {
+    showAlert(alert, 'Username and password are required.');
+    return;
+  }
+
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
+
+  try {
+    const res = await fetch(CONFIG.loginUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    session.save({ ...data, username });
+    enterApp();
+  } catch (err) {
+    showAlert(alert, err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Sign in';
+  }
+});
+
+function enterApp() {
+  document.getElementById('user-name').textContent = session.username;
+  document.getElementById('user-info').classList.remove('hidden');
+  showView('app');
+}
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+  session.clear();
+  document.getElementById('user-info').classList.add('hidden');
+  document.getElementById('username').value = '';
+  document.getElementById('password').value = '';
+  showView('login');
+});
+
+// ═══════════════════════════════════════════════════════════════════
+//  Card: GraphQL Query
+// ═══════════════════════════════════════════════════════════════════
+document.getElementById('gql-run-btn').addEventListener('click', async () => {
+  const query  = document.getElementById('gql-query').value.trim();
+  const result = document.getElementById('gql-result');
+  result.textContent = 'Running…';
+
+  try {
+    const res = await fetch(CONFIG.graphqlUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + session.appToken   // validated by BearerTokenFilter
+      },
+      body: JSON.stringify({ query })
+    });
+    const json = await res.json();
+    result.textContent = JSON.stringify(json, null, 2);
+  } catch (err) {
+    result.textContent = 'Error: ' + err.message;
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════
+//  Card: Documents (REST)
+// ═══════════════════════════════════════════════════════════════════
+document.getElementById('load-docs-btn').addEventListener('click', async () => {
+  const spinner   = document.getElementById('docs-spinner');
+  const container = document.getElementById('docs-container');
+  spinner.classList.remove('hidden');
+  container.innerHTML = '';
+
+  try {
+    const res = await fetch(CONFIG.documentsUrl, {
+      headers: { 'Authorization': 'Bearer ' + session.appToken }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const docs  = data.documents ?? [];
+
+    if (docs.length === 0) {
+      container.innerHTML = '<p style="color:#57606a;font-size:0.9rem;">No documents found.</p>';
+    } else {
+      const rows = docs.map(d => `<tr><td>${esc(d.id)}</td><td>${esc(d.name)}</td></tr>`).join('');
+      container.innerHTML =
+        `<table><thead><tr><th>ID</th><th>Name</th></tr></thead><tbody>${rows}</tbody></table>`;
+    }
+  } catch (err) {
+    container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
+  } finally {
+    spinner.classList.add('hidden');
+  }
+});
+
+
+// ═══════════════════════════════════════════════════════════════════
+//  Card: Connection Test (REST)
+// ═══════════════════════════════════════════════════════════════════
+document.getElementById('card1-btn').addEventListener('click', async () => {
+  const spinner   = document.getElementById('card1-spinner');
+  const container = document.getElementById('card1-container');
+  spinner.classList.remove('hidden');
+  container.innerHTML = '';
+
+  try {
+    const res = await fetch(CONFIG.connectionTestUrl, {
+      headers: { 'Authorization': 'Bearer ' + session.appToken }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.text();
+
+      container.innerHTML = `<pre>${data}</pre>`;
+        
+  } catch (err) {
+    container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
+  } finally {
+    spinner.classList.add('hidden');
+  }
+});
+
+
+// ═══════════════════════════════════════════════════════════════════
+//  Card: List Folders (REST)
+// ═══════════════════════════════════════════════════════════════════
+document.getElementById('card2-btn').addEventListener('click', async () => {
+  const spinner   = document.getElementById('card2-spinner');
+  const container = document.getElementById('card2-container');
+  spinner.classList.remove('hidden');
+  container.innerHTML = '';
+
+  try {
+    const res = await fetch(CONFIG.listfoldersUrl, {
+      headers: { 'Authorization': 'Bearer ' + session.appToken }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.text();
+
+      container.innerHTML = `<pre>${data}</pre>`;
+        
+  } catch (err) {
+    container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
+  } finally {
+    spinner.classList.add('hidden');
+  }
+});
+
+
+// ═══════════════════════════════════════════════════════════════════
+//  Card: <New card JS goes here>
+//  document.getElementById('my-btn').addEventListener('click', async () => { ... });
+// ═══════════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════════
+//  Helpers
+// ═══════════════════════════════════════════════════════════════════
+function showAlert(el, msg) {
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+
+function esc(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Restore session on page load ──────────────────────────────────
+if (session.load()) {
+  enterApp();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="FileNet Sample App OpenLiberty Server">
+
+    <featureManager>
+        <!-- REST -->
+        <feature>restfulWS-3.1</feature>
+        <!-- JSON binding -->
+        <feature>jsonb-3.0</feature>
+        <!-- MicroProfile Config -->
+        <feature>mpConfig-3.1</feature>
+        <!-- CDI -->
+        <feature>cdi-4.0</feature>
+        <!-- Servlet for serving the SPA -->
+        <feature>servlet-6.0</feature>
+    </featureManager>
+
+    <variable name="default.http.port"  defaultValue="9080"/>
+    <variable name="default.https.port" defaultValue="9443"/>
+
+    <httpEndpoint id="defaultHttpEndpoint"
+                  host="*"
+                  httpPort="${default.http.port}"
+                  httpsPort="${default.https.port}"/>
+
+    <!-- TLS keystore (auto-generated for dev; replace in production) -->
+    <keyStore id="defaultKeyStore" password="liberty"/>
+
+    <!-- Web application -->
+    <webApplication id="app"
+                    location="app.war"
+                    contextRoot="/">
+        <classloader apiTypeVisibility="+third-party"/>
+    </webApplication>
+
+    <logging consoleLogLevel="INFO"
+             traceSpecification="dev.fncm.*=all"/>
+
+</server>
