@@ -2,6 +2,7 @@ package dev.fncm.resource;
 
 import dev.fncm.auth.TokenCache;
 import dev.fncm.auth.TokenContext;
+import dev.fncm.service.javaapi.FileNetConfig;
 import dev.fncm.service.javaapi.service.ConnectionTest;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -14,9 +15,6 @@ import jakarta.ws.rs.core.Response.Status;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 /**
  * Example secured REST resource.
@@ -37,6 +35,9 @@ public class ConnectionTestResource {
     @Inject
     TokenCache tokenCache;
 
+    @Inject
+    FileNetConfig fileNetConfig;
+
     @GET
     public Response connectionTest(){
         LOGGER.info("connectionTest enter");
@@ -46,7 +47,7 @@ public class ConnectionTestResource {
         LOGGER.info("userName: "+tokenCache.getUsername(zenToken));
         LOGGER.info("iamToken: "+iamToken);
         
-        ConnectionTest test = new ConnectionTest(tokenCache.getUsername(zenToken), zenToken);
+        ConnectionTest test = new ConnectionTest(tokenCache.getUsername(zenToken), zenToken, fileNetConfig);
         LOGGER.info("ConnectionTest: "+test.toString());
         
         String result = test.run(new String[0]);

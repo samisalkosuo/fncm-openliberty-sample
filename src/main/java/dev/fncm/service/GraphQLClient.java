@@ -35,7 +35,7 @@ public class GraphQLClient {
     AuthService authService;
 
     @Inject
-    @ConfigProperty(name = "external.api.base.url")
+    @ConfigProperty(name = "graphql.url")
     String graphqlUrl;
 
     /**

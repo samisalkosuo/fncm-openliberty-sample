@@ -1,7 +1,7 @@
 lib/*.jar
 samples/
 TODO.md
-config.env
+config*.env
 
 target/
 pom.xml.tag

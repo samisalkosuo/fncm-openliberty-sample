@@ -2,7 +2,7 @@ package dev.fncm.resource;
 
 import dev.fncm.auth.TokenCache;
 import dev.fncm.auth.TokenContext;
-import dev.fncm.service.javaapi.service.ConnectionTest;
+import dev.fncm.service.javaapi.FileNetConfig;
 import dev.fncm.service.javaapi.service.ListFolders;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -15,9 +15,6 @@ import jakarta.ws.rs.core.Response.Status;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 /**
  * Example secured REST resource.
@@ -38,6 +35,9 @@ public class ListFoldersResource {
     @Inject
     TokenCache tokenCache;
 
+    @Inject
+    FileNetConfig fileNetConfig;
+
     @GET
     public Response listFolders() {
         LOGGER.info("listFolders enter");
@@ -47,7 +47,7 @@ public class ListFoldersResource {
             // LOGGER.info("userName: "+tokenCache.getUsername(zenToken));
             // LOGGER.info("iamToken: "+iamToken);
 
-            ListFolders svc = new ListFolders(tokenCache.getUsername(zenToken), zenToken);
+            ListFolders svc = new ListFolders(tokenCache.getUsername(zenToken), zenToken, fileNetConfig);
 
             String result = svc.run(new String[0]);
             return Response.ok(result).build();
