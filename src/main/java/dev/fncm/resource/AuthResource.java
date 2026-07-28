@@ -1,6 +1,5 @@
 package dev.fncm.resource;
 
-import dev.fncm.auth.TokenCache;
 import dev.fncm.model.LoginRequest;
 import dev.fncm.model.LoginResponse;
 import dev.fncm.service.AuthService;
@@ -13,7 +12,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.json.JSONObject;
 
 /**
  * Public (no-JWT) login endpoint.
@@ -29,13 +27,10 @@ import org.json.JSONObject;
 @RequestScoped
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class AuthResource {
+public class AuthResource extends BaseResource {
 
     @Inject
     AuthService authService;
-
-    @Inject
-    TokenCache tokenCache;
 
     @Inject
     @ConfigProperty(name = "token.ttl.seconds", defaultValue = "3600")
@@ -45,9 +40,7 @@ public class AuthResource {
     @Path("/login")
     public Response login(LoginRequest req) {
         if (req == null || req.getUsername() == null || req.getPassword() == null) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(new JSONObject().put("error", "username and password are required").toString())
-                    .build();
+            return error(400, "username and password are required");
         }
 
         try {
@@ -61,20 +54,16 @@ public class AuthResource {
             tokenCache.put(zenToken, req.getUsername(), iamToken, tokenTtlSeconds);
 
             LoginResponse body = new LoginResponse(
-                    zenToken,           // appToken  – Bearer for /api/* calls
-                    zenToken,           // accessToken – raw Zen token for direct GraphQL calls
+                    zenToken,              // appToken  – Bearer for /api/* calls
+                    zenToken,              // accessToken – raw Zen token for direct GraphQL calls
                     (int) tokenTtlSeconds  // expiresIn (seconds)
             );
             return Response.ok(body).build();
 
         } catch (IllegalStateException e) {
-            return Response.status(Response.Status.SERVICE_UNAVAILABLE)
-                    .entity(new JSONObject().put("error", e.getMessage()).toString())
-                    .build();
+            return error(503, e.getMessage());
         } catch (Exception e) {
-            return Response.status(Response.Status.UNAUTHORIZED)
-                    .entity(new JSONObject().put("error", "Authentication failed").toString())
-                    .build();
+            return error(401, "Authentication failed");
         }
     }
 }

@@ -1,6 +1,5 @@
 package dev.fncm.resource;
 
-import dev.fncm.auth.TokenContext;
 import dev.fncm.service.GraphQLClient;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -10,9 +9,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.json.JSONObject;
-
-import java.util.logging.Logger;
 
 /**
  * Server-side proxy for the CP4BA Content Services GraphQL API.
@@ -34,12 +30,7 @@ import java.util.logging.Logger;
 @RequestScoped
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class GraphQLProxyResource {
-
-    private static final Logger LOG = Logger.getLogger(GraphQLProxyResource.class.getName());
-
-    @Inject
-    TokenContext tokenContext;
+public class GraphQLProxyResource extends BaseResource {
 
     @Inject
     GraphQLClient graphQLClient;
@@ -53,25 +44,16 @@ public class GraphQLProxyResource {
     @POST
     public Response proxy(String body) {
         if (body == null || body.isBlank()) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(new JSONObject().put("error", "Empty GraphQL request body").toString())
-                    .build();
+            return error(400, "Empty GraphQL request body");
         }
 
         try {
             String responseBody = graphQLClient.executeJson(body, tokenContext.getZenToken());
             return Response.ok(responseBody).build();
-
         } catch (GraphQLClient.GraphQLException e) {
-            LOG.warning("GraphQL API error " + e.getHttpStatus() + ": " + e.getMessage());
-            return Response.status(e.getHttpStatus())
-                    .entity(new JSONObject().put("error", e.getMessage()).toString())
-                    .build();
+            return error(e.getHttpStatus(), e.getMessage());
         } catch (Exception e) {
-            LOG.warning("GraphQL proxy error: " + e.getMessage());
-            return Response.status(Response.Status.BAD_GATEWAY)
-                    .entity(new JSONObject().put("error", e.getMessage()).toString())
-                    .build();
+            return error(502, e.getMessage());
         }
     }
 }
