@@ -1,24 +1,28 @@
 package dev.fncm.service;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.json.JSONObject;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.util.Optional;
 import java.util.logging.Logger;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.json.JSONObject;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 /**
  * Two-step CP4BA token flow (mirrors get-oauth-token.java / get-token.sh):
@@ -195,7 +199,17 @@ public class AuthService {
 
     @SuppressWarnings("java:S4830")  // intentional trust-all when verification is disabled
     private HttpURLConnection openConnection(String urlStr) throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) new URL(urlStr).openConnection();
+        
+        URL connectionURL = null;
+        try {
+            connectionURL = new URI(urlStr).toURL();
+        }
+        catch (URISyntaxException use)
+        {
+            throw new IOException(use.getMessage());
+        }
+        //HttpURLConnection conn = (HttpURLConnection) new URL(urlStr).openConnection();
+        HttpURLConnection conn = (HttpURLConnection) connectionURL.openConnection();
         conn.setConnectTimeout(15_000);
         conn.setReadTimeout(30_000);
 
