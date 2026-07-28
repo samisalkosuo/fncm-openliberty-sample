@@ -1,8 +1,6 @@
 package dev.fncm.resource;
 
-import dev.fncm.auth.TokenCache;
 import dev.fncm.auth.TokenContext;
-import dev.fncm.service.javaapi.service.ConnectionTest;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -11,7 +9,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.json.JSONArray;
@@ -29,12 +26,8 @@ public class DocumentResource {
 
     private static final Logger LOGGER = Logger.getLogger(DocumentResource.class.getName());
 
-    /** Populated by BearerTokenFilter with the validated token and username. */
     @Inject
     TokenContext tokenContext;
-
-    @Inject
-    TokenCache tokenCache;
 
     /**
      * GET /api/documents

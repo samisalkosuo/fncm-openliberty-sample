@@ -193,7 +193,17 @@
           <div id="card2-container" style="margin-top:1rem;"></div>
           </div>
 
-        <!-- ── Card: Documents (REST) ── -->
+              <div class="card">
+            <h2>List Document Classes</h2>
+          <button id="card3-btn">Load</button>
+          <div id="card3-spinner" class="hidden" style="margin-top:.75rem;">
+            <span class="spinner"></span> Loading…
+          </div>
+          <div id="card3-container" style="margin-top:1rem;"></div>
+          </div>
+
+
+          <!-- ── Card: Documents (REST) ── -->
         <div class="card">
           <h2>Documents <small style="font-weight:400;color:#57606a;font-size:0.8rem;">(via REST)</small></h2>
           <button id="load-docs-btn">Load</button>
@@ -225,7 +235,8 @@ const CONFIG = {
   documentsUrl: '/api/documents',    // GET  – secured with appToken
   graphqlUrl:   '/api/graphql',       // proxied server-side – no CORS
   connectionTestUrl: '/api/connectiontest',
-  listfoldersUrl: '/api/listfolders'
+  listfoldersUrl: '/api/listfolders',
+  listdocumentclassesUrl: '/api/listdocumentclasses'
 };
 
 // ═══════════════════════════════════════════════════════════════════
@@ -430,6 +441,31 @@ document.getElementById('card2-btn').addEventListener('click', async () => {
   }
 });
 
+
+// ═══════════════════════════════════════════════════════════════════
+//  Card: List Document Classes (REST)
+// ═══════════════════════════════════════════════════════════════════
+document.getElementById('card3-btn').addEventListener('click', async () => {
+  const spinner   = document.getElementById('card3-spinner');
+  const container = document.getElementById('card3-container');
+  spinner.classList.remove('hidden');
+  container.innerHTML = '';
+
+  try {
+    const res = await fetch(CONFIG.listdocumentclassesUrl, {
+      headers: { 'Authorization': 'Bearer ' + session.appToken }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.text();
+
+      container.innerHTML = `<pre>${data}</pre>`;
+        
+  } catch (err) {
+    container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
+  } finally {
+    spinner.classList.add('hidden');
+  }
+});
 
 // ═══════════════════════════════════════════════════════════════════
 //  Card: <New card JS goes here>
