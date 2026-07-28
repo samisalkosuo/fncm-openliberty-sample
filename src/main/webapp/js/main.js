@@ -3,7 +3,7 @@ import { session }   from './session.js';
 import { enterApp, logout } from './router.js';
 import { API }       from './api.js';
 import { showAlert } from './util.js';
-import { mountAllCards } from './cards/registry.js';
+import { mountAllCards, runPostLoginCards } from './cards/registry.js';
 
 // ── Card imports (self-registering; order here = display order in the grid) ──
 import './cards/graphql.js';
@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json();
       session.save({ ...data, username });
       enterApp();
+      runPostLoginCards();
     } catch (err) {
       showAlert(alertEl, err.message);
     } finally {
@@ -64,5 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Restore session on page load ────────────────────────────────────
   if (session.load()) {
     enterApp();
+    runPostLoginCards();
   }
 });
