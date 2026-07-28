@@ -6,23 +6,27 @@ import com.filenet.api.core.ObjectStore;
 import com.filenet.api.query.SearchSQL;
 import com.filenet.api.query.SearchScope;
 
+import dev.fncm.model.FolderItem;
+import dev.fncm.model.FolderListResult;
 import dev.fncm.service.javaapi.FileNetOperation;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
  * Lists folders in the object store ordered by creation date descending.
- * Returns a plain-text summary (will be a typed record after R7).
+ * Returns a typed {@link FolderListResult} serialised to JSON by Liberty JSON-B.
  */
-public class ListFoldersOperation implements FileNetOperation<String> {
+public class ListFoldersOperation implements FileNetOperation<FolderListResult> {
 
     private static final Logger LOGGER = Logger.getLogger(ListFoldersOperation.class.getName());
 
     private static final int MAX_FOLDERS = 100;
 
     @Override
-    public String execute(ObjectStore os, String username) throws Exception {
+    public FolderListResult execute(ObjectStore os, String username) throws Exception {
         LOGGER.info("Listing folders in Object Store: " + os.get_DisplayName());
         LOGGER.info("(Showing first " + MAX_FOLDERS + " folders)");
 
@@ -36,30 +40,25 @@ public class ListFoldersOperation implements FileNetOperation<String> {
         SearchScope searchScope = new SearchScope(os);
         FolderSet folders = (FolderSet) searchScope.fetchObjects(searchSQL, null, null, true);
 
-        StringBuilder sb = new StringBuilder("Folders Found\n");
-        int count = 0;
+        List<FolderItem> items = new ArrayList<>();
         Iterator<?> it = folders.iterator();
 
         while (it.hasNext()) {
             Folder folder = (Folder) it.next();
-            count++;
-            sb.append("[").append(count).append("] Folder Information:\n")
-              .append("  Path: ").append(folder.get_PathName()).append('\n')
-              .append("  ID: ").append(folder.get_Id()).append('\n')
-              .append("  Created: ").append(folder.get_DateCreated()).append('\n')
-              .append("  Creator: ").append(folder.get_Creator()).append('\n');
-
-            LOGGER.info("[" + count + "] Path: " + folder.get_PathName());
+            items.add(new FolderItem(
+                    folder.get_PathName(),
+                    folder.get_Id().toString(),
+                    folder.get_DateCreated() != null ? folder.get_DateCreated().toString() : null,
+                    folder.get_Creator()));
+            LOGGER.info("[" + items.size() + "] Path: " + folder.get_PathName());
         }
 
-        sb.append("Total folders listed: ").append(count).append('\n');
-
-        LOGGER.info("Total folders listed: " + count);
-        if (count == 0) {
+        LOGGER.info("Total folders listed: " + items.size());
+        if (items.isEmpty()) {
             LOGGER.info("No folders found in the object store.");
         }
 
-        return sb.toString();
+        return new FolderListResult(items.size(), items);
     }
 }
 

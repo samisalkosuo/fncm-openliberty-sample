@@ -1,6 +1,7 @@
 package dev.fncm.resource;
 
 import dev.fncm.auth.TokenContext;
+import dev.fncm.model.FolderListResult;
 import dev.fncm.service.javaapi.FileNetService;
 import dev.fncm.service.javaapi.service.ListFoldersOperation;
 import jakarta.enterprise.context.RequestScoped;
@@ -32,7 +33,7 @@ public class ListFoldersResource {
     public Response listFolders() {
         LOGGER.info("listFolders enter");
         try {
-            String result = fileNetService.run(new ListFoldersOperation(), tokenContext);
+            FolderListResult result = fileNetService.run(new ListFoldersOperation(), tokenContext);
             return Response.ok(result).build();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);

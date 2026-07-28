@@ -2,20 +2,21 @@ package dev.fncm.service.javaapi.service;
 
 import com.filenet.api.core.ObjectStore;
 
+import dev.fncm.model.ConnectionTestResult;
 import dev.fncm.service.javaapi.FileNetOperation;
 
 import java.util.logging.Logger;
 
 /**
  * Tests connectivity by verifying that domain and object-store are reachable.
- * Returns a plain-text summary (will be a typed record after R7).
+ * Returns a typed {@link ConnectionTestResult} serialised to JSON by Liberty JSON-B.
  */
-public class ConnectionTestOperation implements FileNetOperation<String> {
+public class ConnectionTestOperation implements FileNetOperation<ConnectionTestResult> {
 
     private static final Logger LOGGER = Logger.getLogger(ConnectionTestOperation.class.getName());
 
     @Override
-    public String execute(ObjectStore os, String username) throws Exception {
+    public ConnectionTestResult execute(ObjectStore os, String username) throws Exception {
         String domain = os.get_Domain().get_Name();
         String storeName = os.get_DisplayName();
 
@@ -27,11 +28,9 @@ public class ConnectionTestOperation implements FileNetOperation<String> {
         LOGGER.info("Object Store: " + storeName);
         LOGGER.info("User: " + username);
         LOGGER.info("=================================================");
-        LOGGER.info("✓ FileNet connection test completed successfully!");
+        LOGGER.info("FileNet connection test completed successfully!");
 
-        return "Status: CONNECTED\nDomain: " + domain
-                + "\nObject Store: " + storeName
-                + "\nUser: " + username + "\n";
+        return new ConnectionTestResult("CONNECTED", domain, storeName, username);
     }
 }
 

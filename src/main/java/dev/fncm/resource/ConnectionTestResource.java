@@ -1,6 +1,7 @@
 package dev.fncm.resource;
 
 import dev.fncm.auth.TokenContext;
+import dev.fncm.model.ConnectionTestResult;
 import dev.fncm.service.javaapi.FileNetService;
 import dev.fncm.service.javaapi.service.ConnectionTestOperation;
 import jakarta.enterprise.context.RequestScoped;
@@ -32,7 +33,7 @@ public class ConnectionTestResource {
     public Response connectionTest() {
         LOGGER.info("connectionTest enter");
         try {
-            String result = fileNetService.run(new ConnectionTestOperation(), tokenContext);
+            ConnectionTestResult result = fileNetService.run(new ConnectionTestOperation(), tokenContext);
             return Response.ok(result).build();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
