@@ -1,4 +1,5 @@
 // main.js — bootstraps the app and mounts all registered cards
+import './components/app-header.js';
 import { session }   from './session.js';
 import { enterApp, logout } from './router.js';
 import { API }       from './api.js';
