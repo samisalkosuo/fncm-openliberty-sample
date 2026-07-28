@@ -1,0 +1,21 @@
+/* ── card.css — card shell appearance ────────────────────────────────────────
+   Only the visual surface of cards lives here: background, border, padding.
+   Card sizing (grid spans) is in layout.css.
+   Card content/components (buttons, tables, etc.) are in components.css.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--color-surface);
+  border: var(--border);
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
+}
+
+.card h2 {
+  font-size: 1rem;
+  margin-bottom: var(--space-lg);
+}
+
+/* ── Structural helpers used inside cards ── */
+.card-result  { margin-top: var(--space-lg); }
+.spinner-row  { margin-top: var(--space-md); }

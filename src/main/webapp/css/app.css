@@ -1,105 +1,18 @@
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── app.css — entry point ───────────────────────────────────────────────────
+   Single file referenced by index.html. Imports all layers in order.
 
-body {
-  font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
-  font-size: 15px;
-  line-height: 1.6;
-  background: #f7f8fa;
-  color: #1f2328;
-}
+   Layer responsibilities:
+     tokens.css     — CSS custom properties (colours, spacing, radii, etc.)
+                      Edit this to change look & feel without touching anything else.
+     layout.css     — Page skeleton, card grid, and card size modifiers (data-size).
+                      Edit this to change page structure or grid behaviour.
+     card.css       — Card shell appearance (background, border, padding).
+                      Edit this to restyle cards without affecting layout or components.
+     components.css — Forms, buttons, alerts, tables, spinner.
+                      Edit this to restyle individual UI components.
+   ─────────────────────────────────────────────────────────────────────────── */
 
-/* ── Layout ── */
-#app { min-height: 100vh; display: flex; flex-direction: column; }
-
-header {
-  background: #fff;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 0 1.5rem;
-  height: 52px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-header h1 { font-size: 1rem; font-weight: 600; }
-header #user-info { font-size: 0.85rem; color: #57606a; }
-
-main { flex: 1; max-width: 1200px; width: 100%; margin: 2rem auto; padding: 0 1rem; }
-
-/* ── Views ── */
-.view { display: none; }
-.view.active { display: block; }
-
-/* ── Card grid – 3 columns, wraps automatically ── */
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-  align-items: start;
-}
-
-/* ── Cards ── */
-.card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  padding: 1.5rem;
-}
-.card h2 { font-size: 1rem; margin-bottom: 1rem; }
-
-/* ── Forms ── */
-.form-group { margin-bottom: 1rem; }
-label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: .3rem; }
-input[type=text], input[type=password] {
-  width: 100%;
-  padding: .45rem .65rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 4px;
-  font-size: 0.95rem;
-}
-input:focus { outline: 2px solid #3b82d4; border-color: transparent; }
-
-button {
-  padding: .45rem 1.1rem;
-  background: #3b82d4;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-button:hover { background: #2563ab; }
-button.secondary { background: #fff; color: #3b82d4; border: 1px solid #3b82d4; }
-button.secondary:hover { background: #f0f6ff; }
-
-/* ── Notifications ── */
-.alert {
-  padding: .6rem 1rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
-}
-.alert-error   { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
-.alert-success { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
-.hidden { display: none !important; }
-
-/* ── Table ── */
-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-th, td { text-align: left; padding: .5rem .75rem; border-bottom: 1px solid #e5e7eb; }
-th { font-weight: 600; background: #f7f8fa; }
-tr:last-child td { border-bottom: none; }
-
-/* ── Spinner ── */
-.spinner {
-  display: inline-block;
-  width: 16px; height: 16px;
-  border: 2px solid #e5e7eb;
-  border-top-color: #3b82d4;
-  border-radius: 50%;
-  animation: spin .7s linear infinite;
-  vertical-align: middle;
-  margin-right: .4rem;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-#logout-btn { background: none; color: #57606a; border: none; font-size: 0.85rem; cursor: pointer; }
-#logout-btn:hover { color: #1f2328; }
+@import url("tokens.css");
+@import url("layout.css");
+@import url("card.css");
+@import url("components.css");
