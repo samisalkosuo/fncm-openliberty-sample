@@ -2,6 +2,7 @@
 import { apiFetch, API } from '../api.js';
 import { esc, renderJson } from '../util.js';
 import { registerCard } from './registry.js';
+import { publish,TOPICS } from '../eventBus.js';
 
 registerCard({
   id: 'list-folders',
@@ -26,7 +27,22 @@ registerCard({
         const res = await apiFetch(API.listFolders);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        renderJson(container, data);
+        const folders = data.folders;
+
+        folders.forEach(folder => {
+          const a = document.createElement('a');
+          a.href = '#';
+          a.textContent = folder.path;
+          a.addEventListener('click', e => {
+            e.preventDefault();
+            publish(TOPICS.FOLDER_SELECTED, folder);
+          });
+          container.appendChild(a);
+          container.appendChild(document.createElement('br'));
+        });
+
+        //renderJson(container, folders);
+
       } catch (err) {
         container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
       } finally {

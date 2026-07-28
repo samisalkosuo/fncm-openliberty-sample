@@ -13,6 +13,16 @@
 import { apiFetch, API } from '../api.js';
 import { esc, renderJson, renderWithToggle } from '../util.js';
 import { registerCard } from './registry.js';
+// Event bus — uncomment the functions you need:
+// import { publish, subscribe, unsubscribe, TOPICS } from '../eventBus.js';
+//
+// Publishing example (emit an event when something happens):
+//   publish(TOPICS.DOCUMENT_SELECTED, { id, name, className });
+//
+// Subscribing example (react when another card emits an event):
+//   subscribe(TOPICS.DOCUMENT_SELECTED, ({ id, name }) => { ... });
+//
+// Add new topic names to TOPICS in eventBus.js before using them here.
 
 registerCard({
   id: 'my-feature',
@@ -27,6 +37,9 @@ registerCard({
       <div id="my-feature-result" class="card-result"></div>
     </div>`,
   init() {
+    // To receive events from other cards, subscribe here:
+    // subscribe(TOPICS.DOCUMENT_SELECTED, (payload) => { ... });
+
     document.getElementById('my-feature-btn').addEventListener('click', async () => {
       const spinner   = document.getElementById('my-feature-spinner');
       const container = document.getElementById('my-feature-result');

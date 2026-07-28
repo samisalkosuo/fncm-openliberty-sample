@@ -9,6 +9,7 @@ export const API = {
   listDocumentClasses:  '/api/listdocumentclasses',
   userGroups:           '/api/getusergroups',
   documents:            '/api/documents',
+  listDocumentsInFolder: '/api/listdocumentsinfolder',
 };
 
 export async function apiFetch(url, options = {}) {

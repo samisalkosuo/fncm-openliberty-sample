@@ -16,8 +16,11 @@ RUN mvn install:install-file -Dfile=lib/Jace.jar \
         -DgroupId=com.ibm.filenet -DartifactId=p8cel10n \
         -Dversion=5.5 -Dpackaging=jar -q
 
+#download from Maven before adding our source
+RUN mvn package
+
 COPY src ./src
-RUN mvn package -DskipTests -q
+RUN mvn package -DskipTests
 
 # ─── Stage 2: Runtime ────────────────────────────────────────────────────────
 FROM icr.io/appcafe/open-liberty:full-java21-openj9-ubi-minimal AS runtime
