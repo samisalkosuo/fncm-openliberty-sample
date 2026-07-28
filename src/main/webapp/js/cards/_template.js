@@ -11,7 +11,7 @@
 //   2. Replace every "my-feature" occurrence with your slug
 //   3. Add one import line to main.js — that's it. index.html is not touched.
 import { apiFetch, API } from '../api.js';
-import { esc } from '../util.js';
+import { esc, renderJson, renderWithToggle } from '../util.js';
 import { registerCard } from './registry.js';
 
 registerCard({
@@ -37,9 +37,13 @@ registerCard({
         // 1. call endpoint
         const res = await apiFetch(API.myEndpoint);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        // 2. render result
-        const data = await res.text();
-        container.innerHTML = `<pre>${esc(data)}</pre>`;
+        // 2. render result as expandable JSON tree
+        const data = await res.json();
+        renderJson(container, data);
+        // — or, if you have a custom table/visualization —
+        // renderWithToggle(container, data, (el, d) => {
+        //   el.innerHTML = `<p>${esc(d.someField)}</p>`;
+        // });
       } catch (err) {
         container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
       } finally {

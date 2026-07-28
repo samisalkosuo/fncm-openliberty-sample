@@ -1,6 +1,6 @@
 // cards/documents.js — Documents (REST) card
 import { apiFetch, API } from '../api.js';
-import { esc } from '../util.js';
+import { esc, renderWithToggle } from '../util.js';
 import { registerCard } from './registry.js';
 
 registerCard({
@@ -26,15 +26,19 @@ registerCard({
         const res = await apiFetch(API.documents);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        const docs  = data.documents ?? [];
 
-        if (docs.length === 0) {
-          container.innerHTML = '<p class="text-muted">No documents found.</p>';
-        } else {
-          const rows = docs.map(d => `<tr><td>${esc(d.id)}</td><td>${esc(d.name)}</td></tr>`).join('');
-          container.innerHTML =
-            `<table><thead><tr><th>ID</th><th>Name</th></tr></thead><tbody>${rows}</tbody></table>`;
-        }
+        renderWithToggle(container, data, (el, d) => {
+          const docs = d.documents ?? [];
+          if (docs.length === 0) {
+            el.innerHTML = '<p class="text-muted">No documents found.</p>';
+          } else {
+            const rows = docs.map(doc =>
+              `<tr><td>${esc(doc.id)}</td><td>${esc(doc.name)}</td></tr>`
+            ).join('');
+            el.innerHTML =
+              `<table><thead><tr><th>ID</th><th>Name</th></tr></thead><tbody>${rows}</tbody></table>`;
+          }
+        });
       } catch (err) {
         container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
       } finally {

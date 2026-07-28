@@ -1,6 +1,6 @@
 // cards/connectionTest.js — Connection Test card
 import { apiFetch, API } from '../api.js';
-import { esc } from '../util.js';
+import { esc, renderJson } from '../util.js';
 import { registerCard } from './registry.js';
 
 registerCard({
@@ -16,6 +16,11 @@ registerCard({
       <div id="connection-test-result" class="card-result"></div>
     </div>`,
   init() {
+
+    const run = async () => {
+
+    };
+
     document.getElementById('connection-test-btn').addEventListener('click', async () => {
       const spinner   = document.getElementById('connection-test-spinner');
       const container = document.getElementById('connection-test-result');
@@ -25,8 +30,9 @@ registerCard({
       try {
         const res = await apiFetch(API.connectionTest);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.text();
-        container.innerHTML = `<pre>${data}</pre>`;
+        const data = await res.json();
+        //renderJson(container, data);
+        container.innerHTML = `<b>${esc(data.domain)}</b>`;
       } catch (err) {
         container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
       } finally {

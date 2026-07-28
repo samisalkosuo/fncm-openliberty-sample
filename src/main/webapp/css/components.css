@@ -81,3 +81,57 @@ tr:last-child td { border-bottom: none; }
   margin-right: .4rem;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── JSON tree ── */
+.json-tree {
+  font-family: monospace;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  overflow: auto;
+  background: var(--color-bg);
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+  margin-top: var(--space-sm);
+}
+
+.json-tree details { margin-left: 1rem; }
+.json-tree details:first-child { margin-left: 0; }
+
+.json-summary {
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  color: var(--color-text-muted);
+}
+.json-summary::before        { content: '▸ '; font-size: 0.75rem; }
+details[open] > .json-summary::before { content: '▾ '; }
+.json-summary::-webkit-details-marker { display: none; }
+
+.json-row { padding-left: 1.2rem; }
+
+.json-key      { color: var(--color-primary); }
+.json-val      { }
+.json-string   { color: var(--color-success-text); }
+.json-number   { color: #b45309; }
+.json-boolean  { color: #7c3aed; }
+.json-null     { color: var(--color-text-muted); font-style: italic; }
+
+/* ── View-toggle bar (JSON tree / custom view switch) ── */
+.view-toggle {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+  margin-bottom: var(--space-sm);
+}
+
+.view-toggle button {
+  padding: .25rem .75rem;
+  font-size: 0.8rem;
+}
+
+.view-toggle button.active {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
