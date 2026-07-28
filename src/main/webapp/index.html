@@ -49,77 +49,81 @@
       <div class="card-grid">
 
         <!-- ── Card: GraphQL Query ── -->
-        <div class="card">
+        <div class="card" id="card-graphql">
           <h2>GraphQL Query</h2>
           <div class="form-group">
-            <label for="gql-query">Query</label>
-            <textarea id="gql-query" rows="4"
+            <label for="graphql-query">Query</label>
+            <textarea id="graphql-query" rows="4"
                       style="width:100%;font-family:monospace;font-size:0.85rem;
                              padding:.45rem;border:1px solid #e5e7eb;border-radius:4px;">
 { domain { objectStores { objectStores { symbolicName } }} }
             </textarea>
           </div>
-          <button id="gql-run-btn">Run</button>
-          <pre id="gql-result"
+          <button id="graphql-run-btn">Run</button>
+          <pre id="graphql-result"
                style="margin-top:1rem;background:#f7f8fa;padding:.75rem;
                       border:1px solid #e5e7eb;border-radius:4px;
                       font-size:0.82rem;overflow:auto;min-height:3rem;"></pre>
         </div>
 
         <!-- ── Card: Connection Test ── -->
-        <div class="card">
+        <div class="card" id="card-connection-test">
           <h2>Connection Test</h2>
-          <button id="card1-btn">Load</button>
-          <div id="card1-spinner" class="hidden" style="margin-top:.75rem;">
+          <button id="connection-test-btn">Load</button>
+          <div id="connection-test-spinner" class="hidden" style="margin-top:.75rem;">
             <span class="spinner"></span> Loading…
           </div>
-          <div id="card1-container" style="margin-top:1rem;"></div>
+          <div id="connection-test-result" style="margin-top:1rem;"></div>
         </div>
 
         <!-- ── Card: List Folders ── -->
-        <div class="card">
+        <div class="card" id="card-list-folders">
           <h2>List Folders</h2>
-          <button id="card2-btn">Load</button>
-          <div id="card2-spinner" class="hidden" style="margin-top:.75rem;">
+          <button id="list-folders-btn">Load</button>
+          <div id="list-folders-spinner" class="hidden" style="margin-top:.75rem;">
             <span class="spinner"></span> Loading…
           </div>
-          <div id="card2-container" style="margin-top:1rem;"></div>
+          <div id="list-folders-result" style="margin-top:1rem;"></div>
         </div>
 
         <!-- ── Card: List Document Classes ── -->
-        <div class="card">
+        <div class="card" id="card-list-document-classes">
           <h2>List Document Classes</h2>
-          <button id="card3-btn">Load</button>
-          <div id="card3-spinner" class="hidden" style="margin-top:.75rem;">
+          <button id="list-document-classes-btn">Load</button>
+          <div id="list-document-classes-spinner" class="hidden" style="margin-top:.75rem;">
             <span class="spinner"></span> Loading…
           </div>
-          <div id="card3-container" style="margin-top:1rem;"></div>
+          <div id="list-document-classes-result" style="margin-top:1rem;"></div>
         </div>
 
         <!-- ── Card: User Groups ── -->
-        <div class="card">
+        <div class="card" id="card-user-groups">
           <h2>User Groups</h2>
-          <button id="card4-btn">Load</button>
-          <div id="card4-spinner" class="hidden" style="margin-top:.75rem;">
+          <button id="user-groups-btn">Load</button>
+          <div id="user-groups-spinner" class="hidden" style="margin-top:.75rem;">
             <span class="spinner"></span> Loading…
           </div>
-          <div id="card4-container" style="margin-top:1rem;"></div>
+          <div id="user-groups-result" style="margin-top:1rem;"></div>
         </div>
 
         <!-- ── Card: Documents (REST) ── -->
-        <div class="card">
+        <div class="card" id="card-documents">
           <h2>Documents <small style="font-weight:400;color:#57606a;font-size:0.8rem;">(via REST)</small></h2>
-          <button id="load-docs-btn">Load</button>
-          <div id="docs-spinner" class="hidden" style="margin-top:.75rem;">
+          <button id="documents-btn">Load</button>
+          <div id="documents-spinner" class="hidden" style="margin-top:.75rem;">
             <span class="spinner"></span> Loading…
           </div>
-          <div id="docs-container" style="margin-top:1rem;"></div>
+          <div id="documents-result" style="margin-top:1rem;"></div>
         </div>
 
         <!-- ── Card: <New card here> ──
-          <div class="card">
+          <div class="card" id="card-my-feature">
             <h2>My New Section</h2>
-            ...content...
+            <button id="my-feature-btn">Load</button>
+            <div id="my-feature-spinner" class="hidden" style="margin-top:.75rem;">
+              <span class="spinner"></span> Loading…
+            </div>
+            <div id="my-feature-result" style="margin-top:1rem;"></div>
           </div>
         ── -->
 

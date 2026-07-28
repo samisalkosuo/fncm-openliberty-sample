@@ -3,9 +3,9 @@ import { apiFetch, API } from '../api.js';
 import { esc } from '../util.js';
 
 export function init() {
-  document.getElementById('load-docs-btn').addEventListener('click', async () => {
-    const spinner   = document.getElementById('docs-spinner');
-    const container = document.getElementById('docs-container');
+  document.getElementById('documents-btn').addEventListener('click', async () => {
+    const spinner   = document.getElementById('documents-spinner');
+    const container = document.getElementById('documents-result');
     spinner.classList.remove('hidden');
     container.innerHTML = '';
 

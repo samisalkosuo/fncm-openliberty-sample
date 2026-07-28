@@ -3,9 +3,9 @@ import { apiFetch, API } from '../api.js';
 import { esc } from '../util.js';
 
 export function init() {
-  document.getElementById('card4-btn').addEventListener('click', async () => {
-    const spinner   = document.getElementById('card4-spinner');
-    const container = document.getElementById('card4-container');
+  document.getElementById('user-groups-btn').addEventListener('click', async () => {
+    const spinner   = document.getElementById('user-groups-spinner');
+    const container = document.getElementById('user-groups-result');
     spinner.classList.remove('hidden');
     container.innerHTML = '';
 

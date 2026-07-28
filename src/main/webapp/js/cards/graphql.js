@@ -2,9 +2,9 @@
 import { apiFetch, API } from '../api.js';
 
 export function init() {
-  document.getElementById('gql-run-btn').addEventListener('click', async () => {
-    const query  = document.getElementById('gql-query').value.trim();
-    const result = document.getElementById('gql-result');
+  document.getElementById('graphql-run-btn').addEventListener('click', async () => {
+    const query  = document.getElementById('graphql-query').value.trim();
+    const result = document.getElementById('graphql-result');
     result.textContent = 'Running…';
 
     try {
