@@ -1,6 +1,7 @@
 package dev.fncm.resource;
 
 import dev.fncm.service.GraphQLClient;
+import dev.fncm.service.GraphQLService;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -24,7 +25,8 @@ import jakarta.ws.rs.core.Response;
  *   {"query":"…","variables":{…}}           – query + variables
  *   {"query":"…","operationName":"…",...}   – full envelope
  *
- * GraphQL execution (XSRF token, headers, TLS) is handled by {@link GraphQLClient}.
+ * Typed server-side queries use {@link GraphQLService#execute(dev.fncm.service.GraphQLOperation, String)}.
+ * This endpoint forwards the raw browser-supplied envelope via {@link GraphQLService#executeRaw}.
  */
 @Path("/graphql")
 @RequestScoped
@@ -33,7 +35,7 @@ import jakarta.ws.rs.core.Response;
 public class GraphQLProxyResource extends BaseResource {
 
     @Inject
-    GraphQLClient graphQLClient;
+    GraphQLService graphQLService;
 
     /**
      * POST /api/graphql
@@ -48,7 +50,7 @@ public class GraphQLProxyResource extends BaseResource {
         }
 
         try {
-            String responseBody = graphQLClient.executeJson(body, tokenContext.getZenToken());
+            String responseBody = graphQLService.executeRaw(body, tokenContext.getZenToken());
             return Response.ok(responseBody).build();
         } catch (GraphQLClient.GraphQLException e) {
             return error(e.getHttpStatus(), e.getMessage());

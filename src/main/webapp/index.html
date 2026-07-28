@@ -193,7 +193,7 @@
           <div id="card2-container" style="margin-top:1rem;"></div>
           </div>
 
-              <div class="card">
+            <div class="card">
             <h2>List Document Classes</h2>
           <button id="card3-btn">Load</button>
           <div id="card3-spinner" class="hidden" style="margin-top:.75rem;">
@@ -202,6 +202,14 @@
           <div id="card3-container" style="margin-top:1rem;"></div>
           </div>
 
+            <div class="card">
+            <h2>User Groups</h2>
+          <button id="card4-btn">Load</button>
+          <div id="card4-spinner" class="hidden" style="margin-top:.75rem;">
+            <span class="spinner"></span> Loading…
+          </div>
+          <div id="card4-container" style="margin-top:1rem;"></div>
+          </div>
 
           <!-- ── Card: Documents (REST) ── -->
         <div class="card">
@@ -236,7 +244,9 @@ const CONFIG = {
   graphqlUrl:   '/api/graphql',       // proxied server-side – no CORS
   connectionTestUrl: '/api/connectiontest',
   listfoldersUrl: '/api/listfolders',
-  listdocumentclassesUrl: '/api/listdocumentclasses'
+  listdocumentclassesUrl: '/api/listdocumentclasses',
+  getusergroupsUrl: '/api/getusergroups'
+  
 };
 
 // ═══════════════════════════════════════════════════════════════════
@@ -453,6 +463,31 @@ document.getElementById('card3-btn').addEventListener('click', async () => {
 
   try {
     const res = await fetch(CONFIG.listdocumentclassesUrl, {
+      headers: { 'Authorization': 'Bearer ' + session.appToken }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.text();
+
+      container.innerHTML = `<pre>${data}</pre>`;
+        
+  } catch (err) {
+    container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
+  } finally {
+    spinner.classList.add('hidden');
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════
+//  Card: Get User Groups (REST)
+// ═══════════════════════════════════════════════════════════════════
+document.getElementById('card4-btn').addEventListener('click', async () => {
+  const spinner   = document.getElementById('card4-spinner');
+  const container = document.getElementById('card4-container');
+  spinner.classList.remove('hidden');
+  container.innerHTML = '';
+
+  try {
+    const res = await fetch(CONFIG.getusergroupsUrl, {
       headers: { 'Authorization': 'Bearer ' + session.appToken }
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
