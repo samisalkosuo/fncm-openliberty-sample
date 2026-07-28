@@ -1,18 +1,24 @@
-// main.js — imports + wires all cards on DOMContentLoaded
-import { session }  from './session.js';
+// main.js — bootstraps the app and mounts all registered cards
+import { session }   from './session.js';
 import { enterApp, logout } from './router.js';
-import { API }      from './api.js';
+import { API }       from './api.js';
 import { showAlert } from './util.js';
+import { mountAllCards } from './cards/registry.js';
 
-import { init as initGraphQL }             from './cards/graphql.js';
-import { init as initConnectionTest }      from './cards/connectionTest.js';
-import { init as initListFolders }         from './cards/listFolders.js';
-import { init as initListDocumentClasses } from './cards/listDocumentClasses.js';
-import { init as initUserGroups }          from './cards/userGroups.js';
-import { init as initDocuments }           from './cards/documents.js';
+// ── Card imports (self-registering; order here = display order in the grid) ──
+import './cards/graphql.js';
+import './cards/connectionTest.js';
+import './cards/listFolders.js';
+import './cards/listDocumentClasses.js';
+import './cards/userGroups.js';
+import './cards/documents.js';
+// To add a new card: create js/cards/myFeature.js and add one import line above.
 
 document.addEventListener('DOMContentLoaded', () => {
-  // ── Login ──────────────────────────────────────────────────────────
+  // ── Mount cards into the grid ───────────────────────────────────────
+  mountAllCards(document.querySelector('.card-grid'));
+
+  // ── Login ───────────────────────────────────────────────────────────
   document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const username  = document.getElementById('username').value.trim();
@@ -52,18 +58,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // ── Logout ─────────────────────────────────────────────────────────
+  // ── Logout ──────────────────────────────────────────────────────────
   document.getElementById('logout-btn').addEventListener('click', logout);
 
-  // ── Card init ──────────────────────────────────────────────────────
-  initGraphQL();
-  initConnectionTest();
-  initListFolders();
-  initListDocumentClasses();
-  initUserGroups();
-  initDocuments();
-
-  // ── Restore session on page load ───────────────────────────────────
+  // ── Restore session on page load ────────────────────────────────────
   if (session.load()) {
     enterApp();
   }
