@@ -1,6 +1,5 @@
 package dev.fncm.service.javaapi.service.buildinginspectiondocs;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.filenet.api.core.ObjectStore;
@@ -15,12 +14,11 @@ public class DeleteBuildingInspectionDocsOperation implements FileNetOperation<L
         
         DeleteBuildingInspectionTypes deleteTypes = new DeleteBuildingInspectionTypes();
         deleteTypes.execute(os);
-        BuildingInspectionDocsResult typesDeletedResult = new BuildingInspectionDocsResult("Types deleted",true);
+
+        BuildingInspectionDocsResultBuilder results = new BuildingInspectionDocsResultBuilder();
+        results.add("Documents and types deleted",true);
         
-        List<BuildingInspectionDocsResult> results = new ArrayList<BuildingInspectionDocsResult>();
-        results.add(typesDeletedResult);
-        
-        return results;
+        return results.get();
     }
 }
 

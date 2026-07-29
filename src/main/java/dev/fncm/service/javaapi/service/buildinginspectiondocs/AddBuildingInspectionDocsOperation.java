@@ -14,13 +14,17 @@ public class AddBuildingInspectionDocsOperation implements FileNetOperation<List
     public List<BuildingInspectionDocsResult> execute(ObjectStore os, String username) throws Exception {
         
         CreateBuildingInspectionTypes typeCreator = new CreateBuildingInspectionTypes();
-        typeCreator.execute(os);;
-        BuildingInspectionDocsResult typesCreatedResult = new BuildingInspectionDocsResult("Types created",true);
+        typeCreator.execute(os);
+
+        BuildingInspectionDocsResultBuilder results = new BuildingInspectionDocsResultBuilder();
+        results.add("Types created",true);
         
-        List<BuildingInspectionDocsResult> results = new ArrayList<BuildingInspectionDocsResult>();
-        results.add(typesCreatedResult);
-        
-        return results;
+
+        UploadBuildingInspectionDocs uploadDocs = new UploadBuildingInspectionDocs();
+        uploadDocs.execute(os);
+        results.add("Docs uploaded",true);
+
+        return results.get();
     }
 }
 
