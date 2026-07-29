@@ -22,11 +22,11 @@
 //
 // Naming convention:
 //   Key   : SCREAMING_SNAKE_CASE   (e.g. DOCUMENT_SELECTED)
-//   Value : 'fncmopenlibertystarter:<noun>:<verb>'   (e.g. 'fncmopenlibertystarter:document:selected')
+//   Value : 'fncmopenlibertysample:<noun>:<verb>'   (e.g. 'fncmopenlibertysample:document:selected')
 
 export const TOPICS = {
-  DOCUMENT_SELECTED: 'fncmopenlibertystarter:document:selected',
-  FOLDER_SELECTED: 'fncmopenlibertystarter:folder:selected'
+  DOCUMENT_SELECTED: 'fncmopenlibertysample:document:selected',
+  FOLDER_SELECTED: 'fncmopenlibertysample:folder:selected'
 };
 
 // ── Internal state ───────────────────────────────────────────────────────────
