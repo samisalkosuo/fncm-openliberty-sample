@@ -8,7 +8,7 @@ registerCard({
   html: () => `
     <div class="card" id="card-addbuildinginspectiondocs">
       <h2>Building Inspection Documents</h2>
-      <p>Add or delete Building Inspection document classes and add documents.</p>
+      <p>Add or delete Building Inspection document classes and documents.</p>
       <button id="addbuildinginspectiondocs-add-btn">Create</button>
       <button id="addbuildinginspectiondocs-delete-btn" class="button-delete">Delete</button>
       <div id="addbuildinginspectiondocs-spinner" class="hidden spinner-row">
