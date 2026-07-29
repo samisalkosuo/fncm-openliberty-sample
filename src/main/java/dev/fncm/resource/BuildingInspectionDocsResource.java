@@ -1,8 +1,8 @@
 package dev.fncm.resource;
 
 import dev.fncm.service.javaapi.FileNetService;
-import dev.fncm.service.javaapi.service.AddBuildingInspectionDocsOperation;
-import dev.fncm.service.javaapi.service.DeleteBuildingInspectionDocsOperation;
+import dev.fncm.service.javaapi.service.buildinginspectiondocs.AddBuildingInspectionDocsOperation;
+import dev.fncm.service.javaapi.service.buildinginspectiondocs.DeleteBuildingInspectionDocsOperation;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.DELETE;
