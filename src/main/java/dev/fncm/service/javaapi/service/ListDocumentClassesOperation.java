@@ -7,19 +7,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.filenet.api.collection.RepositoryRowSet;
-import com.filenet.api.property.Properties;
+import com.filenet.api.admin.ClassDefinition;
+import com.filenet.api.collection.ClassDefinitionSet;
+import com.filenet.api.core.Factory;
 import com.filenet.api.core.ObjectStore;
-import com.filenet.api.query.RepositoryRow;
-import com.filenet.api.query.SearchSQL;
-import com.filenet.api.query.SearchScope;
 
 import dev.fncm.model.DocumentClassItem;
 import dev.fncm.model.DocumentClassListResult;
 import dev.fncm.service.javaapi.FileNetOperation;
 
 /**
- * Lists document classes in the object store.
+ * Lists document classes in the object store by walking the class hierarchy
+ * via the Java API, starting from the built-in "Document" class.
  * Returns a typed {@link DocumentClassListResult} serialised to JSON by Liberty JSON-B.
  */
 public class ListDocumentClassesOperation implements FileNetOperation<DocumentClassListResult> {
@@ -29,41 +28,11 @@ public class ListDocumentClassesOperation implements FileNetOperation<DocumentCl
     @Override
     public DocumentClassListResult execute(ObjectStore os, String username) throws Exception {
 
-        String sqlQuery = "SELECT SymbolicName, DisplayName, DescriptiveText " +
-                "FROM ClassDefinition " +
-                "WHERE IsHidden = FALSE " +
-                "ORDER BY SymbolicName";
+        ClassDefinition documentClass = Factory.ClassDefinition.fetchInstance(os, "Document", null);
+        LOGGER.info("Walking subclass hierarchy of: " + documentClass.get_SymbolicName());
 
-        LOGGER.info("Executing query: " + sqlQuery);
-
-        SearchSQL searchSQL = new SearchSQL(sqlQuery);
-        SearchScope searchScope = new SearchScope(os);
-        RepositoryRowSet rowSet = searchScope.fetchRows(searchSQL, null, null, true);
-
-        List<ClassInfo> allClasses = new ArrayList<>();
-        Iterator<?> iterator = rowSet.iterator();
-
-        while (iterator.hasNext()) {
-            RepositoryRow row = (RepositoryRow) iterator.next();
-            Properties props = row.getProperties();
-
-            String symbolicName = props.getStringValue("SymbolicName");
-            String type = isCustomClass(symbolicName) ? "CUSTOM" : "SYSTEM";
-
-            allClasses.add(new ClassInfo(
-                    symbolicName,
-                    props.getStringValue("DisplayName"),
-                    props.getStringValue("DescriptiveText"),
-                    type));
-        }
-
-        // Keep only classes that are queryable as a document table
         List<ClassInfo> documentClasses = new ArrayList<>();
-        for (ClassInfo ci : allClasses) {
-            if (isDocumentClass(ci.symbolicName, os)) {
-                documentClasses.add(ci);
-            }
-        }
+        collectSubclasses(documentClass, documentClasses);
 
         Collections.sort(documentClasses, Comparator.comparing(c -> c.symbolicName));
 
@@ -78,16 +47,50 @@ public class ListDocumentClassesOperation implements FileNetOperation<DocumentCl
     }
 
     /**
-     * Returns true if the class is queryable as a Document table.
+     * Recursively collects all non-hidden subclasses of the given class definition.
      */
-    private boolean isDocumentClass(String symbolicName, ObjectStore os) {
-        try {
-            String testQuery = "SELECT TOP 1 Id FROM " + symbolicName;
-            new SearchScope(os).fetchRows(new SearchSQL(testQuery), null, null, false);
-            return true;
-        } catch (Exception e) {
-            return false;
+    private void collectSubclasses(ClassDefinition classDef, List<ClassInfo> result) {
+        ClassDefinitionSet subclasses = classDef.get_ImmediateSubclassDefinitions();
+        if (subclasses == null) {
+            return;
         }
+
+        Iterator<?> it = subclasses.iterator();
+        while (it.hasNext()) {
+            ClassDefinition sub = (ClassDefinition) it.next();
+
+            Boolean isHidden = sub.get_IsHidden();
+            if (Boolean.TRUE.equals(isHidden)) {
+                collectSubclasses(sub, result);
+                continue;
+            }
+
+            String symbolicName = sub.get_SymbolicName();
+            String displayName = getLocalizedString(sub.get_DisplayNames());
+            String description = getLocalizedString(sub.get_DescriptiveTexts());
+            String type = isCustomClass(symbolicName) ? "CUSTOM" : "SYSTEM";
+
+            result.add(new ClassInfo(symbolicName, displayName, description, type));
+
+            collectSubclasses(sub, result);
+        }
+    }
+
+    /**
+     * Returns the first localized text from a collection, or an empty string if none.
+     */
+    private String getLocalizedString(com.filenet.api.collection.LocalizedStringList list) {
+        if (list == null) {
+            return "";
+        }
+        Iterator<?> it = list.iterator();
+        if (it.hasNext()) {
+            com.filenet.api.admin.LocalizedString ls =
+                    (com.filenet.api.admin.LocalizedString) it.next();
+            String text = ls.get_LocalizedText();
+            return text != null ? text : "";
+        }
+        return "";
     }
 
     /**
