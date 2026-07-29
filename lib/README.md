@@ -1,6 +1,6 @@
 # FileNet JARs
 
-Download the JARs from the ACCE Client API download page and place them in this directory:
+Download the JARs from the FileNet Admin Console (ACCE) Client API download page and place them in this directory:
 
 - `Jace.jar`
 - `p8cel10n.jar`
