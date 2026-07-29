@@ -2,6 +2,7 @@ lib/*.jar
 samples/
 TODO.md
 config*.env
+.vscode/
 
 target/
 pom.xml.tag
