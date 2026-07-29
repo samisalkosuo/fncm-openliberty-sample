@@ -10,7 +10,7 @@ export const API = {
   userGroups:           '/api/getusergroups',
   documents:            '/api/documents',
   listDocumentsInFolder: '/api/listdocumentsinfolder',
-  addBuildingInspectionDocs: '/api/addbuildinginspectiondocs',
+  addBuildingInspectionDocs: '/api/buildinginspectiondocs',
 };
 
 export async function apiFetch(url, options = {}) {

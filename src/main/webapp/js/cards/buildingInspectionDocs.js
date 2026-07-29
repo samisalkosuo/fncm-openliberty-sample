@@ -7,8 +7,8 @@ registerCard({
   size: 'normal',   // 'normal' | 'wide' | 'tall' | 'large' | 'full'
   html: () => `
     <div class="card" id="card-addbuildinginspectiondocs">
-      <h2>Add Building Inspection Documents</h2>
-      <p>Create Building Inspection document classes and add documents to FileNet.</p>
+      <h2>Building Inspection Documents</h2>
+      <p>Add or delete Building Inspection document classes and add documents.</p>
       <button id="addbuildinginspectiondocs-add-btn">Create</button>
       <button id="addbuildinginspectiondocs-delete-btn" class="button-delete">Delete</button>
       <div id="addbuildinginspectiondocs-spinner" class="hidden spinner-row">
@@ -20,6 +20,7 @@ registerCard({
     // To receive events from other cards, subscribe here:
     // subscribe(TOPICS.DOCUMENT_SELECTED, (payload) => { ... });
 
+    //add button
     document.getElementById('addbuildinginspectiondocs-add-btn').addEventListener('click', async () => {
       const spinner   = document.getElementById('addbuildinginspectiondocs-spinner');
       const container = document.getElementById('addbuildinginspectiondocs-result');
@@ -28,7 +29,33 @@ registerCard({
 
       try {
         // 1. call endpoint
-        const res = await apiFetch(API.addBuildingInspectionDocs);
+        const res = await apiFetch(API.addBuildingInspectionDocs,{method:"POST"});
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        // 2. render result as expandable JSON tree
+        const data = await res.json();
+        renderJson(container, data);
+        // — or, if you have a custom table/visualization —
+        // renderWithToggle(container, data, (el, d) => {
+        //   el.innerHTML = `<p>${esc(d.someField)}</p>`;
+        // });
+      } catch (err) {
+        container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
+      } finally {
+        // 3. hide spinner
+        spinner.classList.add('hidden');
+      }
+    });
+
+    //delete button
+    document.getElementById('addbuildinginspectiondocs-delete-btn').addEventListener('click', async () => {
+      const spinner   = document.getElementById('addbuildinginspectiondocs-spinner');
+      const container = document.getElementById('addbuildinginspectiondocs-result');
+      spinner.classList.remove('hidden');
+      container.innerHTML = '';
+
+      try {
+        // 1. call endpoint
+        const res = await apiFetch(API.addBuildingInspectionDocs,{method: "DELETE"});
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         // 2. render result as expandable JSON tree
         const data = await res.json();

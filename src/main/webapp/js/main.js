@@ -9,7 +9,7 @@ import { mountAllCards, runPostLoginCards } from './cards/registry.js';
 // ── Card imports (self-registering; order here = display order in the grid) ──
 import './cards/graphql.js';
 import './cards/connectionTest.js';
-import './cards/addBuildingInspectionDocs.js';
+import './cards/buildingInspectionDocs.js';
 import './cards/listFolders.js';
 import './cards/listDocumentClasses.js';
 import './cards/userGroups.js';
