@@ -9,6 +9,7 @@ import { mountAllCards, runPostLoginCards } from './cards/registry.js';
 // ── Card imports (self-registering; order here = display order in the grid) ──
 import './cards/graphql.js';
 import './cards/connectionTest.js';
+import './cards/addBuildingInspectionDocs.js';
 import './cards/listFolders.js';
 import './cards/listDocumentClasses.js';
 import './cards/userGroups.js';
@@ -16,6 +17,7 @@ import './cards/documents.js';
 import './cards/listDocumentsInFolder.js';
 import './cards/folderDetails.js';
 import './cards/documentDetails.js';
+
 // To add a new card: create js/cards/myFeature.js and add one import line above.
 
 document.addEventListener('DOMContentLoaded', () => {

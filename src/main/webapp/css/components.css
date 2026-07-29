@@ -35,6 +35,17 @@ button {
 }
 button:hover { background: var(--color-primary-hover); }
 
+.button-delete {
+  padding: var(--btn-padding);
+  background: #ff0000;
+  color: #fff;
+  border: none;
+  border-radius: var(--btn-radius);
+  font-size: var(--btn-font-size);
+  cursor: pointer;
+}
+.button-delete:hover { background: #ff4444; }
+
 /* Inline link-style button — used in table cells for clickable values */
 button.link-btn {
   background: none;
