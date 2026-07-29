@@ -12,6 +12,7 @@ export const API = {
   listDocumentsInFolder: '/api/listdocumentsinfolder',
   addBuildingInspectionDocs: '/api/buildinginspectiondocs',
   fileBuildingInspectionDocs: '/api/filebuildinginspectiondocs',
+  deleteAllFolders: '/api/deleteallfolders',
   
 };
 

@@ -242,7 +242,7 @@ public class CreateFoldersAndFileBuildingInspectionReports {
                 doc.getObjectStore(), null);
         rcr.set_Head(doc);
         rcr.set_Tail(folder);
-        rcr.save(RefreshMode.NO_REFRESH);
+        rcr.save(RefreshMode.REFRESH);
     }
 
 }

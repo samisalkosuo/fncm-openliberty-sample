@@ -15,6 +15,7 @@ import './cards/documents.js';
 import './cards/listFolders.js';
 import './cards/listDocumentClasses.js';
 import './cards/userGroups.js';
+import './cards/deleteAllFolders.js';
 import './cards/listDocumentsInFolder.js';
 import './cards/folderDetails.js';
 import './cards/documentDetails.js';
