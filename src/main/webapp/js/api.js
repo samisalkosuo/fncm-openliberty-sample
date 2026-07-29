@@ -11,6 +11,8 @@ export const API = {
   documents:            '/api/documents',
   listDocumentsInFolder: '/api/listdocumentsinfolder',
   addBuildingInspectionDocs: '/api/buildinginspectiondocs',
+  fileBuildingInspectionDocs: '/api/filebuildinginspectiondocs',
+  
 };
 
 export async function apiFetch(url, options = {}) {
