@@ -25,6 +25,12 @@ public class ListDocumentClassesOperation implements FileNetOperation<DocumentCl
 
     private static final Logger LOGGER = Logger.getLogger(ListDocumentClassesOperation.class.getName());
 
+    private final boolean includeHidden;
+
+    public ListDocumentClassesOperation(boolean includeHidden) {
+        this.includeHidden = includeHidden;
+    }
+
     @Override
     public DocumentClassListResult execute(ObjectStore os, String username) throws Exception {
 
@@ -60,7 +66,7 @@ public class ListDocumentClassesOperation implements FileNetOperation<DocumentCl
             ClassDefinition sub = (ClassDefinition) it.next();
 
             Boolean isHidden = sub.get_IsHidden();
-            if (Boolean.TRUE.equals(isHidden)) {
+            if (Boolean.TRUE.equals(isHidden) && !includeHidden) {
                 collectSubclasses(sub, result);
                 continue;
             }
