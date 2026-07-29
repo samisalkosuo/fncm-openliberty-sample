@@ -1,0 +1,182 @@
+{
+  "model": "qwen2.5:3b",
+  "total_documents": 16,
+  "results": [
+    {
+      "file": "building_inspections\\building_inspections_deepseek_en-12df16309654dda31e58623d63ed540f.md",
+      "fields": {
+        "InspectionDate": "17.04.2025",
+        "BuildingAddress": "Säätöni 56, Kurikka",
+        "BuildingType": "Industrial",
+        "InspectorName": "Mika Lehto",
+        "ComplianceStatus": "Partially Compliant",
+        "Municipality": "Kurikka"
+      }
+    },
+    {
+      "file": "building_inspections\\building_inspections_deepseek_en-3b8ab365aa8752397d3f2a65e14d8a81.md",
+      "fields": {
+        "InspectionDate": "19.11.2024",
+        "BuildingAddress": "Industrial Workshop 123 A, Espoo",
+        "BuildingType": "Industrial",
+        "InspectorName": "Sanna Kivimäki",
+        "ComplianceStatus": "Partially Compliant",
+        "Municipality": "Espoo"
+      }
+    },
+    {
+      "file": "building_inspections\\building_inspections_deepseek_en-525a81dbdeaa3f62b85899946fdad50d.md",
+      "fields": {
+        "InspectionDate": "03.09.2024",
+        "BuildingAddress": "Ylöjärvi Cultural and Business Center, Ylöjärvi 5B",
+        "BuildingType": "Public",
+        "InspectorName": "Mika Salo",
+        "ComplianceStatus": "Partially Compliant",
+        "Municipality": "Ylöjärvi"
+      }
+    },
+    {
+      "file": "building_inspections\\building_inspections_deepseek_en-63a62583e65cc30e9a85e734a0f3bb43.md",
+      "fields": {
+        "InspectionDate": "23.07.2025",
+        "BuildingAddress": "Säiläpingi 45, Lapinlahti, FI-02600",
+        "BuildingType": "Residential",
+        "InspectorName": "Emma Rautio",
+        "ComplianceStatus": "Partially Compliant",
+        "Municipality": "Lapinlahti"
+      }
+    },
+    {
+      "file": "building_inspections\\building_inspections_granite_en-0559e61e45e33ff71375864062f41fa0.md",
+      "fields": {
+        "InspectionDate": "29.04.2025",
+        "BuildingAddress": "Kaarina 40100 Kaarina, Finland",
+        "BuildingType": "Industrial",
+        "InspectorName": "Jari P. Lehtinen",
+        "ComplianceStatus": "Partially Compliant",
+        "Municipality": "Kaarina"
+      }
+    },
+    {
+      "file": "building_inspections\\building_inspections_granite_en-43b48d3f346e4779a487e50afc8e2c3c.md",
+      "fields": {
+        "InspectionDate": "25.10.2024",
+        "BuildingAddress": "Kauppakatu 23, 02510 Suonenjoki",
+        "BuildingType": "Residential",
+        "InspectorName": "Jari Pietilä",
+        "ComplianceStatus": "Partially Compliant",
+        "Municipality": "Suonenjoki"
+      }
+    },
+    {
+      "file": "building_inspections\\building_inspections_granite_en-57730bf9bb8b9a69639636db4125b66c.md",
+      "fields": {
+        "InspectionDate": "06.12.2024",
+        "BuildingAddress": "Kauppakatu 23, 37100 Lapua",
+        "BuildingType": "Public",
+        "InspectorName": "Jari P. Lehtinen",
+        "ComplianceStatus": "Partially Compliant",
+        "Municipality": "Lapua"
+      }
+    },
+    {
+      "file": "building_inspections\\building_inspections_granite_en-7e9bc04df6a83a44172e0206556e0a95.md",
+      "fields": {
+        "InspectionDate": "22.11.2024",
+        "BuildingAddress": "Kauppakatu 23, 02610 Pukkila",
+        "BuildingType": "Industrial",
+        "InspectorName": "Jari Koskinen",
+        "ComplianceStatus": "Partially Compliant",
+        "Municipality": "Pukkila"
+      }
+    },
+    {
+      "file": "building_inspections\\building_inspections_llama_en-299f72ab31718da4fe3a4b58852da1f6.md",
+      "fields": {
+        "InspectionDate": "01.03.2025",
+        "BuildingAddress": "45600 Joutsa",
+        "BuildingType": "Industrial",
+        "InspectorName": "Antti Laaksonen",
+        "ComplianceStatus": "Partially Compliant",
+        "Municipality": "Joutsa"
+      }
+    },
+    {
+      "file": "building_inspections\\building_inspections_llama_en-521033cbc02574371504db7429bb0304.md",
+      "fields": {
+        "InspectionDate": "28.01.2025",
+        "BuildingAddress": "123 Kivikatu, 69100 Kalajoki",
+        "BuildingType": "Public",
+        "InspectorName": "Antti Laaksonen",
+        "ComplianceStatus": "Requires Follow-up",
+        "Municipality": "Kalajoki"
+      }
+    },
+    {
+      "file": "building_inspections\\building_inspections_llama_en-84f590bf26ba60da15f0299affaf07ff.md",
+      "fields": {
+        "InspectionDate": "21.12.2024",
+        "BuildingAddress": "Kivikatu 12, 28500 Lieto",
+        "BuildingType": "Residential",
+        "InspectorName": "Antti Laaksonen",
+        "ComplianceStatus": "Requires Follow-up",
+        "Municipality": "Lieto"
+      }
+    },
+    {
+      "file": "building_inspections\\building_inspections_llama_en-ad7cdea51fc9172bb3466a0ced70fdc4.md",
+      "fields": {
+        "InspectionDate": "08.10.2024",
+        "BuildingAddress": "1230 Kivipuontie, 36200 Jyväskylä",
+        "BuildingType": "Industrial",
+        "InspectorName": "Antti Laaksonen",
+        "ComplianceStatus": "Partially Compliant",
+        "Municipality": "Jyväskylä"
+      }
+    },
+    {
+      "file": "building_inspections\\building_inspections_mistral_en-0a9bfd0387801807dd83274edb530320.md",
+      "fields": {
+        "InspectionDate": "02.10.2024",
+        "BuildingAddress": "Mannerheimintie 42 A, 04100 Porvoo",
+        "BuildingType": "Public",
+        "InspectorName": "Juhani Kivinen",
+        "ComplianceStatus": "Partially Compliant",
+        "Municipality": "Porvoo"
+      }
+    },
+    {
+      "file": "building_inspections\\building_inspections_mistral_en-6df5e0b3a9d58ed3994693bac7a9b025.md",
+      "fields": {
+        "InspectionDate": "12.04.2025",
+        "BuildingAddress": "Myllytie 23",
+        "BuildingType": "Industrial",
+        "InspectorName": "Jari Kivinen",
+        "ComplianceStatus": "Partially Compliant",
+        "Municipality": "Koski Tl"
+      }
+    },
+    {
+      "file": "building_inspections\\building_inspections_mistral_en-beb9d40efdb9760cea18704bfd84a6be.md",
+      "fields": {
+        "InspectionDate": "22.06.2025",
+        "BuildingAddress": "Mannerheimintie 42 A, 20650 Raisio",
+        "BuildingType": "Residential",
+        "InspectorName": "Juhani Kivinen",
+        "ComplianceStatus": "Partially Compliant",
+        "Municipality": "Raisio"
+      }
+    },
+    {
+      "file": "building_inspections\\building_inspections_mistral_en-d7da66286af10d2b1735054cd7de8b36.md",
+      "fields": {
+        "InspectionDate": "28.04.2025",
+        "BuildingAddress": "Mäkelänkatu 42, 68500 Pihtipudas",
+        "BuildingType": "Public",
+        "InspectorName": "Juhani Kivinen",
+        "ComplianceStatus": "Partially Compliant",
+        "Municipality": "Pihtipudas"
+      }
+    }
+  ]
+}
