@@ -15,7 +15,7 @@ import jakarta.ws.rs.core.Response;
 @Path("/buildinginspectiondocs")
 @RequestScoped
 @Produces(MediaType.APPLICATION_JSON)
-public class AddBuildingInspectionDocsResource extends BaseResource {
+public class BuildingInspectionDocsResource extends BaseResource {
 
     @Inject
     FileNetService fileNetService;
