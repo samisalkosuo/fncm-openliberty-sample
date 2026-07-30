@@ -13,7 +13,7 @@ export const API = {
   addBuildingInspectionDocs: '/api/buildinginspectiondocs',
   fileBuildingInspectionDocs: '/api/filebuildinginspectiondocs',
   deleteAllFolders: '/api/deleteallfolders',
-  
+  createDocument:   '/api/createdocument',
 };
 
 export async function apiFetch(url, options = {}) {

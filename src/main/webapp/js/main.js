@@ -19,6 +19,7 @@ import './cards/deleteAllFolders.js';
 import './cards/listDocumentsInFolder.js';
 import './cards/folderDetails.js';
 import './cards/documentDetails.js';
+import './cards/createDocument.js';
 
 // To add a new card: create js/cards/myFeature.js and add one import line above.
 
