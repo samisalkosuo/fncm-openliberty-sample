@@ -100,7 +100,7 @@ registerCard({
         formData.append('file', fileInput.files[0]);
 
         // apiFetch must NOT forward a Content-Type header for multipart requests
-        const res = await apiFetch(API.createDocument, {
+        const res = await apiFetch(API.createBuildingInspectionReportDocument, {
           method: 'POST',
           body:   formData,
           // Prevent apiFetch from spreading a stale Content-Type from options.headers

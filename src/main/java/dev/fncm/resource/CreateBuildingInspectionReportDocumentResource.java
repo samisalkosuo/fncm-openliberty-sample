@@ -1,7 +1,7 @@
 package dev.fncm.resource;
 
 import dev.fncm.service.javaapi.FileNetService;
-import dev.fncm.service.javaapi.service.CreateDocumentOperation;
+import dev.fncm.service.javaapi.service.buildinginspectiondocs.CreateBuildingInspectionDocumentOperation;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -30,10 +30,10 @@ import java.util.Date;
  *   <li>{@code file}              — binary file to store as the document's content element</li>
  * </ul>
  */
-@Path("/createdocument")
+@Path("/createbuildinginspectionreportdocument")
 @RequestScoped
 @Produces(MediaType.APPLICATION_JSON)
-public class CreateDocumentResource extends BaseResource {
+public class CreateBuildingInspectionReportDocumentResource extends BaseResource {
 
     @Inject
     FileNetService fileNetService;
@@ -65,7 +65,7 @@ public class CreateDocumentResource extends BaseResource {
             }
 
             return fileNetService.run(
-                    new CreateDocumentOperation(
+                    new CreateBuildingInspectionDocumentOperation(
                             municipality,
                             propertyAddress,
                             inspectorName,

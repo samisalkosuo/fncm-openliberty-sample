@@ -1,4 +1,4 @@
-package dev.fncm.service.javaapi.service;
+package dev.fncm.service.javaapi.service.buildinginspectiondocs;
 
 import com.filenet.api.core.ObjectStore;
 import dev.fncm.model.CreateDocumentResult;
@@ -19,9 +19,9 @@ import java.util.logging.Logger;
  * name
  * before implementing.
  */
-public class CreateDocumentOperation implements FileNetOperation<CreateDocumentResult> {
+public class CreateBuildingInspectionDocumentOperation implements FileNetOperation<CreateDocumentResult> {
 
-    private static final Logger LOGGER = Logger.getLogger(CreateDocumentOperation.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CreateBuildingInspectionDocumentOperation.class.getName());
 
     // FileNet document class symbolic name
     private static final String DOCUMENT_CLASS = "BuildingInspectionReport";
@@ -35,7 +35,7 @@ public class CreateDocumentOperation implements FileNetOperation<CreateDocumentR
     private final byte[] fileBytes;
     private final String fileName;
 
-    public CreateDocumentOperation(
+    public CreateBuildingInspectionDocumentOperation(
             String municipality,
             String propertyAddress,
             String inspectorName,
