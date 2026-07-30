@@ -14,6 +14,49 @@ const BUILDING_TYPE_OPTIONS = ['Unknown','Residential', 'Commercial', 'Industria
 // Choice list values for complianceStatus
 const COMPLIANCE_STATUS_OPTIONS = ['Unknown','Fully Compliant','Mostly Compliant','Partially Compliant','Non-Compliant','Requires Follow-Up'];
 
+// ── Test-data helpers ────────────────────────────────────────────────────────
+const _pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+const TEST_MUNICIPALITIES  = ['Helsinki', 'Espoo', 'Vantaa', 'Turku', 'Oulu', 'Tampere'];
+const TEST_STREET_TYPES    = ['Katu', 'Tie', 'Kuja', 'Bulevardi'];
+const TEST_FIRST_NAMES     = [
+  'Mikko', 'Juhani', 'Pekka', 'Matti', 'Antti', 'Jari', 'Timo', 'Kari',
+  'Anna', 'Maria', 'Laura', 'Sari', 'Tiina', 'Päivi', 'Leena', 'Hanna',
+];
+const TEST_LAST_NAMES      = [
+  'Virtanen', 'Korhonen', 'Mäkinen', 'Nieminen', 'Mäkelä',
+  'Hämäläinen', 'Leinonen', 'Koskinen', 'Heikkinen', 'Järvinen',
+];
+
+function fillTestData() {
+  // Municipality
+  document.getElementById('create-document-municipality').value = _pick(TEST_MUNICIPALITIES);
+
+  // Property address: e.g. "Puistokatu 42"
+  document.getElementById('create-document-property-address').value =
+    `${_pick(TEST_STREET_TYPES)} ${Math.floor(Math.random() * 100) + 1}`;
+
+  // Inspector name: random first + last
+  document.getElementById('create-document-inspector-name').value =
+    `${_pick(TEST_FIRST_NAMES)} ${_pick(TEST_LAST_NAMES)}`;
+
+  // Inspection date: random day within the last 60 days
+  const daysAgo = Math.floor(Math.random() * 60);
+  const d = new Date();
+  d.setDate(d.getDate() - daysAgo);
+  document.getElementById('create-document-inspection-date').value =
+    d.toISOString().slice(0, 10);
+
+  // Building type — skip index 0 ("Unknown") for more realistic data
+  const btSelect = document.getElementById('create-document-building-type');
+  btSelect.value = _pick(BUILDING_TYPE_OPTIONS.slice(1));
+
+  // Compliance status — skip index 0 ("Unknown")
+  const csSelect = document.getElementById('create-document-compliance-status');
+  csSelect.value = _pick(COMPLIANCE_STATUS_OPTIONS.slice(1));
+}
+// ────────────────────────────────────────────────────────────────────────────
+
 registerCard({
   id: 'create-document',
   size: 'normal',
@@ -21,6 +64,10 @@ registerCard({
     <div class="card" id="card-create-document">
       <h2>Create Document</h2>
       <p>Fill in the properties and select a file to create a new document in FileNet. Fields marked <span style="color:red">*</span> are required.</p>
+      <div class="form-group" style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+        <button id="create-document-fill-btn" type="button" style="font-size:0.78rem;padding:0.25rem 0.6rem">Fill test data</button>
+      </div>
+
       <div class="form-group">
         <label for="create-document-municipality">Municipality <span style="color:red">*</span></label>
         <input type="text" id="create-document-municipality" placeholder="Enter municipality…" required />
@@ -55,13 +102,16 @@ registerCard({
         <label for="create-document-file">File</label>
         <input type="file" id="create-document-file" />
       </div>
-      <button id="create-document-btn">Create Document</button>
+      <div class="form-group" style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+        <button id="create-document-btn">Create Document</button>
+      </div>
       <div id="create-document-spinner" class="hidden spinner-row">
         <span class="spinner"></span> Creating…
       </div>
       <div id="create-document-result" class="card-result"></div>
     </div>`,
   init() {
+    document.getElementById('create-document-fill-btn').addEventListener('click', fillTestData);
     document.getElementById('create-document-btn').addEventListener('click', async () => {
       const spinner   = document.getElementById('create-document-spinner');
       const container = document.getElementById('create-document-result');
