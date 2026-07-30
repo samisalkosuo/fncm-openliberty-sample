@@ -97,7 +97,10 @@ registerCard({
         formData.append('inspectionDate',   inspectionDate);
         formData.append('buildingType',     buildingType);
         formData.append('complianceStatus', complianceStatus);
-        formData.append('file', fileInput.files[0]);
+        if (fileInput.files.length > 0)
+        {
+          formData.append('file', fileInput.files[0]);
+        }
 
         // apiFetch must NOT forward a Content-Type header for multipart requests
         const res = await apiFetch(API.createBuildingInspectionReportDocument, {

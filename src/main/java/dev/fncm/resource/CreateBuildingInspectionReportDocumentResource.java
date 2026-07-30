@@ -58,7 +58,7 @@ public class CreateBuildingInspectionReportDocumentResource extends BaseResource
 
             // Read file bytes and filename from the EntityPart
             byte[] fileBytes = null;
-            String fileName  = "unknown";
+            String fileName  = null;
             if (filePart != null) {
                 fileBytes = filePart.getContent().readAllBytes();
                 fileName  = filePart.getFileName().orElse("unknown");
