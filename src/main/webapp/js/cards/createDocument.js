@@ -20,32 +20,34 @@ registerCard({
   html: () => `
     <div class="card" id="card-create-document">
       <h2>Create Document</h2>
-      <p>Fill in the properties and select a file to create a new document in FileNet.</p>
+      <p>Fill in the properties and select a file to create a new document in FileNet. Fields marked <span style="color:red">*</span> are required.</p>
       <div class="form-group">
-        <label for="create-document-municipality">Municipality</label>
-        <input type="text" id="create-document-municipality" placeholder="Enter municipality…" />
+        <label for="create-document-municipality">Municipality <span style="color:red">*</span></label>
+        <input type="text" id="create-document-municipality" placeholder="Enter municipality…" required />
       </div>
       <div class="form-group">
-        <label for="create-document-property-address">Property Address</label>
-        <input type="text" id="create-document-property-address" placeholder="Enter property address…" />
+        <label for="create-document-property-address">Property Address <span style="color:red">*</span></label>
+        <input type="text" id="create-document-property-address" placeholder="Enter property address…" required />
       </div>
       <div class="form-group">
-        <label for="create-document-inspector-name">Inspector Name</label>
-        <input type="text" id="create-document-inspector-name" placeholder="Enter inspector name…" />
+        <label for="create-document-inspector-name">Inspector Name <span style="color:red">*</span></label>
+        <input type="text" id="create-document-inspector-name" placeholder="Enter inspector name…" required />
       </div>
       <div class="form-group">
-        <label for="create-document-inspection-date">Inspection Date</label>
-        <input type="date" id="create-document-inspection-date" />
+        <label for="create-document-inspection-date">Inspection Date <span style="color:red">*</span></label>
+        <input type="date" id="create-document-inspection-date" required />
       </div>
       <div class="form-group">
-        <label for="create-document-building-type">Building Type</label>
-        <select id="create-document-building-type">
+        <label for="create-document-building-type">Building Type <span style="color:red">*</span></label>
+        <select id="create-document-building-type" required>
+          <option value="">— select —</option>
           ${BUILDING_TYPE_OPTIONS.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('\n          ')}
         </select>
       </div>
       <div class="form-group">
-        <label for="create-document-compliance-status">Compliance Status</label>
-        <select id="create-document-compliance-status">
+        <label for="create-document-compliance-status">Compliance Status <span style="color:red">*</span></label>
+        <select id="create-document-compliance-status" required>
+          <option value="">— select —</option>
           ${COMPLIANCE_STATUS_OPTIONS.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('\n          ')}
         </select>
       </div>
@@ -75,8 +77,16 @@ registerCard({
         const complianceStatus = document.getElementById('create-document-compliance-status').value;
         const fileInput        = document.getElementById('create-document-file');
 
-        if (!fileInput.files.length) {
-          throw new Error('Please select a file before submitting.');
+        // Mandatory-field validation (browser-side)
+        const missing = [];
+        if (!municipality)     missing.push('Municipality');
+        if (!propertyAddress)  missing.push('Property Address');
+        if (!inspectorName)    missing.push('Inspector Name');
+        if (!inspectionDate)   missing.push('Inspection Date');
+        if (!buildingType)     missing.push('Building Type');
+        if (!complianceStatus) missing.push('Compliance Status');
+        if (missing.length) {
+          throw new Error(`Please fill in all required fields: ${missing.join(', ')}.`);
         }
 
         // Build multipart/form-data — do NOT set Content-Type; browser sets boundary
