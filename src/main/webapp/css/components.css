@@ -122,6 +122,12 @@ tr:last-child td { border-bottom: none; }
 .json-tree details { margin-left: 1rem; }
 .json-tree details:first-child { margin-left: 0; }
 
+.json-raw pre {
+  margin: 0;
+  white-space: pre;
+  overflow: auto;
+}
+
 .json-summary {
   cursor: pointer;
   list-style: none;

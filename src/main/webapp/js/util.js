@@ -15,15 +15,42 @@ export function esc(str) {
 // ── JSON rendering ────────────────────────────────────────────────────────────
 
 /**
- * Render `data` as an expandable JSON tree inside `container`.
- * All top-level nodes start open. Nested objects/arrays are collapsible.
+ * Render `data` as an expandable JSON tree inside `container`, with a
+ * Tree / Raw toggle bar above it.  Tree view is shown by default.
  */
 export function renderJson(container, data) {
   container.innerHTML = '';
-  const root = document.createElement('div');
-  root.className = 'json-tree';
-  root.appendChild(_buildNode(data, true));
-  container.appendChild(root);
+
+  // ── tree view ──
+  const treeDiv = document.createElement('div');
+  treeDiv.className = 'json-tree';
+  treeDiv.appendChild(_buildNode(data, true));
+
+  // ── raw view ──
+  const rawDiv = document.createElement('div');
+  rawDiv.className = 'json-tree json-raw hidden';
+  const pre = document.createElement('pre');
+  pre.textContent = JSON.stringify(data, null, 2);
+  rawDiv.appendChild(pre);
+
+  // ── toggle bar ──
+  const bar = document.createElement('div');
+  bar.className = 'view-toggle';
+  bar.innerHTML = `
+    <button class="secondary active" data-view="tree">🌲 Tree</button>
+    <button class="secondary"        data-view="raw">{ } Raw</button>`;
+
+  bar.addEventListener('click', e => {
+    const view = e.target.dataset.view;
+    if (!view) return;
+    treeDiv.classList.toggle('hidden', view !== 'tree');
+    rawDiv.classList.toggle('hidden',  view !== 'raw');
+    bar.querySelectorAll('button').forEach(b =>
+      b.classList.toggle('active', b.dataset.view === view)
+    );
+  });
+
+  container.append(bar, treeDiv, rawDiv);
 }
 
 /**
