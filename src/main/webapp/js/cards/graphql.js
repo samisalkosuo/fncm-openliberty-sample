@@ -1,6 +1,6 @@
 // cards/graphql.js — GraphQL Query card
 import { GraphQL } from '../api.js';
-import { esc, renderJson } from '../util.js';
+import { esc, renderJson   } from '../util.js';
 import { registerCard } from './registry.js';
 
 registerCard({

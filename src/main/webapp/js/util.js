@@ -85,6 +85,29 @@ function _buildNode(value, isRoot = false) {
   const summary  = document.createElement('summary');
   summary.className   = 'json-summary';
   summary.textContent = label;
+
+  const btn = document.createElement('button');
+  btn.className   = 'json-expand-btn';
+  btn.textContent = '⊞';
+  btn.title       = 'Expand all';
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    e.preventDefault();
+    const parentDetails = btn.closest('details');
+    const descendants   = [...parentDetails.querySelectorAll('details')];
+    if (descendants.some(d => !d.open)) {
+      parentDetails.open = true;
+      descendants.forEach(d => { d.open = true; });
+      btn.textContent = '⊟';
+      btn.title       = 'Collapse all';
+    } else {
+      parentDetails.open = false;
+      descendants.forEach(d => { d.open = false; });
+      btn.textContent = '⊞';
+      btn.title       = 'Expand all';
+    }
+  });
+  summary.appendChild(btn);
   details.appendChild(summary);
 
   for (const [key, val] of entries) {

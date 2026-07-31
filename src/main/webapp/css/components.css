@@ -132,6 +132,19 @@ tr:last-child td { border-bottom: none; }
 details[open] > .json-summary::before { content: '▾ '; }
 .json-summary::-webkit-details-marker { display: none; }
 
+.json-expand-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0 0.2rem;
+  margin-left: 0.4rem;
+  color: var(--color-text-muted);
+  vertical-align: middle;
+  line-height: 1;
+}
+.json-expand-btn:hover { color: var(--color-primary); }
+
 .json-row { padding-left: 1.2rem; }
 
 .json-key      { color: var(--color-primary); }
