@@ -1,5 +1,6 @@
 package dev.fncm.service.graphql;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -21,7 +22,7 @@ import dev.fncm.service.javaapi.service.buildinginspectiondocs.CreateBuildingIns
  *
  * <p>
  * With file (multipart):
- * 
+ *
  * <pre>
  * CreateDocumentMutation mutation = new CreateDocumentMutation(
  *         "OS1", "/Folder for Browsing", "Document", "My Report",
@@ -32,7 +33,7 @@ import dev.fncm.service.javaapi.service.buildinginspectiondocs.CreateBuildingIns
  *
  * <p>
  * Without file:
- * 
+ *
  * <pre>
  * CreateDocumentMutation mutation = new CreateDocumentMutation(
  *         "OS1", "/Folder for Browsing", "Document", "My Report",
@@ -44,14 +45,55 @@ import dev.fncm.service.javaapi.service.buildinginspectiondocs.CreateBuildingIns
  * <p>
  * Additional document properties are serialised as inline fields inside the
  * {@code documentProperties { … }} block. String values are quoted; non-String
- * values
- * (numbers, booleans) are written unquoted.
+ * values (numbers, booleans) are written unquoted.
  */
 public class CreateDocumentMutation implements FileUploadOperation {
 
     private static final Logger LOGGER = Logger.getLogger(CreateBuildingInspectionDocumentOperation.class.getName());
 
     private static final String FILE_FIELD = "contvar";
+
+    // Query template used when a file is being uploaded.
+    // %s is replaced by the optional ", properties:[…]" block.
+    private static final String WITH_FILE_TEMPLATE = """
+            mutation ($repositoryIdentifier: String!, $classIdentifier: String!,
+                      $documentName: String!, $fileInFolderIdentifier: String,
+                      $contentType: String, $contvar: String) {
+              createDocument(
+                repositoryIdentifier: $repositoryIdentifier
+                fileInFolderIdentifier: $fileInFolderIdentifier
+                classIdentifier: $classIdentifier
+                documentProperties: {
+                  name: $documentName
+                  %s
+                  contentElements: { replace: [{
+                    type: CONTENT_TRANSFER
+                    contentType: $contentType
+                    subContentTransfer: { content: $contvar }
+                  }] }
+                }
+                checkinAction: {}
+              ) { id name }
+            }
+            """;
+
+    // Query template used when no file is being uploaded.
+    // %s is replaced by the optional ", properties:[…]" block.
+    private static final String NO_FILE_TEMPLATE = """
+            mutation ($repositoryIdentifier: String!, $classIdentifier: String!,
+                      $documentName: String!, $fileInFolderIdentifier: String) {
+              createDocument(
+                repositoryIdentifier: $repositoryIdentifier
+                fileInFolderIdentifier: $fileInFolderIdentifier
+                classIdentifier: $classIdentifier
+                documentProperties: {
+                  name: $documentName
+                  %s
+                }
+                checkinAction: {}
+              ) { id name }
+            }
+            """;
 
     private final String repositoryIdentifier;
     private final String folderIdentifier;
@@ -65,12 +107,14 @@ public class CreateDocumentMutation implements FileUploadOperation {
     /**
      * @param repositoryIdentifier object store identifier (e.g. {@code "OS1"})
      * @param folderIdentifier     destination folder path (e.g.
-     *                             {@code "/Folder for Browsing"})
+     *                             {@code "/Folder for Browsing"}); may be
+     *                             {@code null}
      * @param classIdentifier      document class name (e.g. {@code "Document"})
      * @param documentName         value for the {@code name} document property
      * @param additionalProperties extra document properties; may be {@code null} or
      *                             empty
-     * @param fileBytes            raw bytes of the file to attach
+     * @param fileBytes            raw bytes of the file to attach; {@code null} for
+     *                             no-file path
      * @param fileContentType      MIME type of the file (e.g.
      *                             {@code "application/pdf"})
      * @param fileName             original filename (e.g. {@code "report.pdf"})
@@ -101,72 +145,34 @@ public class CreateDocumentMutation implements FileUploadOperation {
 
     @Override
     public String query() {
-        // Build the properties list: [{Key: "value"}, {Key2: "value2"}, ...]
-        StringBuilder propertiesList = new StringBuilder();
-        for (Map.Entry<String, Object> entry : additionalProperties.entrySet()) {
-            Object val = entry.getValue();
-            if (propertiesList.length() > 0) {
-                propertiesList.append(", ");
-            }
-            propertiesList.append("{").append(entry.getKey()).append(": ");
-            if (val instanceof String s) {
-                propertiesList.append("\"").append(escape(s)).append("\"");
-            } else if (val != null) {
-                propertiesList.append(val);
-            } else {
-                propertiesList.append("null");
-            }
-            propertiesList.append("}");
-        }
-
-        StringBuilder sb = new StringBuilder();
-        if (hasFile()) {
-            sb.append("mutation ($").append(FILE_FIELD).append(":String) {");
-        } else {
-            sb.append("mutation {");
-        }
-        sb.append("createDocument(")
-                .append("repositoryIdentifier:\"").append(escape(repositoryIdentifier)).append("\" ");
-        if (folderIdentifier != null) {
-            sb.append("fileInFolderIdentifier:\"").append(escape(folderIdentifier)).append("\" ");
-
-        }
-        sb.append("classIdentifier:\"").append(escape(classIdentifier)).append("\" ")
-                .append("documentProperties:{")
-                .append("name:\"").append(escape(documentName)).append("\"");
-
-        if (propertiesList.length() > 0) {
-            sb.append(", properties:[").append(propertiesList).append("]");
-        }
-
-        if (hasFile()) {
-            sb.append(" contentElements:{replace:[{")
-                    .append("type:CONTENT_TRANSFER ")
-                    .append("contentType:\"").append(escape(fileContentType)).append("\" ")
-                    .append("subContentTransfer:{content:$").append(FILE_FIELD).append("}")
-                    .append("}]}");
-        }
-
-        sb.append("} ")
-                .append("checkinAction:{}")
-                .append(") { id name }")
-                .append("}");
-
+        String propsBlock = buildPropertiesBlock();
+        String q = hasFile()
+                ? WITH_FILE_TEMPLATE.formatted(propsBlock)
+                : NO_FILE_TEMPLATE.formatted(propsBlock);
         LOGGER.info("GraphQL:");
-        LOGGER.info(sb.toString());
-        return sb.toString();
+        LOGGER.info(q);
+        return q;
     }
 
     /**
-     * Returns {@code {"contvar": null}} so CP4BA reads file content from the
-     * multipart part.
-     * When there is no file ({@link #hasFile()} is false) returns an empty map.
+     * Returns all scalar variables. The {@code contvar} entry (set to {@code null}
+     * so CP4BA reads file content from the multipart part) is included only when
+     * a file is present. {@code fileInFolderIdentifier} is always included; when
+     * {@code folderIdentifier} is {@code null} GraphQL treats the omitted optional
+     * argument correctly.
      */
     @Override
     public Map<String, Object> variables() {
-        return hasFile()
-                ? java.util.Collections.singletonMap(FILE_FIELD, null)
-                : Map.of();
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("repositoryIdentifier", repositoryIdentifier);
+        vars.put("fileInFolderIdentifier", folderIdentifier);
+        vars.put("classIdentifier", classIdentifier);
+        vars.put("documentName", documentName);
+        if (hasFile()) {
+            vars.put("contentType", fileContentType);
+            vars.put(FILE_FIELD, null);
+        }
+        return vars;
     }
 
     @Override
@@ -192,8 +198,39 @@ public class CreateDocumentMutation implements FileUploadOperation {
     // ── helpers ────────────────────────────────────────────────────────────────
 
     /**
+     * Builds the optional {@code , properties:[{Key:"val"}, …]} inline block for
+     * {@code additionalProperties}. Returns an empty string when there are no
+     * additional properties.
+     */
+    private String buildPropertiesBlock() {
+        if (additionalProperties.isEmpty()) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder(", properties:[");
+        boolean first = true;
+        for (Map.Entry<String, Object> entry : additionalProperties.entrySet()) {
+            if (!first) {
+                sb.append(", ");
+            }
+            first = false;
+            Object val = entry.getValue();
+            sb.append("{").append(entry.getKey()).append(": ");
+            if (val instanceof String s) {
+                sb.append("\"").append(escape(s)).append("\"");
+            } else if (val != null) {
+                sb.append(val);
+            } else {
+                sb.append("null");
+            }
+            sb.append("}");
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    /**
      * Escapes backslashes and double-quotes for safe inline embedding in a GraphQL
-     * string.
+     * string literal (used only for {@code additionalProperties} values).
      */
     private static String escape(String value) {
         if (value == null)

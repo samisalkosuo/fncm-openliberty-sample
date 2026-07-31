@@ -17,11 +17,11 @@ const COMPLIANCE_STATUS_OPTIONS = ['Unknown','Fully Compliant','Mostly Compliant
 // ── Test-data helpers ────────────────────────────────────────────────────────
 const _pick = arr => arr[Math.floor(Math.random() * arr.length)];
 
-const TEST_MUNICIPALITIES  = ['Helsinki', 'Espoo', 'Vantaa', 'Kuopio', 'Turku', 'Oulu', 'Tampere',"Rovaniemi"];
-const TEST_STREET_TYPES    = ['Katu', 'Tie', 'Kuja', 'Bulevardi'];
+const TEST_MUNICIPALITIES  = ['Helsinki', 'Espoo', 'Vantaa', 'Kuopio', 'Turku', 'Oulu', 'Kouvola', 'Lappeenranta', 'Kotka', 'Salo', 'Jyväskylä', 'Utsjoki', 'Hämeenlinna', 'Savonlinna', 'Tampere',"Rovaniemi"];
+const TEST_STREET_TYPES    = ['Katu', 'Tie', 'Kuja', 'Bulevardi', 'Polku'];
 const TEST_FIRST_NAMES     = [
-  'Mikko', 'Juhani', 'Pekka', 'Matti', 'Antti', 'Jari', 'Timo', 'Kari',
-  'Anna', 'Maria', 'Laura', 'Sari', 'Tiina', 'Päivi', 'Leena', 'Hanna',
+  'Mikko', 'Juhani', 'Pekka', 'Matti', 'Antti', 'Jari', 'Timo', 'Kari', 'Sakari', 
+  'Anna', 'Maria', 'Laura', 'Sari', 'Tiina', 'Päivi', 'Leena', 'Hanna', 'Sara,'
 ];
 const TEST_LAST_NAMES      = [
   'Virtanen', 'Korhonen', 'Mäkinen', 'Nieminen', 'Mäkelä',
@@ -40,8 +40,8 @@ function fillTestData() {
   document.getElementById('create-document-inspector-name').value =
     `${_pick(TEST_FIRST_NAMES)} ${_pick(TEST_LAST_NAMES)}`;
 
-  // Inspection date: random day within the last 60 days
-  const daysAgo = Math.floor(Math.random() * 60);
+  // Inspection date: random day within the last 120 days
+  const daysAgo = Math.floor(Math.random() * 120);
   const d = new Date();
   d.setDate(d.getDate() - daysAgo);
   document.getElementById('create-document-inspection-date').value =
