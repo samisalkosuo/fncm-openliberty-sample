@@ -1,7 +1,8 @@
 package dev.fncm.resource;
 
-import dev.fncm.service.javaapi.FileNetService;
-import dev.fncm.service.javaapi.service.buildinginspectiondocs.CreateBuildingInspectionDocumentOperation;
+import dev.fncm.service.GraphQLService;
+import dev.fncm.service.graphql.CreateDocumentMutation;
+import dev.fncm.service.javaapi.FileNetConfig;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -14,21 +15,27 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 /**
- * POST /api/createdocument
+ * POST /api/createbuildinginspectionreportdocument
  *
- * <p>Accepts a multipart/form-data request with the following parts:
+ * <p>Accepts a multipart/form-data request and creates a document in CP4BA via the
+ * {@code createDocument} GraphQL mutation.
+ *
+ * <p>Accepted form fields:
  * <ul>
- *   <li>{@code municipality}      — municipality name</li>
+ *   <li>{@code municipality}      — municipality name (stored as document property)</li>
  *   <li>{@code propertyAddress}   — address of the inspected property</li>
  *   <li>{@code inspectorName}     — name of the inspector</li>
  *   <li>{@code inspectionDate}    — date string in YYYY-MM-DD format</li>
  *   <li>{@code buildingType}      — building type choice list value</li>
  *   <li>{@code complianceStatus}  — compliance status choice list value</li>
- *   <li>{@code file}              — binary file to store as the document's content element</li>
+ *   <li>{@code file}              — (optional) binary file to attach as content element</li>
  * </ul>
+ *
+ * <p>When {@code file} is omitted the document is created without a content element.
  */
 @Path("/createbuildinginspectionreportdocument")
 @RequestScoped
@@ -36,7 +43,10 @@ import java.util.Date;
 public class CreateBuildingInspectionReportDocumentResource extends BaseResource {
 
     @Inject
-    FileNetService fileNetService;
+    FileNetConfig config;
+
+    @Inject
+    GraphQLService graphQLService;
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -50,33 +60,54 @@ public class CreateBuildingInspectionReportDocumentResource extends BaseResource
             @FormParam("file")             EntityPart filePart) {
 
         return execute(() -> {
-            // Parse date (YYYY-MM-DD from <input type="date">)
-            Date parsedDate = null;
-            if (inspectionDate != null && !inspectionDate.isBlank()) {
-                parsedDate = java.sql.Date.valueOf(LocalDate.parse(inspectionDate));
-            }
+            // Collect domain-specific properties into the generic properties map
+            Map<String, Object> properties = new java.util.LinkedHashMap<>();
+            if (municipality     != null) properties.put("Municipality",     municipality);
+            if (propertyAddress  != null) properties.put("PropertyAddress",  propertyAddress);
+            if (inspectorName    != null) properties.put("InspectorName",    inspectorName);
+            if (inspectionDate   != null) properties.put("InspectionDate",   toFileNetDateTime(inspectionDate));
+            if (buildingType     != null) properties.put("BuildingType",     buildingType);
+            if (complianceStatus != null) properties.put("ComplianceStatus", complianceStatus);
 
-            // Read file bytes and filename from the EntityPart
-            byte[] fileBytes = null;
-            String fileName  = null;
+            // Extract file parts — null filePart means no content element
+            byte[] fileBytes       = null;
+            String fileName        = null;
+            String fileContentType = null;
             if (filePart != null) {
-                fileBytes = filePart.getContent().readAllBytes();
-                fileName  = filePart.getFileName().orElse("unknown");
+                fileBytes       = filePart.getContent().readAllBytes();
+                fileName        = filePart.getFileName().orElse("unknown");
+                fileContentType = filePart.getMediaType().toString();
             }
+            String documentName = String.format("Inspection Report (%s %s)",municipality,inspectionDate);
+            CreateDocumentMutation mutation = new CreateDocumentMutation(
+                    config.getObjectStore(),
+                    null,
+                    "BuildingInspectionReport",
+                    documentName,
+                    properties,
+                    fileBytes,
+                    fileContentType,
+                    fileName);
 
-            return fileNetService.run(
-                    new CreateBuildingInspectionDocumentOperation(
-                            municipality,
-                            propertyAddress,
-                            inspectorName,
-                            parsedDate,
-                            buildingType,
-                            complianceStatus,
-                            fileBytes,
-                            fileName),
-                    tokenContext);
+            if (mutation.hasFile()) {
+                return graphQLService.executeMultipart(mutation, tokenContext.getZenToken());
+            } else {
+                return graphQLService.execute(mutation, tokenContext.getZenToken());
+            }
         });
     }
+    /**
+     * Converts a {@code YYYY-MM-DD} date string to the ISO-8601 datetime format that
+     * FileNet expects: {@code 2026-07-02T00:00:00Z} (midnight UTC).
+     *
+     * @param date a date string in {@code YYYY-MM-DD} format
+     * @return formatted datetime string, or the original value if parsing fails
+     */
+    private static String toFileNetDateTime(String date) {
+        try {
+            return LocalDate.parse(date).atStartOfDay().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + "Z";
+        } catch (Exception e) {
+            return date;
+        }
+    }
 }
-
-// Made with Bob

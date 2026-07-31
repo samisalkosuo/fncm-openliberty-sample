@@ -7,6 +7,8 @@ import org.json.JSONObject;
 import java.util.Map;
 import java.util.logging.Logger;
 
+// FileUploadOperation is in the same package — no import needed
+
 /**
  * Thin wrapper around {@link GraphQLClient} that accepts {@link GraphQLOperation} instances.
  *
@@ -60,6 +62,36 @@ public class GraphQLService {
     public String executeRaw(String jsonBody, String zenToken) throws Exception {
         LOG.info("GraphQLService executeRaw (proxy)");
         return graphQLClient.executeJson(jsonBody, zenToken);
+    }
+
+    /**
+     * Executes a {@link FileUploadOperation} — a GraphQL mutation that uploads a file as a
+     * multipart form part alongside the JSON envelope.
+     *
+     * <p>Usage:
+     * <pre>
+     *   CreateDocumentMutation mutation = new CreateDocumentMutation(
+     *           repositoryId, folderPath, classId, docName, additionalProps,
+     *           fileBytes, "application/pdf", "report.pdf");
+     *   String result = graphQLService.executeMultipart(mutation, zenToken);
+     * </pre>
+     *
+     * @param op       the file-upload operation (provides query, variables, and file metadata)
+     * @param zenToken CP4BA Zen access token from the current session
+     * @return raw JSON response string from the GraphQL API
+     * @throws GraphQLClient.GraphQLException when the upstream API returns a non-2xx status
+     * @throws Exception on network or TLS errors
+     */
+    public String executeMultipart(FileUploadOperation op, String zenToken) throws Exception {
+        String jsonBody = buildBody(op);
+        LOG.info("GraphQLService executeMultipart: " + op.getClass().getSimpleName());
+        return graphQLClient.executeMultipart(
+                jsonBody,
+                op.fileFieldName(),
+                op.fileBytes(),
+                op.fileContentType(),
+                op.fileName(),
+                zenToken);
     }
 
     // ── helpers ────────────────────────────────────────────────────────────────

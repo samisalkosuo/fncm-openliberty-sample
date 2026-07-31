@@ -158,6 +158,86 @@ public class AuthService {
         }
     }
 
+    /**
+     * POST a GraphQL multipart request to {@code urlStr}.
+     *
+     * <p>The body contains two parts:
+     * <ol>
+     *   <li>{@code graphql} — {@code application/json} — the GraphQL JSON envelope</li>
+     *   <li>{@code fileFieldName} — {@code fileContentType} — raw file bytes</li>
+     * </ol>
+     *
+     * <p>Same XSRF + Bearer auth as {@link #httpPostGraphQL}.
+     *
+     * @param urlStr          fully-qualified GraphQL endpoint URL
+     * @param zenToken        CP4BA Zen access token
+     * @param jsonBody        GraphQL JSON envelope ({@code {"query":"…","variables":{…}}})
+     * @param fileFieldName   multipart field name for the file part (e.g. {@code "contvar"})
+     * @param fileBytes       raw file content
+     * @param fileContentType MIME type of the file (e.g. {@code "application/pdf"})
+     * @param fileName        original filename for Content-Disposition
+     * @return a String[2] where [0] is the response body and [1] is the HTTP status code
+     */
+    public String[] httpPostGraphQLMultipart(
+            String urlStr,
+            String zenToken,
+            String jsonBody,
+            String fileFieldName,
+            byte[] fileBytes,
+            String fileContentType,
+            String fileName) throws IOException {
+
+        String boundary  = java.util.UUID.randomUUID().toString();
+        String xsrfToken = java.util.UUID.randomUUID().toString();
+
+        // -- Part 1: graphql JSON envelope -----------------------------------
+        byte[] part1Headers = (
+                "--" + boundary + "\r\n" +
+                "Content-Disposition: form-data; name=\"graphql\"\r\n" +
+                "Content-Type: application/json\r\n" +
+                "\r\n").getBytes(StandardCharsets.UTF_8);
+        byte[] part1Body = jsonBody.getBytes(StandardCharsets.UTF_8);
+
+        // -- Part 2: file bytes ----------------------------------------------
+        String safeFileName = (fileName != null) ? fileName : "file";
+        byte[] part2Headers = (
+                "\r\n--" + boundary + "\r\n" +
+                "Content-Disposition: form-data; name=\"" + fileFieldName + "\"; filename=\"" + safeFileName + "\"\r\n" +
+                "Content-Type: " + fileContentType + "\r\n" +
+                "\r\n").getBytes(StandardCharsets.UTF_8);
+
+        // -- Closing boundary ------------------------------------------------
+        byte[] closing = ("\r\n--" + boundary + "--\r\n").getBytes(StandardCharsets.UTF_8);
+
+        int contentLength = part1Headers.length + part1Body.length
+                          + part2Headers.length + fileBytes.length
+                          + closing.length;
+
+        HttpURLConnection conn = openConnection(urlStr);
+        try {
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            conn.setRequestProperty("Content-Type",       "multipart/form-data; boundary=" + boundary);
+            conn.setRequestProperty("Accept",             "application/json");
+            conn.setRequestProperty("Authorization",      "Bearer " + zenToken);
+            conn.setRequestProperty("ECM-CS-XSRF-Token", xsrfToken);
+            conn.setRequestProperty("Cookie",             "ECM-CS-XSRF-Token=" + xsrfToken);
+            conn.setRequestProperty("Content-Length",     String.valueOf(contentLength));
+
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(part1Headers);
+                os.write(part1Body);
+                os.write(part2Headers);
+                os.write(fileBytes);
+                os.write(closing);
+            }
+            int status = conn.getResponseCode();
+            return new String[]{readResponse(conn), String.valueOf(status)};
+        } finally {
+            conn.disconnect();
+        }
+    }
+
     /** POST with form-encoded body, returns the response body as a String. */
     private String httpPost(String urlStr, String contentType, String body) throws IOException {
         HttpURLConnection conn = openConnection(urlStr);

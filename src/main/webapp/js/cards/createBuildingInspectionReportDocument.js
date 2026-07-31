@@ -17,7 +17,7 @@ const COMPLIANCE_STATUS_OPTIONS = ['Unknown','Fully Compliant','Mostly Compliant
 // ── Test-data helpers ────────────────────────────────────────────────────────
 const _pick = arr => arr[Math.floor(Math.random() * arr.length)];
 
-const TEST_MUNICIPALITIES  = ['Helsinki', 'Espoo', 'Vantaa', 'Turku', 'Oulu', 'Tampere'];
+const TEST_MUNICIPALITIES  = ['Helsinki', 'Espoo', 'Vantaa', 'Kuopio', 'Turku', 'Oulu', 'Tampere',"Rovaniemi"];
 const TEST_STREET_TYPES    = ['Katu', 'Tie', 'Kuja', 'Bulevardi'];
 const TEST_FIRST_NAMES     = [
   'Mikko', 'Juhani', 'Pekka', 'Matti', 'Antti', 'Jari', 'Timo', 'Kari',
@@ -62,8 +62,9 @@ registerCard({
   size: 'normal',
   html: () => `
     <div class="card" id="card-create-document">
-      <h2>Create Document</h2>
-      <p>Fill in the properties and select a file to create a new document in FileNet. Fields marked <span style="color:red">*</span> are required.</p>
+      <h2>Create Building Inspepction Report Documentn</h2>
+      <p>Fill in the properties and select a file to create a new Building Inspection Report document in FileNet.<br/>
+      <span style="font-size:0.66rem">Fields marked <span style="color:red">*</span> are required.<span></p>
       <div class="form-group" style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
         <button id="create-document-fill-btn" type="button" style="font-size:0.78rem;padding:0.25rem 0.6rem">Fill test data</button>
       </div>

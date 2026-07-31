@@ -85,6 +85,44 @@ public class GraphQLClient {
         return responseBody;
     }
 
+    /**
+     * Executes a GraphQL mutation that uploads a file as a multipart form part.
+     *
+     * <p>Sends two multipart parts to the configured endpoint:
+     * <ol>
+     *   <li>{@code graphql} — the JSON envelope ({@code {"query":"…","variables":{…}}})</li>
+     *   <li>{@code fileFieldName} — raw file bytes with the given content-type</li>
+     * </ol>
+     *
+     * @param jsonBody        pre-built GraphQL JSON envelope
+     * @param fileFieldName   multipart field name for the file (e.g. {@code "contvar"})
+     * @param fileBytes       raw file content
+     * @param fileContentType MIME type of the file
+     * @param fileName        original filename
+     * @param zenToken        CP4BA Zen access token
+     * @return raw JSON response string from the GraphQL API
+     * @throws GraphQLException when the upstream API returns a non-2xx status
+     */
+    public String executeMultipart(
+            String jsonBody,
+            String fileFieldName,
+            byte[] fileBytes,
+            String fileContentType,
+            String fileName,
+            String zenToken) throws Exception {
+        LOG.info("GraphQL executeMultipart → " + graphqlUrl);
+        String[] result = authService.httpPostGraphQLMultipart(
+                graphqlUrl, zenToken, jsonBody, fileFieldName, fileBytes, fileContentType, fileName);
+
+        String responseBody = result[0];
+        int    status       = Integer.parseInt(result[1]);
+
+        if (status < 200 || status >= 300) {
+            throw new GraphQLException(status, responseBody);
+        }
+        return responseBody;
+    }
+
     // ── JSON body builders ─────────────────────────────────────────────────
 
     /** Wraps a plain query string: {"query":"…"} */
