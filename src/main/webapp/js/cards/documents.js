@@ -2,14 +2,16 @@
 import { apiFetch, API } from '../api.js';
 import { esc, renderWithToggle } from '../util.js';
 import { registerCard } from './registry.js';
+import { session } from '../session.js';
+
 
 registerCard({
   id: 'documents',
   size: 'normal',
   html: () => `
     <div class="card" id="card-documents">
-      <h2>Documents <small class="card-subtitle">(via REST)</small></h2>
-      <button id="documents-btn">Load</button>
+      <h2>Documents</h2>
+      <button id="documents-btn">Get documents</button>
       <div id="documents-spinner" class="hidden spinner-row">
         <span class="spinner"></span> Loading…
       </div>
@@ -21,7 +23,8 @@ registerCard({
       const container = document.getElementById('documents-result');
       spinner.classList.remove('hidden');
       container.innerHTML = '';
-
+      const REPOSITORY_IDENTIFIER = session.config.repositoryIdentifier;      
+      console.log(REPOSITORY_IDENTIFIER);
       try {
         const res = await apiFetch(API.documents);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);

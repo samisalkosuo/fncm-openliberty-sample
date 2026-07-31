@@ -1,8 +1,10 @@
 package dev.fncm.resource;
 
+import dev.fncm.model.AppConfig;
 import dev.fncm.model.LoginRequest;
 import dev.fncm.model.LoginResponse;
 import dev.fncm.service.AuthService;
+import dev.fncm.service.javaapi.FileNetConfig;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -18,10 +20,11 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
  * POST /api/auth/login  { "username": "...", "password": "..." }
  *
  * Calls the two-step CP4BA/IAM token flow and returns:
- *   { appToken, accessToken, expiresIn }
+ *   { appToken, accessToken, expiresIn, config }
  *
  *  - accessToken – Zen token forwarded to the browser for direct GraphQL calls
  *  - appToken    – same token used as Bearer for /api/* REST calls
+ *  - config      – non-sensitive server config (repositoryIdentifier, domain, stanza)
  */
 @Path("/auth")
 @RequestScoped
@@ -31,6 +34,9 @@ public class AuthResource extends BaseResource {
 
     @Inject
     AuthService authService;
+
+    @Inject
+    FileNetConfig fileNetConfig;
 
     @Inject
     @ConfigProperty(name = "token.ttl.seconds", defaultValue = "3600")
@@ -53,10 +59,17 @@ public class AuthResource extends BaseResource {
             // BearerTokenFilter can resolve the username on subsequent requests.
             tokenCache.put(zenToken, req.getUsername(), iamToken, tokenTtlSeconds);
 
+            AppConfig appConfig = new AppConfig(
+                    fileNetConfig.getObjectStore(),  // repositoryIdentifier
+                    fileNetConfig.getDomain(),
+                    fileNetConfig.getStanza()
+            );
+
             LoginResponse body = new LoginResponse(
                     zenToken,              // appToken  – Bearer for /api/* calls
                     zenToken,              // accessToken – raw Zen token for direct GraphQL calls
-                    (int) tokenTtlSeconds  // expiresIn (seconds)
+                    (int) tokenTtlSeconds, // expiresIn (seconds)
+                    appConfig
             );
             return Response.ok(body).build();
 

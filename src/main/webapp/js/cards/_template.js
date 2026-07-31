@@ -12,6 +12,7 @@
 //   3. Add one import line to main.js — that's it. index.html is not touched.
 import { apiFetch, API, GraphQL } from '../api.js';
 import { esc, renderJson, renderWithToggle } from '../util.js';
+import { session } from '../session.js';
 import { registerCard } from './registry.js';
 // Event bus — uncomment the functions you need:
 // import { publish, subscribe, unsubscribe, TOPICS } from '../eventBus.js';
@@ -59,6 +60,18 @@ registerCard({
         // });
 
         // 1b. call GraphQL — returns parsed JSON directly, no .json() needed
+        // Use session.config for server-side values in GraphQL variables:
+        //   session.config.repositoryIdentifier  — FileNet object store name
+        //   session.config.domain                — FileNet domain name
+        //   session.config.stanza                — FileNet stanza name
+        //
+        // Example:
+        // const data = await GraphQL.execute(
+        //   `query($repo: String!) { folder(repositoryIdentifier: $repo, identifier: "/") { name } }`,
+        //   { repo: session.config.repositoryIdentifier }
+        // );
+        // renderJson(container, data);
+        //
         // const data = await GraphQL.execute(`{ domain { name } }`);
         // const data = await GraphQL.execute(`query($id: ID!) { ... }`, { id: '123' });
         // renderJson(container, data);
