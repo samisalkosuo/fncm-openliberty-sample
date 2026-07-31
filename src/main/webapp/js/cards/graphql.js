@@ -1,5 +1,5 @@
 // cards/graphql.js — GraphQL Query card
-import { apiFetch, API } from '../api.js';
+import { GraphQL } from '../api.js';
 import { esc, renderJson } from '../util.js';
 import { registerCard } from './registry.js';
 
@@ -28,12 +28,7 @@ registerCard({
       container.innerHTML = '';
 
       try {
-        const res = await apiFetch(API.graphql, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query }),
-        });
-        const data = await res.json();
+        const data = await GraphQL.execute(query);
         renderJson(container, data);
       } catch (err) {
         container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;

@@ -62,7 +62,7 @@ registerCard({
   size: 'normal',
   html: () => `
     <div class="card" id="card-create-document">
-      <h2>Create Building Inspepction Report Documentn</h2>
+      <h2>Create Building Inspection Report Document</h2>
       <p>Fill in the properties and select a file to create a new Building Inspection Report document in FileNet.<br/>
       <span style="font-size:0.66rem">Fields marked <span style="color:red">*</span> are required.<span></p>
       <div class="form-group" style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">

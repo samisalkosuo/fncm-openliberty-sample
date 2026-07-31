@@ -23,3 +23,17 @@ export async function apiFetch(url, options = {}) {
   };
   return fetch(url, { ...options, headers });
 }
+
+// GraphQL — single entry point for all GraphQL calls.
+// Usage: const data = await GraphQL.execute(query);
+//        const data = await GraphQL.execute(query, { varName: value });
+export const GraphQL = {
+  async execute(query, variables = {}) {
+    const res = await apiFetch(API.graphql, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, variables }),
+    });
+    return res.json();
+  },
+};

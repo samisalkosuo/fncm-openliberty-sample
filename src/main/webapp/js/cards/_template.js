@@ -10,7 +10,7 @@
 //   1. Copy this file → cards/myFeature.js
 //   2. Replace every "my-feature" occurrence with your slug
 //   3. Add one import line to main.js — that's it. index.html is not touched.
-import { apiFetch, API } from '../api.js';
+import { apiFetch, API, GraphQL } from '../api.js';
 import { esc, renderJson, renderWithToggle } from '../util.js';
 import { registerCard } from './registry.js';
 // Event bus — uncomment the functions you need:
@@ -47,7 +47,7 @@ registerCard({
       container.innerHTML = '';
 
       try {
-        // 1. call endpoint
+        // 1a. call a REST endpoint
         const res = await apiFetch(API.myEndpoint);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         // 2. render result as expandable JSON tree
@@ -57,6 +57,11 @@ registerCard({
         // renderWithToggle(container, data, (el, d) => {
         //   el.innerHTML = `<p>${esc(d.someField)}</p>`;
         // });
+
+        // 1b. call GraphQL — returns parsed JSON directly, no .json() needed
+        // const data = await GraphQL.execute(`{ domain { name } }`);
+        // const data = await GraphQL.execute(`query($id: ID!) { ... }`, { id: '123' });
+        // renderJson(container, data);
       } catch (err) {
         container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
       } finally {
