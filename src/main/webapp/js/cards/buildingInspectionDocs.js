@@ -11,6 +11,7 @@ registerCard({
       <p>Add or delete Building Inspection document classes and documents.</p>
       <button id="addbuildinginspectiondocs-add-btn">Create</button>
       <button id="addbuildinginspectiondocs-delete-btn" class="button-delete">Delete</button>
+      <button id="addbuildinginspectiondocs-delete-folders-btn" class="button-delete">Delete all folders</button>
       <div id="addbuildinginspectiondocs-spinner" class="hidden spinner-row">
         <span class="spinner"></span> Loading…
       </div>
@@ -68,6 +69,25 @@ registerCard({
         container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
       } finally {
         // 3. hide spinner
+        spinner.classList.add('hidden');
+      }
+    });
+
+    //delete all folders button
+    document.getElementById('addbuildinginspectiondocs-delete-folders-btn').addEventListener('click', async () => {
+      const spinner   = document.getElementById('addbuildinginspectiondocs-spinner');
+      const container = document.getElementById('addbuildinginspectiondocs-result');
+      spinner.classList.remove('hidden');
+      container.innerHTML = '';
+
+      try {
+        const res = await apiFetch(API.deleteAllFolders,{method:"DELETE"});
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        renderJson(container, data);
+      } catch (err) {
+        container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
+      } finally {
         spinner.classList.add('hidden');
       }
     });
