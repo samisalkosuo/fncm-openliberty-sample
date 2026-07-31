@@ -3,6 +3,7 @@ samples/
 TODO.md
 config*.env
 .vscode/
+plans/
 
 target/
 pom.xml.tag
