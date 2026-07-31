@@ -110,7 +110,8 @@ public class UploadBuildingInspectionDocs {
 
         // Set document title (use filename without extension)
         String fileName = resourcePath.substring(resourcePath.lastIndexOf('/') + 1);
-        String title = fileName.contains(".") ? fileName.substring(0, fileName.lastIndexOf('.')) : fileName;
+        //String title = fileName.contains(".") ? fileName.substring(0, fileName.lastIndexOf('.')) : fileName;
+        String title = createDocumentName(fields);
         doc.getProperties().putValue("DocumentTitle", title);
 
         LOGGER.info("  Document Title: " + title);
@@ -139,6 +140,31 @@ public class UploadBuildingInspectionDocs {
         } finally {
             docStream.close();
         }
+    }
+
+    private String createDocumentName(JsonObject fields) throws Exception {
+
+        StringBuilder title = new StringBuilder("Inspection Report ");
+        title.append("(");
+        // Municipality (String)
+        if (fields.has("Municipality")) {
+            String municipality = fields.get("Municipality").getAsString();
+            title.append(municipality);
+            title.append(" ");
+        }        
+        // InspectionDate (DateTime)
+        if (fields.has("InspectionDate")) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String dateStr = fields.get("InspectionDate").getAsString();
+            try {
+                Date inspectionDate = INPUT_DATE_FORMAT.parse(dateStr);                
+                title.append(dateFormat.format(inspectionDate));
+            } catch (Exception e) {
+                LOGGER.warning("  Warning: Could not parse InspectionDate: " + dateStr);
+            }
+        }
+        title.append(")");
+        return title.toString();
     }
 
     /**
