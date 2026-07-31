@@ -7,11 +7,13 @@ registerCard({
   size: 'normal',   // 'normal' | 'wide' | 'tall' | 'large' | 'full'
   html: () => `
     <div class="card" id="card-addbuildinginspectiondocs">
-      <h2>Building Inspection Documents</h2>
-      <p>Add or delete Building Inspection document classes and documents.</p>
-      <button id="addbuildinginspectiondocs-add-btn">Create</button>
-      <button id="addbuildinginspectiondocs-delete-btn" class="button-delete">Delete</button>
-      <button id="addbuildinginspectiondocs-delete-folders-btn" class="button-delete">Delete all folders</button>
+      <h2>Building Inspection Documents Setup</h2>
+      <p>Create or delete Building Inspection Report document classes and documents.</p>
+      <div style="display:flex; flex-direction:column; gap:.5rem; margin-top:.5rem;">
+        <button id="addbuildinginspectiondocs-add-btn">Create classes and upload docs</button>
+        <button id="addbuildinginspectiondocs-delete-btn" class="button-delete">Delete docs and classes</button>
+        <button id="addbuildinginspectiondocs-delete-folders-btn" class="button-delete">Delete all folders</button>
+      </div>
       <div id="addbuildinginspectiondocs-spinner" class="hidden spinner-row">
         <span class="spinner"></span> Loading…
       </div>
