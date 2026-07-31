@@ -124,6 +124,7 @@ public class UploadBuildingInspectionDocs {
             com.filenet.api.core.ContentTransfer ct = Factory.ContentTransfer.createInstance();
             ct.setCaptureSource(docStream);
             ct.set_RetrievalName(fileName);
+            ct.set_ContentType("text/markdown; charset=UTF-8");
             doc.set_ContentElements(Factory.ContentElement.createList());
             doc.get_ContentElements().add(ct);
 
