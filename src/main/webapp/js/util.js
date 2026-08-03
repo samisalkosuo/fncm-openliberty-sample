@@ -50,6 +50,22 @@ export function renderJson(container, data) {
     );
   });
 
+  // ── copy button ──
+  const copyBtn = document.createElement('button');
+  copyBtn.className   = 'secondary json-copy-btn';
+  copyBtn.textContent = '📋 Copy JSON';
+  copyBtn.title       = 'Copy raw JSON to clipboard';
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(JSON.stringify(data, null, 2)).then(() => {
+      copyBtn.textContent = '✔ Copied!';
+      setTimeout(() => { copyBtn.textContent = '📋 Copy JSON'; }, 1500);
+    }).catch(() => {
+      copyBtn.textContent = '✖ Failed';
+      setTimeout(() => { copyBtn.textContent = '📋 Copy JSON'; }, 1500);
+    });
+  });
+  bar.appendChild(copyBtn);
+
   container.append(bar, treeDiv, rawDiv);
 }
 
