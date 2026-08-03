@@ -12,12 +12,12 @@ import './cards/fileBuildingInspectionDocs.js';
 import './cards/connectionTest.js';
 import './cards/graphql.js';
 import './cards/documents.js';
+import './cards/documentDetails.js';
 import './cards/listFolders.js';
 import './cards/listDocumentClasses.js';
 import './cards/userGroups.js';
 import './cards/listDocumentsInFolder.js';
 import './cards/folderDetails.js';
-import './cards/documentDetails.js';
 import './cards/createBuildingInspectionReportDocument.js';
 
 // To add a new card: create js/cards/myFeature.js and add one import line above.

@@ -24,9 +24,12 @@
 //   Key   : SCREAMING_SNAKE_CASE   (e.g. DOCUMENT_SELECTED)
 //   Value : 'fncmopenlibertysample:<noun>:<verb>'   (e.g. 'fncmopenlibertysample:document:selected')
 
+const TOPIC_PREFIX = 'fncmopenlibertysample';
+
 export const TOPICS = {
-  DOCUMENT_SELECTED: 'fncmopenlibertysample:document:selected',
-  FOLDER_SELECTED: 'fncmopenlibertysample:folder:selected'
+  DOCUMENT_SELECTED: `${TOPIC_PREFIX}:document:selected`,
+  FOLDER_SELECTED: `${TOPIC_PREFIX}:folder:selected`,
+  DOCUMENT_ID: `${TOPIC_PREFIX}:document:id`,
 };
 
 // ── Internal state ───────────────────────────────────────────────────────────

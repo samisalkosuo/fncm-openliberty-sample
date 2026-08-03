@@ -3,6 +3,8 @@ import { GraphQL,apiFetch, API } from '../api.js';
 import { esc, renderWithToggle, renderJson } from '../util.js';
 import { registerCard } from './registry.js';
 import { session } from '../session.js';
+import { publish, TOPICS } from '../eventBus.js';
+import { logout } from '../router.js';
 
 
 registerCard({
@@ -24,34 +26,65 @@ registerCard({
       spinner.classList.remove('hidden');
       container.innerHTML = '';
       try {
-      //const REPOSITORY_IDENTIFIER = session.config.repositoryIdentifier;
-      //this.testFunction(`repository id: ${REPOSITORY_IDENTIFIER}`);
-      const documentResult = await this.getDocuments();
-      renderJson(container, documentResult);
+        const documentResult = await this.getDocuments();
+        const docs = documentResult?.data.documents?.documents ?? [];
+        if (docs.length === 0) {
+          container.innerHTML = '<p class="text-muted">No documents found.</p>';
+          return;
+        }
 
-      /*
-        const res = await apiFetch(API.documents);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        renderWithToggle(container, data, (el, d) => {
-          const docs = d.documents ?? [];
-          if (docs.length === 0) {
-            el.innerHTML = '<p class="text-muted">No documents found.</p>';
-          } else {
-            const rows = docs.map(doc =>
-              `<tr><td>${esc(doc.id)}</td><td>${esc(doc.name)}</td></tr>`
-            ).join('');
-            el.innerHTML =
-              `<table><thead><tr><th>ID</th><th>Name</th></tr></thead><tbody>${rows}</tbody></table>`;
-          }
+        const sorted = [...docs].sort((a, b) => a.name.localeCompare(b.name));
+
+        const select = document.createElement('select');
+        select.id = 'documents-dropdown';
+
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = '— Select a document —';
+        placeholder.disabled = true;
+        placeholder.selected = true;
+        select.appendChild(placeholder);
+
+        sorted.forEach(doc => {
+          const option = document.createElement('option');
+          option.value = doc.id;
+          option.textContent = esc(doc.name);
+          select.appendChild(option);
         });
-        */
+
+        select.addEventListener('change', () => {
+          const selectedId = select.value;
+          if (selectedId) this.onDocumentSelected(selectedId);
+        });
+
+        const idLabel = document.createElement('p');
+        idLabel.id = 'documents-selected-id';
+        idLabel.className = 'text-muted';
+        container.appendChild(select);
+        container.appendChild(idLabel);
       } catch (err) {
-        container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
+        if (err.status === 401) {
+          container.innerHTML = `
+            <div class="alert alert-error">
+              <strong>401 Unauthorized</strong> — ${esc(err.message)}
+              <br><br>
+              <button id="documents-relogin-btn">Sign in again</button>
+            </div>`;
+          document.getElementById('documents-relogin-btn')
+            .addEventListener('click', logout);
+        } else {
+          container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
+        }
       } finally {
         spinner.classList.add('hidden');
       }
     });
+  },
+  onDocumentSelected(documentId) {
+    console.log('Document selected, id:', documentId);
+    const idLabel = document.getElementById('documents-selected-id');
+    if (idLabel) idLabel.textContent = `ID: ${documentId}`;
+    publish(TOPICS.DOCUMENT_ID, documentId);
   },
   testFunction(arg) {
     console.log(arg);
@@ -78,17 +111,7 @@ registerCard({
             return data;
             */
 
-    try {
-            const data = await GraphQL.execute(graphqlQuery);
-            return data;
-            //renderJson(container, data);
-          } catch (err) {
-            const errorMessage = {
-              message: `${esc(err.message)}`
-            };
-            return errorMessage
-          } finally {
-          }
+    return GraphQL.execute(graphqlQuery);
     
   }
 });
