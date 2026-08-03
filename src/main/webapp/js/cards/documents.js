@@ -1,6 +1,6 @@
 // cards/documents.js — Documents (REST) card
-import { apiFetch, API } from '../api.js';
-import { esc, renderWithToggle } from '../util.js';
+import { GraphQL,apiFetch, API } from '../api.js';
+import { esc, renderWithToggle, renderJson } from '../util.js';
 import { registerCard } from './registry.js';
 import { session } from '../session.js';
 
@@ -23,13 +23,16 @@ registerCard({
       const container = document.getElementById('documents-result');
       spinner.classList.remove('hidden');
       container.innerHTML = '';
-      const REPOSITORY_IDENTIFIER = session.config.repositoryIdentifier;      
-      console.log(REPOSITORY_IDENTIFIER);
       try {
+      //const REPOSITORY_IDENTIFIER = session.config.repositoryIdentifier;
+      //this.testFunction(`repository id: ${REPOSITORY_IDENTIFIER}`);
+      const documentResult = await this.getDocuments();
+      renderJson(container, documentResult);
+
+      /*
         const res = await apiFetch(API.documents);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-
         renderWithToggle(container, data, (el, d) => {
           const docs = d.documents ?? [];
           if (docs.length === 0) {
@@ -42,6 +45,7 @@ registerCard({
               `<table><thead><tr><th>ID</th><th>Name</th></tr></thead><tbody>${rows}</tbody></table>`;
           }
         });
+        */
       } catch (err) {
         container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
       } finally {
@@ -49,4 +53,42 @@ registerCard({
       }
     });
   },
+  testFunction(arg) {
+    console.log(arg);
+  },
+  async getDocuments() {
+    const REPOSITORY_IDENTIFIER = session.config.repositoryIdentifier;
+    var graphqlQuery = `
+    {
+  documents(
+    repositoryIdentifier: "${REPOSITORY_IDENTIFIER}"
+    from: "BuildingInspectionReport"
+    orderBy: "DocumentTitle"
+  ) {
+    documents {      
+      name
+      id
+    }
+  }
+}`;
+/*
+        console.log(graphqlQuery);
+            const data = GraphQL.execute(graphqlQuery);
+            console.log(data);
+            return data;
+            */
+
+    try {
+            const data = await GraphQL.execute(graphqlQuery);
+            return data;
+            //renderJson(container, data);
+          } catch (err) {
+            const errorMessage = {
+              message: `${esc(err.message)}`
+            };
+            return errorMessage
+          } finally {
+          }
+    
+  }
 });
