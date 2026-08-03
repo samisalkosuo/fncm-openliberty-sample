@@ -34,6 +34,11 @@ export const GraphQL = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query, variables }),
     });
+    if (!res.ok) {
+      const err = new Error(res.status === 401 ? 'Session expired. Please sign in again.' : `HTTP ${res.status}`);
+      err.status = res.status;
+      throw err;
+    }
     return res.json();
   },
 };
