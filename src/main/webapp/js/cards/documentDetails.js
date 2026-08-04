@@ -135,9 +135,13 @@ registerCard({
 
   // ── Edit mode ──────────────────────────────────────────────────────────────
   async showEditForm() {
-    const container = document.getElementById('document-details-result');
-    const editForm  = document.getElementById('document-details-edit-form');
+    const container   = document.getElementById('document-details-result');
+    const editForm    = document.getElementById('document-details-edit-form');
+    const refreshBtn  = document.getElementById('document-details-refresh-btn');
+    const editBtn     = document.getElementById('document-details-edit-btn');
 
+    refreshBtn.classList.add('hidden');
+    editBtn.classList.add('hidden');
     container.classList.add('hidden');
     editForm.classList.remove('hidden');
     await this.checkoutDocument(this.currentDoc.id)
@@ -244,13 +248,16 @@ registerCard({
   },
 
   async cancelEdit() {
-
     await this.cancelCheckoutDocument(session.getState('reservationId'));
-    const container = document.getElementById('document-details-result');
-    const editForm  = document.getElementById('document-details-edit-form');
+    const container  = document.getElementById('document-details-result');
+    const editForm   = document.getElementById('document-details-edit-form');
+    const refreshBtn = document.getElementById('document-details-refresh-btn');
+    const editBtn    = document.getElementById('document-details-edit-btn');
     editForm.classList.add('hidden');
     editForm.innerHTML = '';
     container.classList.remove('hidden');
+    refreshBtn.classList.remove('hidden');
+    editBtn.classList.remove('hidden');
   },
 
   // ── Save handler ───────────────────────────────────────────────────────────
@@ -319,11 +326,13 @@ registerCard({
       }
 
       // Switch back to read-only and refresh with the mutation response
-      const editForm  = document.getElementById('document-details-edit-form');
-      const container = document.getElementById('document-details-result');
+      const editForm   = document.getElementById('document-details-edit-form');
+      const container  = document.getElementById('document-details-result');
+      const refreshBtn = document.getElementById('document-details-refresh-btn');
       editForm.classList.add('hidden');
       editForm.innerHTML = '';
       container.classList.remove('hidden');
+      refreshBtn.classList.remove('hidden');
       this.renderDetails(updated);
 
     } catch (err) {
