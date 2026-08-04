@@ -12,7 +12,7 @@ import { registerCard } from './registry.js';
 const BUILDING_TYPE_OPTIONS = ['Unknown','Residential', 'Commercial', 'Industrial', 'Public'];
 
 // Choice list values for complianceStatus
-const COMPLIANCE_STATUS_OPTIONS = ['Unknown','Fully Compliant','Mostly Compliant','Partially Compliant','Non-Compliant','Requires Follow-Up'];
+const COMPLIANCE_STATUS_OPTIONS = ['Unknown','Fully Compliant','Mostly Compliant','Partially Compliant','Non-Compliant','Requires Follow-up'];
 
 // ── Test-data helpers ────────────────────────────────────────────────────────
 const _pick = arr => arr[Math.floor(Math.random() * arr.length)];
