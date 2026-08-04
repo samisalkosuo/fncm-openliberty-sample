@@ -16,11 +16,38 @@ export const session = {
    */
   config: null,
 
+  /**
+   * Generic runtime key-value store — survives page reloads automatically.
+   * Write: session.setState('reservationId', id)
+   * Read:  session.getState('reservationId')
+   * Any key is valid; no schema changes needed for future values.
+   */
+  state: {},
+
+  setState(key, value) {
+    this.state[key] = value;
+    const stored = JSON.parse(sessionStorage.getItem('session') ?? '{}');
+    stored.state = { ...stored.state, [key]: value };
+    sessionStorage.setItem('session', JSON.stringify(stored));
+  },
+
+  getState(key, defaultValue = null) {
+    return key in this.state ? this.state[key] : defaultValue;
+  },
+
+  clearState(key) {
+    delete this.state[key];
+    const stored = JSON.parse(sessionStorage.getItem('session') ?? '{}');
+    if (stored.state) delete stored.state[key];
+    sessionStorage.setItem('session', JSON.stringify(stored));
+  },
+
   save(data) {
     this.appToken    = data.appToken;
     this.accessToken = data.accessToken;
     this.username    = data.username;
     this.config      = data.config ?? null;
+    this.state       = data.state  ?? {};
     sessionStorage.setItem('session', JSON.stringify(data));
   },
 
@@ -32,6 +59,7 @@ export const session = {
       this.accessToken = d.accessToken;
       this.username    = d.username;
       this.config      = d.config ?? null;
+      this.state       = d.state  ?? {};
       return true;
     }
     return false;
@@ -39,6 +67,7 @@ export const session = {
 
   clear() {
     this.appToken = this.accessToken = this.username = this.config = null;
+    this.state = {};
     sessionStorage.removeItem('session');
   },
 };

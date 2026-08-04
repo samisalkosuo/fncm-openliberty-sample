@@ -134,13 +134,60 @@ registerCard({
   },
 
   // ── Edit mode ──────────────────────────────────────────────────────────────
-  showEditForm() {
+  async showEditForm() {
     const container = document.getElementById('document-details-result');
     const editForm  = document.getElementById('document-details-edit-form');
 
     container.classList.add('hidden');
     editForm.classList.remove('hidden');
+    await this.checkoutDocument(this.currentDoc.id)
     this.renderEditForm(this.currentDoc);
+  },
+
+  async checkoutDocument(docId) {
+    const repo = session.config.repositoryIdentifier;
+
+    const checkoutMutation = `
+    mutation checkoutDocument{
+    checkoutDocument(
+        repositoryIdentifier:"${escPropValue(repo)}",
+        identifier:"${escPropValue(docId)}",
+        )
+      {
+        id
+        name
+        reservation
+        {
+          id
+          name
+          dateCreated
+        }
+      }
+    }
+`;
+    const result = await GraphQL.execute(checkoutMutation);
+    const reservationId = result?.data?.checkoutDocument?.reservation?.id;
+    session.setState('reservationId', reservationId);
+    console.log(`Checkout done. Reservation ID: ${reservationId}`);
+  },
+  async cancelCheckoutDocument(reservationId) {
+    const repo = session.config.repositoryIdentifier;
+
+    const cancelCheckoutMutation = `
+    mutation cancelCheckout {
+      cancelDocumentCheckout(
+        repositoryIdentifier:"${escPropValue(repo)}",
+      identifier:"${escPropValue(reservationId)}",
+      ) 
+      {
+        id
+      }
+    }
+  `;
+    const result = await GraphQL.execute(cancelCheckoutMutation);
+    const canceledReservationId = result?.data?.cancelDocumentCheckout?.id;
+    session.clearState('reservationId');
+    console.log(`Checkout canceled. Canceled Reservation ID: ${canceledReservationId}`);
   },
 
   renderEditForm(doc) {
@@ -196,7 +243,9 @@ registerCard({
     document.getElementById('doc-edit-cancel-btn').addEventListener('click', () => this.cancelEdit());
   },
 
-  cancelEdit() {
+  async cancelEdit() {
+
+    await this.cancelCheckoutDocument(session.getState('reservationId'));
     const container = document.getElementById('document-details-result');
     const editForm  = document.getElementById('document-details-edit-form');
     editForm.classList.add('hidden');
@@ -263,11 +312,8 @@ registerCard({
             }
           }
         }`;
-      console.log(mutation);
       const result = await GraphQL.execute(mutation);
-      console.log(result);
       const updated = result?.data?.updateDocument;
-      console.log(updated);
       if (!updated) {
         throw new Error('No data returned from updateDocument.');
       }
