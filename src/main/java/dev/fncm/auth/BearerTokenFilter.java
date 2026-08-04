@@ -41,9 +41,9 @@ public class BearerTokenFilter implements ContainerRequestFilter {
         String raw    = ctx.getUriInfo().getRequestUri().getPath();
         LOG.info("BearerTokenFilter: " + method + " " + raw);
 
-        // Pass the public login endpoint through without requiring a token.
-        if (raw.contains("/auth/")) {
-            LOG.info("BearerTokenFilter: skipping auth check for login path");
+        // Pass public endpoints through without requiring a token.
+        if (raw.contains("/auth/") || raw.endsWith("/config")) {
+            LOG.info("BearerTokenFilter: skipping auth check for public path");
             return;
         }
 

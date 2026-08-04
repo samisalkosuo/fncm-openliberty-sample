@@ -22,9 +22,21 @@ import './cards/createBuildingInspectionReportDocument.js';
 
 // To add a new card: create js/cards/myFeature.js and add one import line above.
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   // ── Mount cards into the grid ───────────────────────────────────────
   mountAllCards(document.querySelector('.card-grid'));
+
+  // ── Dev convenience: pre-fill login form from server env vars ───────
+  try {
+    const cfgRes = await fetch('/api/config');
+    console.log(cfgRes);
+    if (cfgRes.ok) {
+      const cfg = await cfgRes.json();
+      console.log(cfg);
+      if (cfg.devUsername) document.getElementById('username').value = cfg.devUsername;
+      if (cfg.devPassword) document.getElementById('password').value = cfg.devPassword;
+    }
+  } catch { /* dev-only; ignore failures */ }
 
   // ── Login ───────────────────────────────────────────────────────────
   document.getElementById('login-form').addEventListener('submit', async (e) => {

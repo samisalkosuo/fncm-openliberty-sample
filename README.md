@@ -58,7 +58,7 @@ mvn package -DskipTests
 
 # Build & run container
 podman build -t fncm-openliberty-sample:latest .
-podman run -it --rm --name fncm-openliberty-sample -p 9080:9080 --env-file=config.env fncm-openliberty-sample:latest
+podman run -it --rm --name fncm-openliberty-sample -p 9080:9080 --env-file=config.env -e DEV_USER_NAME=usr -e DEV_USER_PASSWORD=pwd fncm-openliberty-sample:latest
 ```
 
 Open <http://localhost:9080>.
