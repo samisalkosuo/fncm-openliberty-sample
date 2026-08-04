@@ -166,7 +166,6 @@ registerCard({
     await this.checkoutDocument(this.currentDoc.id)
     this.renderEditForm(this.currentDoc);
   },
-
   async checkoutDocument(docId) {
     const repo = session.config.repositoryIdentifier;
 
@@ -179,6 +178,17 @@ registerCard({
       {
         id
         name
+        contentElements {
+          
+          contentType
+          elementSequenceNumber
+          ... on ContentTransfer {
+            className
+            contentSize
+            retrievalName 
+            downloadUrl
+          }
+        }
         reservation
         {
           id
@@ -192,6 +202,26 @@ registerCard({
     const reservationId = result?.data?.checkoutDocument?.reservation?.id;
     session.setState('reservationId', reservationId);
     console.log(`Checkout done. Reservation ID: ${reservationId}`);
+  },
+  async checkinDocument(docId) {
+    const repo = session.config.repositoryIdentifier;
+
+    const checkinMutation = `
+mutation checkinDocument{
+  checkinDocument(repositoryIdentifier:"${escPropValue(repo)}",
+  identifier:"${escPropValue(docId)}"
+  checkinAction: {})
+  
+  {
+    id
+}
+}
+`;
+    const result = await GraphQL.execute(checkinMutation);
+    const newDocId = result?.data?.checkinDocument?.id;
+    session.clearState('reservationId');
+    console.log(`Checkin done. Doc ID: ${newDocId}`);
+    return newDocId;
   },
   async cancelCheckoutDocument(reservationId) {
     const repo = session.config.repositoryIdentifier;
@@ -314,6 +344,7 @@ registerCard({
     try {
       const repo = session.config.repositoryIdentifier;
       const id   = this.currentDocumentId;
+      //const id   = session.getState("reservationid");
       const mutation = ` mutation
         {
           updateDocument(
@@ -344,6 +375,7 @@ registerCard({
         throw new Error('No data returned from updateDocument.');
       }
 
+
       // Switch back to read-only and refresh with the mutation response
       const editForm   = document.getElementById('document-details-edit-form');
       const container  = document.getElementById('document-details-result');
@@ -352,6 +384,8 @@ registerCard({
       editForm.innerHTML = '';
       container.classList.remove('hidden');
       refreshBtn.classList.remove('hidden');
+      //const newDocId = this.checkinDocument();
+      //this.fetchAndRender(newDocId);
       this.renderDetails(updated);
 
     } catch (err) {
