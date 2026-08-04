@@ -23,6 +23,9 @@ import './cards/createBuildingInspectionReportDocument.js';
 // To add a new card: create js/cards/myFeature.js and add one import line above.
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // ── Restore session first so cards can read state during init ───────
+  const hasSession = session.load();
+
   // ── Mount cards into the grid ───────────────────────────────────────
   mountAllCards(document.querySelector('.card-grid'));
 
@@ -83,7 +86,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('logout-btn').addEventListener('click', logout);
 
   // ── Restore session on page load ────────────────────────────────────
-  if (session.load()) {
+  if (hasSession) {
     enterApp();
     runPostLoginCards();
   }
