@@ -97,6 +97,7 @@ registerCard({
     repositoryIdentifier: "${REPOSITORY_IDENTIFIER}"
     from: "BuildingInspectionReport"
     orderBy: "DocumentTitle"
+    where:"[IsCurrentVersion] = True"
   ) {
     documents {      
       name
