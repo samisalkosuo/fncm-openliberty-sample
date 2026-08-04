@@ -67,6 +67,25 @@ registerCard({
       refreshBtn.classList.remove('hidden');
       this.fetchAndRender(documentId);
     });
+
+    subscribe(TOPICS.DOCUMENT_CLEARED, () => this.clearDetails());
+  },
+
+  clearDetails() {
+    this.currentDocumentId = null;
+    this.currentDoc = null;
+
+    const container  = document.getElementById('document-details-result');
+    const editForm   = document.getElementById('document-details-edit-form');
+    const refreshBtn = document.getElementById('document-details-refresh-btn');
+    const editBtn    = document.getElementById('document-details-edit-btn');
+
+    editForm.classList.add('hidden');
+    editForm.innerHTML = '';
+    container.classList.remove('hidden');
+    container.innerHTML = '<p class="text-muted">Select a document from the Documents card to see its details here.</p>';
+    refreshBtn.classList.add('hidden');
+    editBtn.classList.add('hidden');
   },
 
   // ── Read-only fetch ────────────────────────────────────────────────────────

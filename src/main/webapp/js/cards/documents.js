@@ -3,7 +3,7 @@ import { GraphQL,apiFetch, API } from '../api.js';
 import { esc, renderWithToggle, renderJson } from '../util.js';
 import { registerCard } from './registry.js';
 import { session } from '../session.js';
-import { publish, TOPICS } from '../eventBus.js';
+import { publish, subscribe, TOPICS } from '../eventBus.js';
 import { logout } from '../router.js';
 
 
@@ -13,7 +13,10 @@ registerCard({
   html: () => `
     <div class="card" id="card-documents">
       <h2>Documents</h2>
-      <button id="documents-btn">Get documents</button>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem">
+        <button id="documents-btn">Get documents</button>
+        <button id="documents-clear-btn" class="hidden">Clear selection</button>
+      </div>
       <div id="documents-spinner" class="hidden spinner-row">
         <span class="spinner"></span> Loading…
       </div>
@@ -21,6 +24,7 @@ registerCard({
     </div>`,
   init() {
     document.getElementById('documents-btn').addEventListener('click', () => this.loadDocuments());
+    document.getElementById('documents-clear-btn').addEventListener('click', () => this.clearSelection());
 
     // Restore previously selected document after a page refresh
     const savedId = session.getState('selectedDocumentId');
@@ -99,7 +103,21 @@ registerCard({
     session.setState('selectedDocumentId', documentId);
     const idLabel = document.getElementById('documents-selected-id');
     if (idLabel) idLabel.textContent = `ID: ${documentId}`;
+    document.getElementById('documents-clear-btn').classList.remove('hidden');
     publish(TOPICS.DOCUMENT_ID, documentId);
+  },
+
+  clearSelection() {
+    session.clearState('selectedDocumentId');
+    const select  = document.getElementById('documents-dropdown');
+    const idLabel = document.getElementById('documents-selected-id');
+    if (select) {
+      // Reset to the placeholder option
+      select.selectedIndex = 0;
+    }
+    if (idLabel) idLabel.textContent = '';
+    document.getElementById('documents-clear-btn').classList.add('hidden');
+    publish(TOPICS.DOCUMENT_CLEARED);
   },
   testFunction(arg) {
     console.log(arg);
