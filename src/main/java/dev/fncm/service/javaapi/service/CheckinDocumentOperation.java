@@ -66,40 +66,39 @@ public class CheckinDocumentOperation implements FileNetOperation<CheckinDocumen
         // Update properties on the reservation before checking in
         setProperties(reservationDoc);
 
-        // Get content elements of reservation doc
+        // Check whether content elements were already set on the reservation
+        // (e.g. by UpdateContentElementOperation during the edit session).
+        // If so, use them as-is. Otherwise copy from the original document.
         ContentElementList contentElements = reservationDoc.get_ContentElements();
-        if (contentElements == null) {
-            contentElements = Factory.ContentElement.createList();
+        boolean reservationHasContent = contentElements != null && contentElements.size() > 0;
+
+        if (reservationHasContent) {
+            LOGGER.info("Reservation already has " + contentElements.size() + " content element(s) — skipping copy from original");
+        } else {
+            LOGGER.info("Reservation has no content elements — copying from original document: " + documentId);
+            if (contentElements == null) {
+                contentElements = Factory.ContentElement.createList();
+            }
+
+            Document originalDoc = (Document) Factory.Document.fetchInstance(os, new Id(documentId), null);
+            ContentElementList originalContentElements = originalDoc.get_ContentElements();
+
+            for (int i = 0; i < originalContentElements.size(); i++) {
+                ContentTransfer content = (ContentTransfer) originalContentElements.get(i);
+                LOGGER.info("Retrieval name: " + content.get_RetrievalName());
+                LOGGER.info("Content size  : " + content.get_ContentSize());
+                LOGGER.info("Content type  : " + content.get_ContentType());
+
+                ContentTransfer newContent = Factory.ContentTransfer.createInstance();
+                newContent.setCaptureSource(content.accessContentStream());
+                newContent.set_RetrievalName(content.get_RetrievalName());
+                newContent.set_ContentType(content.get_ContentType());
+                contentElements.add(newContent);
+            }
+
+            // Reassign updated list to the reservation
+            reservationDoc.set_ContentElements(contentElements);
         }
-
-
-        Document originalDoc = (Document) Factory.Document.fetchInstance(os, new Id(documentId), null);
-        // Get existing content elements
-        ContentElementList originalContentElements = originalDoc.get_ContentElements();
-        
-        for(int i=0; i< originalContentElements.size();i++)
-        {
-            //Add content from original to reservation doc
-            ContentTransfer content = (ContentTransfer)originalContentElements.get(i);
-            LOGGER.info("Retrieval name: " + content.get_RetrievalName());
-            LOGGER.info("Content size  :" + content.get_ContentSize());
-            LOGGER.info("Content type  :" + content.get_ContentType());
-
-            // Create only the new content transfer
-            ContentTransfer newContent = Factory.ContentTransfer.createInstance();
-
-            newContent.setCaptureSource(content.accessContentStream());
-            newContent.set_RetrievalName(content.get_RetrievalName());
-            newContent.set_ContentType(content.get_ContentType());
-
-            contentElements.add(newContent);
-
-            
-        }
-        
-        
-        // Reassign full collection
-        reservationDoc.set_ContentElements(contentElements);
         
 
         LOGGER.info("Checking in reservation as MAJOR_VERSION");

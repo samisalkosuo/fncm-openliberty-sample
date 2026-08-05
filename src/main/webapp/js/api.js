@@ -16,6 +16,7 @@ export const API = {
   createBuildingInspectionReportDocument:   '/api/createbuildinginspectionreportdocument',
   checkinDocument:                          '/api/checkindocument',
   downloadDocument:                         '/api/downloaddocument',
+  updateContentElement:                     '/api/contentElement',
 };
 
 export async function apiFetch(url, options = {}) {

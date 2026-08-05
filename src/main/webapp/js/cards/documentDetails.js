@@ -1,4 +1,4 @@
-// cards/documentDetails.js — Document Details card
+﻿// cards/documentDetails.js — Document Details card
 //
 // Subscribes to TOPICS.DOCUMENT_ID, fetches full document details (including
 // custom properties) via GraphQL, and renders them.  Includes inline editing
@@ -273,6 +273,14 @@ mutation checkinDocument{
     console.log(`Checkout canceled. Canceled Reservation ID: ${canceledReservationId}`);
   },
 
+  // Returns the inner HTML for the content elements <ul> used in the edit form.
+  buildContentListHtml(contentElements) {
+    const items = (contentElements ?? []).map(ce =>
+      `<li>${esc(ce.retrievalName ?? '')}</li>`
+    ).join('');
+    return items || '<li class="text-muted">None</li>';
+  },
+
   renderEditForm(doc) {
     const editForm = document.getElementById('document-details-edit-form');
 
@@ -311,12 +319,21 @@ mutation checkinDocument{
       ${selectField('BuildingType',     'Building Type',     BUILDING_TYPE_OPTIONS,     propMap['BuildingType'])}
       ${selectField('ComplianceStatus', 'Compliance Status', COMPLIANCE_STATUS_OPTIONS, propMap['ComplianceStatus'])}
 
+      <h3>Content Elements</h3>
+      <ul id="doc-edit-content-list">${this.buildContentListHtml(doc.contentElements)}</ul>
+      <div class="form-group" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem">
+        <button id="doc-edit-add-file-btn" style="font-size:0.8rem;padding:0.25rem 0.6rem;background:#f0f4ff;color:#3b5bdb;border:1px solid #aab4e8;border-radius:4px;cursor:pointer">Add new file</button>
+        <button id="doc-edit-replace-btn" style="font-size:0.8rem;padding:0.25rem 0.6rem;background:#f0f4ff;color:#3b5bdb;border:1px solid #aab4e8;border-radius:4px;cursor:pointer">Replace file</button>
+        <span id="doc-edit-upload-status" class="text-muted" style="align-self:center"></span>
+      </div>
+      <input type="file" id="doc-edit-file-input" style="display:none" />
+
       <div id="doc-edit-error"></div>
 
       <div id="doc-edit-spinner" class="hidden spinner-row">
         <span class="spinner"></span> Saving…
       </div>
-
+      <hr style="margin:1.5rem 0">
       <div class="form-group" style="display:flex;gap:0.5rem;flex-wrap:wrap">
         <button id="doc-edit-save-btn">Save</button>
         <button id="doc-edit-cancel-btn">Cancel</button>
@@ -324,6 +341,75 @@ mutation checkinDocument{
 
     document.getElementById('doc-edit-save-btn').addEventListener('click', () => this.saveEdit());
     document.getElementById('doc-edit-cancel-btn').addEventListener('click', () => this.cancelEdit());
+
+    // ── Content element buttons ───────────────────────────────────────────
+    let pendingMode = null;
+    const fileInput   = document.getElementById('doc-edit-file-input');
+    const addBtn      = document.getElementById('doc-edit-add-file-btn');
+    const replaceBtn  = document.getElementById('doc-edit-replace-btn');
+
+    addBtn.addEventListener('click', () => { pendingMode = 'add';     fileInput.click(); });
+    replaceBtn.addEventListener('click', () => { pendingMode = 'replace'; fileInput.click(); });
+
+    fileInput.addEventListener('change', () => {
+      if (!fileInput.files.length) return;
+      const file = fileInput.files[0];
+      const mode = pendingMode;
+      fileInput.value = '';
+      this.uploadContentElement(mode, file);
+    });
+  },
+
+  async uploadContentElement(mode, file) {
+    const addBtn      = document.getElementById('doc-edit-add-file-btn');
+    const replaceBtn  = document.getElementById('doc-edit-replace-btn');
+    const statusEl    = document.getElementById('doc-edit-upload-status');
+    const errorEl     = document.getElementById('doc-edit-error');
+
+    addBtn.disabled     = true;
+    replaceBtn.disabled = true;
+    statusEl.textContent = 'Uploading…';
+    errorEl.innerHTML   = '';
+
+    try {
+      const reservationId = session.getState('reservationId');
+      const formData = new FormData();
+      formData.append('documentId',    this.currentDocumentId);
+      formData.append('reservationId', reservationId);
+      formData.append('mode', mode);
+      formData.append('file', file);
+
+      const res = await apiFetch(API.updateContentElement, {
+        method:  'POST',
+        headers: {},
+        body:    formData,
+      });
+      if (!res.ok) {
+        const err = new Error(res.status === 401 ? 'Session expired. Please sign in again.' : `HTTP ${res.status}`);
+        err.status = res.status;
+        throw err;
+      }
+
+      // Re-query the reservation via GraphQL to get the updated content elements
+      const result = await this.getDocumentDetails(reservationId);
+      const updated = result?.data?.document?.contentElements ?? [];
+      this.currentDoc = { ...this.currentDoc, contentElements: updated };
+
+      document.getElementById('doc-edit-content-list').innerHTML =
+        this.buildContentListHtml(updated);
+      statusEl.textContent = 'Upload successful.';
+
+    } catch (err) {
+      if (err.status === 401) {
+        errorEl.innerHTML = `<div class="alert alert-error"><strong>401 Unauthorized</strong> — ${esc(err.message)}</div>`;
+      } else {
+        errorEl.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
+      }
+      statusEl.textContent = '';
+    } finally {
+      addBtn.disabled     = false;
+      replaceBtn.disabled = false;
+    }
   },
 
   async cancelEdit() {
