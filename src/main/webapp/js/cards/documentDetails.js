@@ -136,6 +136,11 @@ registerCard({
       `<tr><th>${esc(p.id)}</th><td>${esc(p.value ?? '')}</td></tr>`
     ).join('');
 
+    const contentElements = doc.contentElements ?? [];
+    const contentItems = contentElements.map(ce =>
+      `<li><strong>${esc(ce.retrievalName ?? '')}</strong> <span class="text-muted">${esc(ce.contentType ?? '')}</span></li>`
+    ).join('');
+
     container.innerHTML = `
       <table>
         <tbody>
@@ -147,7 +152,9 @@ registerCard({
       <table>
         <thead><tr><th>Property</th><th>Value</th></tr></thead>
         <tbody>${propRows}</tbody>
-      </table>`;
+      </table>
+      <h3>Content Elements</h3>
+      <ul>${contentItems || '<li class="text-muted">None</li>'}</ul>`;
 
     editBtn.classList.remove('hidden');
   },
@@ -415,6 +422,13 @@ mutation checkinDocument{
             id
             value
           }
+        contentElements {      
+          ... on ContentTransfer {
+            retrievalName
+            contentType
+          }
+        }
+
         }
       }`;
     return GraphQL.execute(query);
