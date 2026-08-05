@@ -58,7 +58,7 @@ public class CreateDocumentMutation implements FileUploadOperation {
     private static final String WITH_FILE_TEMPLATE = """
             mutation ($repositoryIdentifier: String!, $classIdentifier: String!,
                       $documentName: String!, $fileInFolderIdentifier: String,
-                      $contentType: String, $contvar: String) {
+                      $contentType: String, $fileName: String, $contvar: String) {
               createDocument(
                 repositoryIdentifier: $repositoryIdentifier
                 fileInFolderIdentifier: $fileInFolderIdentifier
@@ -69,7 +69,7 @@ public class CreateDocumentMutation implements FileUploadOperation {
                   contentElements: { replace: [{
                     type: CONTENT_TRANSFER
                     contentType: $contentType
-                    subContentTransfer: { content: $contvar }
+                    subContentTransfer: { retrievalName: $fileName content: $contvar }
                   }] }
                 }
                 checkinAction: {}
@@ -170,6 +170,7 @@ public class CreateDocumentMutation implements FileUploadOperation {
         vars.put("documentName", documentName);
         if (hasFile()) {
             vars.put("contentType", fileContentType);
+            vars.put("fileName", fileName);
             vars.put(FILE_FIELD, null);
         }
         return vars;

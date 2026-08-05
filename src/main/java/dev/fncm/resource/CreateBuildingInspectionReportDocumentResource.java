@@ -76,7 +76,13 @@ public class CreateBuildingInspectionReportDocumentResource extends BaseResource
             if (filePart != null) {
                 fileBytes       = filePart.getContent().readAllBytes();
                 fileName        = filePart.getFileName().orElse("unknown");
-                fileContentType = filePart.getMediaType().toString();
+                // Preserve the full media type string including parameters (e.g. charset=UTF-8)
+                // by reading the raw Content-Type header of the part instead of using
+                // getMediaType() which strips parameters.
+                String rawContentType = filePart.getHeaders().getFirst("Content-Type");
+                fileContentType = (rawContentType != null && !rawContentType.isBlank())
+                        ? rawContentType
+                        : filePart.getMediaType().toString();
             }
             String documentName = String.format("Inspection Report (%s %s)",municipality,inspectionDate);
             CreateDocumentMutation mutation = new CreateDocumentMutation(
