@@ -32,6 +32,7 @@ function handleDocumentClick(e) {
   const btn = e.target.closest('.link-btn');
   if (!btn) return;
   const row = btn.closest('tr');
+  publish(TOPICS.DOCUMENT_ID, row.dataset.docId);
   publish(TOPICS.DOCUMENT_SELECTED, {
     id:        row.dataset.docId,
     name:      row.dataset.docName,
