@@ -14,6 +14,7 @@ export const API = {
   fileBuildingInspectionDocs: '/api/filebuildinginspectiondocs',
   deleteAllFolders: '/api/deleteallfolders',
   createBuildingInspectionReportDocument:   '/api/createbuildinginspectionreportdocument',
+  checkinDocument:                          '/api/checkindocument',
 };
 
 export async function apiFetch(url, options = {}) {

@@ -3,7 +3,7 @@
 // Subscribes to TOPICS.DOCUMENT_ID, fetches full document details (including
 // custom properties) via GraphQL, and renders them.  Includes inline editing
 // of all six custom properties via the updateDocument GraphQL mutation.
-import { GraphQL } from '../api.js';
+import { GraphQL, apiFetch, API } from '../api.js';
 import { esc } from '../util.js';
 import { subscribe, TOPICS } from '../eventBus.js';
 import { session } from '../session.js';
@@ -342,41 +342,35 @@ mutation checkinDocument{
     cancelBtn.disabled = true;
 
     try {
-      const repo = session.config.repositoryIdentifier;
-      const id   = this.currentDocumentId;
-      //const id   = session.getState("reservationid");
-      const mutation = ` mutation
-        {
-          updateDocument(
-            repositoryIdentifier: "${escPropValue(repo)}"
-            identifier: "${escPropValue(id)}"
-            documentProperties: {
-              properties: [
-                {Municipality: "${escPropValue(municipality)}"}
-                {InspectionDate: "${escPropValue(toFileNetDateTime(inspectionDate))}"}
-                {InspectorName: "${escPropValue(inspectorName)}"}
-                {PropertyAddress: "${escPropValue(propertyAddress)}"}
-                {ComplianceStatus: "${escPropValue(complianceStatus)}"}
-                {BuildingType: "${escPropValue(buildingType)}"}
-              ]
-            }
-          ) {
-            name
-            id
-            properties(includes: ["Municipality","InspectionDate","InspectorName","PropertyAddress","ComplianceStatus","BuildingType"]) {
-              id
-              value
-            }
-          }
-        }`;
-      const result = await GraphQL.execute(mutation);
-      const updated = result?.data?.updateDocument;
-      if (!updated) {
-        throw new Error('No data returned from updateDocument.');
+      const payload = {
+        documentId:       this.currentDocumentId,
+        reservationId:    session.getState('reservationId'),
+        municipality,
+        propertyAddress,
+        inspectorName,
+        inspectionDate:   toFileNetDateTime(inspectionDate),
+        buildingType,
+        complianceStatus,
+      };
+
+      const res = await apiFetch(API.checkinDocument, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const err = new Error(res.status === 401 ? 'Session expired. Please sign in again.' : `HTTP ${res.status}`);
+        err.status = res.status;
+        throw err;
       }
+      const result = await res.json();
+      if (result.status !== 'ok') {
+        throw new Error(result.message ?? 'Checkin failed.');
+      }
+      console.log(`Check in done: ${JSON.stringify(result)}`);
+      this.currentDocumentId = result.documentId;
 
-
-      // Switch back to read-only and refresh with the mutation response
+      // Switch back to read-only and reload the newly checked-in document version
       const editForm   = document.getElementById('document-details-edit-form');
       const container  = document.getElementById('document-details-result');
       const refreshBtn = document.getElementById('document-details-refresh-btn');
@@ -384,9 +378,8 @@ mutation checkinDocument{
       editForm.innerHTML = '';
       container.classList.remove('hidden');
       refreshBtn.classList.remove('hidden');
-      //const newDocId = this.checkinDocument();
-      //this.fetchAndRender(newDocId);
-      this.renderDetails(updated);
+      session.clearState('reservationId');
+      await this.fetchAndRender(this.currentDocumentId);
 
     } catch (err) {
       if (err.status === 401) {
