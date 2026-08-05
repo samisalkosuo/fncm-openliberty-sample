@@ -15,6 +15,7 @@ export const API = {
   deleteAllFolders: '/api/deleteallfolders',
   createBuildingInspectionReportDocument:   '/api/createbuildinginspectionreportdocument',
   checkinDocument:                          '/api/checkindocument',
+  downloadDocument:                         '/api/downloaddocument',
 };
 
 export async function apiFetch(url, options = {}) {

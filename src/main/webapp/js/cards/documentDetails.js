@@ -138,7 +138,7 @@ registerCard({
 
     const contentElements = doc.contentElements ?? [];
     const contentItems = contentElements.map(ce =>
-      `<li><strong>${esc(ce.retrievalName ?? '')}</strong> <span class="text-muted">${esc(ce.contentType ?? '')}</span></li>`
+      `<li><a href="#" class="download-link" data-doc-id="${esc(doc.id)}" data-name="${esc(ce.retrievalName ?? '')}">${esc(ce.retrievalName ?? '')}</a> <span class="text-muted">${esc(ce.contentType ?? '')}</span></li>`
     ).join('');
 
     container.innerHTML = `
@@ -155,6 +155,29 @@ registerCard({
       </table>
       <h3>Content Elements</h3>
       <ul>${contentItems || '<li class="text-muted">None</li>'}</ul>`;
+
+    // Attach download handlers — use apiFetch so the Bearer token is sent
+    container.querySelectorAll('.download-link').forEach(link => {
+      link.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const docId = link.dataset.docId;
+        const name  = link.dataset.name;
+        const url   = `${API.downloadDocument}?documentId=${encodeURIComponent(docId)}&retrievalName=${encodeURIComponent(name)}`;
+        try {
+          const res = await apiFetch(url);
+          if (!res.ok) throw new Error(`Download failed: HTTP ${res.status}`);
+          const blob    = await res.blob();
+          const objUrl  = URL.createObjectURL(blob);
+          const anchor  = document.createElement('a');
+          anchor.href     = objUrl;
+          anchor.download = name;
+          anchor.click();
+          URL.revokeObjectURL(objUrl);
+        } catch (err) {
+          alert(`Could not download "${name}": ${err.message}`);
+        }
+      });
+    });
 
     editBtn.classList.remove('hidden');
   },
