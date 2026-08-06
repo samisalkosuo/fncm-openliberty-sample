@@ -151,7 +151,7 @@ public class DeleteBuildingInspectionTypes {
                     doc.save(RefreshMode.NO_REFRESH);
                     deleted++;
                 } catch (Exception e) {
-                    System.err.println("Failed to delete document "
+                    LOGGER.severe("Failed to delete document "
                             + safeId(doc) + " of class " + className + ": " + e.getMessage());
                 }
             }
@@ -193,7 +193,7 @@ public class DeleteBuildingInspectionTypes {
                 LOGGER.info("Removed property from class "
                         + classDef.get_SymbolicName() + ": " + symbolicName);
             } catch (Exception e) {
-                System.err.println("Failed to remove property "
+                LOGGER.severe("Failed to remove property "
                         + symbolicName + " from class "
                         + classDef.get_SymbolicName() + ": " + e.getMessage());
             }
@@ -214,7 +214,7 @@ public class DeleteBuildingInspectionTypes {
             classDef.save(RefreshMode.REFRESH);
             LOGGER.info("Deleted class definition: " + className);
         } catch (Exception e) {
-            System.err.println("Failed to delete class definition "
+            LOGGER.severe("Failed to delete class definition "
                     + classDef.get_SymbolicName() + ": " + e.getMessage());
         }
     }
@@ -236,7 +236,7 @@ public class DeleteBuildingInspectionTypes {
             template.save(RefreshMode.REFRESH);
             LOGGER.info("Deleted property template: " + symbolicName);
         } catch (Exception e) {
-            System.err.println("Failed to delete property template "
+            LOGGER.severe("Failed to delete property template "
                     + symbolicName + ": " + e.getMessage());
         }
     }
@@ -295,7 +295,7 @@ public class DeleteBuildingInspectionTypes {
             choiceList.save(RefreshMode.REFRESH);
             LOGGER.info("Deleted choice list: " + displayName);
         } catch (Exception e) {
-            System.err.println("Failed to delete choice list "
+            LOGGER.severe("Failed to delete choice list "
                     + displayName + ": " + e.getMessage());
         }
     }
