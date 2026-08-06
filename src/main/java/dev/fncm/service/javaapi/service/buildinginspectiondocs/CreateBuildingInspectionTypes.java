@@ -166,7 +166,7 @@ public class CreateBuildingInspectionTypes {
             template.set_Cardinality(Cardinality.SINGLE);
             setDisplayName(template, objectStore, displayName);
 
-            ChoiceList choiceList = findChoiceListByDisplayName(objectStore, displayName + " Choices");
+            ChoiceList choiceList = FileNetQueryUtil.findChoiceListByDisplayName(objectStore, displayName + " Choices");
             if (choiceList == null) {
                 choiceList = Factory.ChoiceList.createInstance(objectStore);
                 choiceList.set_DataType(TypeID.STRING);
@@ -194,7 +194,7 @@ public class CreateBuildingInspectionTypes {
     }
 
     private PropertyTemplateString findStringTemplateBySymbolicName(ObjectStore objectStore, String symbolicName) {
-        String sql = "SELECT This FROM PropertyTemplateString WHERE SymbolicName = '" + escapeSql(symbolicName) + "'";
+        String sql = "SELECT This FROM PropertyTemplateString WHERE SymbolicName = '" + FileNetQueryUtil.escapeSql(symbolicName) + "'";
         SearchSQL searchSQL = new SearchSQL(sql);
         SearchScope scope = new SearchScope(objectStore);
 
@@ -207,7 +207,7 @@ public class CreateBuildingInspectionTypes {
     }
 
     private PropertyTemplateDateTime findDateTemplateBySymbolicName(ObjectStore objectStore, String symbolicName) {
-        String sql = "SELECT This FROM PropertyTemplateDateTime WHERE SymbolicName = '" + escapeSql(symbolicName) + "'";
+        String sql = "SELECT This FROM PropertyTemplateDateTime WHERE SymbolicName = '" + FileNetQueryUtil.escapeSql(symbolicName) + "'";
         SearchSQL searchSQL = new SearchSQL(sql);
         SearchScope scope = new SearchScope(objectStore);
 
@@ -215,19 +215,6 @@ public class CreateBuildingInspectionTypes {
         Iterator<?> it = results.iterator();
         if (it.hasNext()) {
             return (PropertyTemplateDateTime) it.next();
-        }
-        return null;
-    }
-
-    private ChoiceList findChoiceListByDisplayName(ObjectStore objectStore, String displayName) {
-        String sql = "SELECT This FROM ChoiceList WHERE DisplayName = '" + escapeSql(displayName) + "'";
-        SearchSQL searchSQL = new SearchSQL(sql);
-        SearchScope scope = new SearchScope(objectStore);
-
-        EngineCollection results = scope.fetchObjects(searchSQL, null, null, Boolean.TRUE);
-        Iterator<?> it = results.iterator();
-        if (it.hasNext()) {
-            return (ChoiceList) it.next();
         }
         return null;
     }
@@ -259,8 +246,5 @@ public class CreateBuildingInspectionTypes {
         template.get_DisplayNames().add(ls);
     }
 
-    private String escapeSql(String s) {
-        return s.replace("'", "''");
-    }
 }
 

@@ -262,7 +262,7 @@ public class DeleteBuildingInspectionTypes {
 
         for (String templateClass : classesToTry) {
             String sqlText = "SELECT This FROM " + templateClass +
-                    " WHERE SymbolicName = '" + escapeSql(symbolicName) + "'";
+                    " WHERE SymbolicName = '" + FileNetQueryUtil.escapeSql(symbolicName) + "'";
             SearchSQL sql = new SearchSQL(sqlText);
 
             EngineCollection results = scope.fetchObjects(sql, null, null, Boolean.TRUE);
@@ -284,7 +284,7 @@ public class DeleteBuildingInspectionTypes {
      * Choice lists are typically referenced by their display name.
      */
     private void deleteChoiceListIfExists(ObjectStore objectStore, String displayName) {
-        ChoiceList choiceList = findChoiceListByDisplayName(objectStore, displayName);
+        ChoiceList choiceList = FileNetQueryUtil.findChoiceListByDisplayName(objectStore, displayName);
         if (choiceList == null) {
             LOGGER.info("Choice list not found, skipping: " + displayName);
             return;
@@ -303,33 +303,12 @@ public class DeleteBuildingInspectionTypes {
     /**
      * Finds a choice list by its display name.
      */
-    private ChoiceList findChoiceListByDisplayName(ObjectStore objectStore, String displayName) {
-        SearchScope scope = new SearchScope(objectStore);
-        String sqlText = "SELECT This FROM ChoiceList WHERE DisplayName = '" + escapeSql(displayName) + "'";
-        SearchSQL sql = new SearchSQL(sqlText);
-
-        EngineCollection results = scope.fetchObjects(sql, null, null, Boolean.TRUE);
-        Iterator<?> it = results.iterator();
-        if (it.hasNext()) {
-            Object obj = it.next();
-            if (obj instanceof ChoiceList) {
-                return (ChoiceList) obj;
-            }
-        }
-
-        return null;
-    }
-
     private String safeId(IndependentObject obj) {
         try {
             return obj.getProperties().getIdValue("Id").toString();
         } catch (Exception e) {
             return "<unknown-id>";
         }
-    }
-
-    private String escapeSql(String s) {
-        return s.replace("'", "''");
     }
 
 }
