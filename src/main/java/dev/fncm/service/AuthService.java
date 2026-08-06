@@ -40,7 +40,7 @@ import jakarta.inject.Inject;
 @ApplicationScoped
 public class AuthService {
 
-    private static final Logger LOG = Logger.getLogger(AuthService.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(AuthService.class.getName());
 
     @Inject
     @ConfigProperty(name = "iam.host")
@@ -75,10 +75,10 @@ public class AuthService {
                 + "&password=" + urlEncode(password)
                 + "&scope=openid";
 
-        LOG.info("Step 1: POST " + iamUrl);
+        LOGGER.info("Step 1: POST " + iamUrl);
         String iamResponse = httpPost(iamUrl,
                 "application/x-www-form-urlencoded;charset=UTF-8", formBody);
-        LOG.fine("IAM response length: " + iamResponse.length());
+        LOGGER.fine("IAM response length: " + iamResponse.length());
 
         String iamToken = new JSONObject(iamResponse).optString("access_token", null);
         if (iamToken == null || iamToken.isEmpty()) {
@@ -86,7 +86,7 @@ public class AuthService {
                     "Failed to obtain IAM token from " + iamUrl
                     + ". Response: " + iamResponse);
         }
-        LOG.info("IAM token obtained, length: " + iamToken.length());
+        LOGGER.info("IAM token obtained, length: " + iamToken.length());
         return iamToken;
     }
 
@@ -105,9 +105,9 @@ public class AuthService {
         }
 
         String zenUrl = cp4baHostVal + "/v1/preauth/validateAuth";
-        LOG.info("Step 2: GET " + zenUrl);
+        LOGGER.info("Step 2: GET " + zenUrl);
         String zenResponse = httpGet(zenUrl, username, iamToken);
-        LOG.fine("Zen response: " + zenResponse);
+        LOGGER.fine("Zen response: " + zenResponse);
 
         String zenToken = new JSONObject(zenResponse).optString("accessToken", null);
         if (zenToken == null || zenToken.isEmpty()) {
@@ -115,7 +115,7 @@ public class AuthService {
                     "Failed to obtain Zen token from " + zenUrl
                     + ". Response: " + zenResponse);
         }
-        LOG.info("Zen token length: " + zenToken.length());
+        LOGGER.info("Zen token length: " + zenToken.length());
         return zenToken;
     }
 
@@ -288,7 +288,6 @@ public class AuthService {
         {
             throw new IOException(use.getMessage());
         }
-        //HttpURLConnection conn = (HttpURLConnection) new URL(urlStr).openConnection();
         HttpURLConnection conn = (HttpURLConnection) connectionURL.openConnection();
         conn.setConnectTimeout(15_000);
         conn.setReadTimeout(30_000);
@@ -303,7 +302,7 @@ public class AuthService {
                 }}, new java.security.SecureRandom());
                 https.setSSLSocketFactory(ctx.getSocketFactory());
                 https.setHostnameVerifier((host, session) -> true);
-                LOG.warning("TLS certificate verification DISABLED for: " + urlStr);
+                LOGGER.warning("TLS certificate verification DISABLED for: " + urlStr);
             } catch (Exception e) {
                 throw new IOException("Failed to configure trust-all SSL context", e);
             }

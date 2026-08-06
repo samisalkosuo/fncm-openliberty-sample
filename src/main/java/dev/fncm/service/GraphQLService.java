@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 @ApplicationScoped
 public class GraphQLService {
 
-    private static final Logger LOG = Logger.getLogger(GraphQLService.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GraphQLService.class.getName());
 
     @Inject
     GraphQLClient graphQLClient;
@@ -44,7 +44,7 @@ public class GraphQLService {
      */
     public String execute(GraphQLOperation op, String zenToken) throws Exception {
         String jsonBody = buildBody(op);
-        LOG.info("GraphQLService executing: " + op.getClass().getSimpleName());
+        LOGGER.info("GraphQLService executing: " + op.getClass().getSimpleName());
         return graphQLClient.executeJson(jsonBody, zenToken);
     }
 
@@ -60,7 +60,7 @@ public class GraphQLService {
      * @throws Exception on network or TLS errors
      */
     public String executeRaw(String jsonBody, String zenToken) throws Exception {
-        LOG.info("GraphQLService executeRaw (proxy)");
+        LOGGER.info("GraphQLService executeRaw (proxy)");
         return graphQLClient.executeJson(jsonBody, zenToken);
     }
 
@@ -84,7 +84,7 @@ public class GraphQLService {
      */
     public String executeMultipart(FileUploadOperation op, String zenToken) throws Exception {
         String jsonBody = buildBody(op);
-        LOG.info("GraphQLService executeMultipart: " + op.getClass().getSimpleName());
+        LOGGER.info("GraphQLService executeMultipart: " + op.getClass().getSimpleName());
         return graphQLClient.executeMultipart(
                 jsonBody,
                 op.fileFieldName(),

@@ -59,10 +59,9 @@ public class UpdateContentElementOperation implements FileNetOperation<ResponseM
         ContentElementList list = Factory.ContentElement.createList();
         if ("replace".equals(mode)) {
             LOGGER.info("Replace mode — creating empty content element list");
-            //list = Factory.ContentElement.createList();
         } else {
             LOGGER.info("Add mode — using existing content elements");
-            
+
             Document originalDoc = (Document) Factory.Document.fetchInstance(os, new Id(documentId), null);
             ContentElementList originalContentList = originalDoc.get_ContentElements();
 
@@ -75,13 +74,6 @@ public class UpdateContentElementOperation implements FileNetOperation<ResponseM
                 newContent.set_ContentType(content.get_ContentType());
                 list.add(newContent);
             }
-
-            /*
-            list = reservationDoc.get_ContentElements();
-            if (list == null) {
-                list = Factory.ContentElement.createList();
-            }
-            */
         }
 
         ContentTransfer ct = Factory.ContentTransfer.createInstance();

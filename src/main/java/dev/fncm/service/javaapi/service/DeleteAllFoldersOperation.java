@@ -7,15 +7,7 @@ import dev.fncm.service.javaapi.FileNetOperation;
 import dev.fncm.utils.DeleteAllFolders;
 
 /**
- * _OperationTemplate — copy and rename this file to implement a new FileNet operation.
- *
- * Steps:
- *  1. Rename this class to {@code MyOperation} and this file to {@code MyOperation.java}.
- *  2. Change {@code String} to your desired result type (or add a model record in
- *     {@code dev.fncm.model}).
- *  3. Implement {@code execute()} using the pre-connected {@code os} and {@code username}.
- *  4. In your resource, inject {@link dev.fncm.service.javaapi.FileNetService} and call:
- *     <pre>service.run(new MyOperation(), tokenContext)</pre>
+ * Deletes all folders in the object store by delegating to {@link dev.fncm.utils.DeleteAllFolders}.
  */
 public class DeleteAllFoldersOperation implements FileNetOperation<ResponseMessage> {
 

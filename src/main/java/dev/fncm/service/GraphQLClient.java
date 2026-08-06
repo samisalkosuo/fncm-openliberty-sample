@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 @ApplicationScoped
 public class GraphQLClient {
 
-    private static final Logger LOG = Logger.getLogger(GraphQLClient.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GraphQLClient.class.getName());
 
     @Inject
     AuthService authService;
@@ -73,7 +73,7 @@ public class GraphQLClient {
      * @return raw JSON response string from the GraphQL API
      */
     public String executeJson(String jsonBody, String zenToken) throws Exception {
-        LOG.info("GraphQL executeJson → " + graphqlUrl);
+        LOGGER.info("GraphQL executeJson → " + graphqlUrl);
         String[] result = authService.httpPostGraphQL(graphqlUrl, zenToken, jsonBody);
 
         String responseBody = result[0];
@@ -110,7 +110,7 @@ public class GraphQLClient {
             String fileContentType,
             String fileName,
             String zenToken) throws Exception {
-        LOG.info("GraphQL executeMultipart → " + graphqlUrl);
+        LOGGER.info("GraphQL executeMultipart → " + graphqlUrl);
         String[] result = authService.httpPostGraphQLMultipart(
                 graphqlUrl, zenToken, jsonBody, fileFieldName, fileBytes, fileContentType, fileName);
 

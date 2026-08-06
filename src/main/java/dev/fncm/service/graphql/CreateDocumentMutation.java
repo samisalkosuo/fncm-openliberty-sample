@@ -49,7 +49,7 @@ import dev.fncm.service.javaapi.service.buildinginspectiondocs.CreateBuildingIns
  */
 public class CreateDocumentMutation implements FileUploadOperation {
 
-    private static final Logger LOGGER = Logger.getLogger(CreateBuildingInspectionDocumentOperation.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CreateDocumentMutation.class.getName());
 
     private static final String FILE_FIELD = "contvar";
 
