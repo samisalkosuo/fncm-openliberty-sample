@@ -46,7 +46,7 @@ registerCard({
   size: 'full',
   html: () => `
     <div class="card" id="card-list-documents-in-folder">
-      <h2>List Documents in Folder <small class="card-subtitle">(via GraphQL)</small></h2>
+      <h2>List Documents in Folder</h2>
       <div class="form-group">
         <label for="list-documents-in-folder-path">Folder path</label>
         <input id="list-documents-in-folder-path" type="text"
