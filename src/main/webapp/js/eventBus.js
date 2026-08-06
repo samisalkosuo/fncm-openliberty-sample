@@ -30,6 +30,7 @@ export const TOPICS = {
   DOCUMENT_SELECTED: `${TOPIC_PREFIX}:document:selected`,
   FOLDER_SELECTED: `${TOPIC_PREFIX}:folder:selected`,
   DOCUMENT_ID: `${TOPIC_PREFIX}:document:id`,
+  FOLDER_ID: `${TOPIC_PREFIX}:folder:id`,
   DOCUMENT_CLEARED: `${TOPIC_PREFIX}:document:cleared`,
 };
 

@@ -178,3 +178,75 @@ details[open] > .json-summary::before { content: '▾ '; }
   color: #fff;
   border-color: var(--color-primary);
 }
+
+/* ── Folder tree ── */
+.folder-tree,
+.ft-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ft-list .ft-list {
+  padding-left: 1.25rem;
+}
+
+.ft-list.ft-collapsed {
+  display: none;
+}
+
+.ft-item {
+  line-height: 1.8;
+}
+
+/* Folder row button */
+.ft-folder {
+  background: none;
+  border: none;
+  color: var(--color-text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: .1rem .3rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ft-folder:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+/* Document leaf button */
+.ft-doc {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: .1rem .3rem;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.88rem;
+}
+.ft-doc:hover {
+  background: var(--color-primary-light);
+}
+
+/* Selected document highlight */
+.ft-doc.ft-selected {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Scrollable tree container */
+.card-result .folder-tree {
+  max-height: 480px;
+  overflow-y: auto;
+  margin-top: var(--space-sm);
+}

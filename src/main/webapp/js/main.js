@@ -14,6 +14,7 @@ import './cards/graphql.js';
 import './cards/documents.js';
 import './cards/documentDetails.js';
 import './cards/listFolders.js';
+import './cards/folderTree.js';
 import './cards/listDocumentClasses.js';
 import './cards/userGroups.js';
 import './cards/listDocumentsInFolder.js';
