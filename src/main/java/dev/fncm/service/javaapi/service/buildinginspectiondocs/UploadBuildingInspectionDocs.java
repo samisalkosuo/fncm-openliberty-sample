@@ -9,6 +9,8 @@ import com.filenet.api.constants.CheckinType;
 import com.filenet.api.property.Properties;
 import com.filenet.api.util.Id;
 
+import dev.fncm.service.javaapi.service.DateUtil;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
@@ -27,9 +29,6 @@ public class UploadBuildingInspectionDocs {
     private static final String CLASS_SYMBOLIC_NAME = "BuildingInspectionReport";
     private static final String RESOURCES_BASE = "/building_inspection_sample_docs";
     private static final String JSON_RESOURCE_PATH = RESOURCES_BASE + "/extract_fields.json";
-
-    // Date format used in the JSON (DD.MM.YYYY)
-    private static final SimpleDateFormat INPUT_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 
     public void execute(ObjectStore objectStore) throws Exception {
 
@@ -155,13 +154,10 @@ public class UploadBuildingInspectionDocs {
         }        
         // InspectionDate (DateTime)
         if (fields.has("InspectionDate")) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             String dateStr = fields.get("InspectionDate").getAsString();
-            try {
-                Date inspectionDate = INPUT_DATE_FORMAT.parse(dateStr);                
-                title.append(dateFormat.format(inspectionDate));
-            } catch (Exception e) {
-                LOGGER.warning("  Warning: Could not parse InspectionDate: " + dateStr);
+            Date inspectionDate = DateUtil.parseDdMmYyyy(dateStr);
+            if (inspectionDate != null) {
+                title.append(new SimpleDateFormat("yyyy-MM-dd").format(inspectionDate));
             }
         }
         title.append(")");
@@ -177,12 +173,10 @@ public class UploadBuildingInspectionDocs {
         // InspectionDate (DateTime)
         if (fields.has("InspectionDate")) {
             String dateStr = fields.get("InspectionDate").getAsString();
-            try {
-                Date inspectionDate = INPUT_DATE_FORMAT.parse(dateStr);
+            Date inspectionDate = DateUtil.parseDdMmYyyy(dateStr);
+            if (inspectionDate != null) {
                 props.putValue("InspectionDate", inspectionDate);
                 LOGGER.info("  InspectionDate: " + dateStr);
-            } catch (Exception e) {
-                LOGGER.warning("  Warning: Could not parse InspectionDate: " + dateStr);
             }
         }
 

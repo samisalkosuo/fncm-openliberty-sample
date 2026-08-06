@@ -13,10 +13,7 @@ import com.filenet.api.util.Id;
 import dev.fncm.model.CheckinDocumentResult;
 import dev.fncm.service.javaapi.FileNetOperation;
 
-import java.io.FileInputStream;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TimeZone;
 import java.util.logging.Logger;
 
 /**
@@ -120,10 +117,8 @@ public class CheckinDocumentOperation implements FileNetOperation<CheckinDocumen
         props.putValue("BuildingType",     buildingType);
         props.putValue("ComplianceStatus", complianceStatus);
 
-        if (inspectionDate != null && !inspectionDate.isBlank()) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-            Date parsed = sdf.parse(inspectionDate);
+        Date parsed = DateUtil.parseIso8601Utc(inspectionDate);
+        if (parsed != null) {
             props.putValue("InspectionDate", parsed);
             LOGGER.info("InspectionDate set to: " + inspectionDate);
         }
