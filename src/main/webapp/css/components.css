@@ -14,14 +14,16 @@ label {
 }
 
 input[type=text],
-input[type=password] {
+input[type=password],
+select {
   width: 100%;
   padding: var(--space-sm) .65rem;
   border: var(--border);
   border-radius: var(--radius-sm);
   font-size: 0.95rem;
 }
-input:focus { outline: 2px solid var(--color-primary); border-color: transparent; }
+input:focus,
+select:focus { outline: 2px solid var(--color-primary); border-color: transparent; }
 
 /* ── Buttons ── */
 button {
