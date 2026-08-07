@@ -12,19 +12,18 @@ public class AddBuildingInspectionDocsOperation implements FileNetOperation<List
 
     @Override
     public List<BuildingInspectionDocsResult> execute(ObjectStore os, String username) throws Exception {
-        
+
         CreateBuildingInspectionTypes typeCreator = new CreateBuildingInspectionTypes();
         typeCreator.execute(os);
 
-        BuildingInspectionDocsResultBuilder results = new BuildingInspectionDocsResultBuilder();
-        results.add("Types created",true);
-        
+        List<BuildingInspectionDocsResult> results = new ArrayList<>();
+        results.add(new BuildingInspectionDocsResult("Types created", true));
 
         UploadBuildingInspectionDocs uploadDocs = new UploadBuildingInspectionDocs();
         uploadDocs.execute(os);
-        results.add("Docs uploaded",true);
+        results.add(new BuildingInspectionDocsResult("Docs uploaded", true));
 
-        return results.get();
+        return results;
     }
 }
 
