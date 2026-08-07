@@ -38,25 +38,13 @@ public class UploadBuildingInspectionDocs {
         LOGGER.info("Object Store: " + objectStore.get_DisplayName());
         LOGGER.info("Document Class: " + CLASS_SYMBOLIC_NAME);
 
-        // Read JSON resource
-        InputStream jsonStream = getClass().getResourceAsStream(JSON_RESOURCE_PATH);
-        if (jsonStream == null) {
-            throw new Exception("JSON resource not found: " + JSON_RESOURCE_PATH);
-        }
-
-        LOGGER.info("Reading JSON resource: " + JSON_RESOURCE_PATH);
-        Gson gson = new Gson();
-        JsonObject jsonRoot = gson.fromJson(new InputStreamReader(jsonStream), JsonObject.class);
-
-        JsonArray results = jsonRoot.getAsJsonArray("results");
-        int totalDocuments = jsonRoot.get("total_documents").getAsInt();
-
+        JsonArray results = loadSampleData();
+        int totalDocuments = results.size();
         LOGGER.info("Total documents to upload: " + totalDocuments);
 
         int successCount = 0;
         int failureCount = 0;
 
-        // Process each document
         for (int i = 0; i < results.size(); i++) {
             JsonObject docInfo = results.get(i).getAsJsonObject();
             String filePath = docInfo.get("file").getAsString();
@@ -67,7 +55,6 @@ public class UploadBuildingInspectionDocs {
                 LOGGER.info("Processing document " + (i + 1) + " of " + totalDocuments);
                 LOGGER.info("File: " + filePath);
 
-                // Upload document
                 uploadDocument(objectStore, filePath, fields);
                 successCount++;
                 LOGGER.info("✓ Document uploaded successfully");
@@ -79,7 +66,28 @@ public class UploadBuildingInspectionDocs {
             }
         }
 
-        // Summary
+        logUploadSummary(totalDocuments, successCount, failureCount);
+    }
+
+    /**
+     * Load the JSON sample-data file from classpath resources and return its "results" array.
+     */
+    private JsonArray loadSampleData() throws Exception {
+        InputStream jsonStream = getClass().getResourceAsStream(JSON_RESOURCE_PATH);
+        if (jsonStream == null) {
+            throw new Exception("JSON resource not found: " + JSON_RESOURCE_PATH);
+        }
+
+        LOGGER.info("Reading JSON resource: " + JSON_RESOURCE_PATH);
+        Gson gson = new Gson();
+        JsonObject jsonRoot = gson.fromJson(new InputStreamReader(jsonStream), JsonObject.class);
+        return jsonRoot.getAsJsonArray("results");
+    }
+
+    /**
+     * Log the final upload summary.
+     */
+    private void logUploadSummary(int totalDocuments, int successCount, int failureCount) {
         LOGGER.info("=================================================");
         LOGGER.info("Upload Summary");
         LOGGER.info("=================================================");
@@ -87,7 +95,6 @@ public class UploadBuildingInspectionDocs {
         LOGGER.info("Successfully uploaded: " + successCount);
         LOGGER.info("Failed: " + failureCount);
         LOGGER.info("=================================================");
-
     }
 
     /**
@@ -109,7 +116,6 @@ public class UploadBuildingInspectionDocs {
 
         // Set document title (use filename without extension)
         String fileName = resourcePath.substring(resourcePath.lastIndexOf('/') + 1);
-        //String title = fileName.contains(".") ? fileName.substring(0, fileName.lastIndexOf('.')) : fileName;
         String title = createDocumentName(fields);
         doc.getProperties().putValue("DocumentTitle", title);
 

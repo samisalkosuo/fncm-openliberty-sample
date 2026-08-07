@@ -15,15 +15,12 @@ import com.filenet.api.collection.FolderSet;
 import com.filenet.api.collection.DocumentSet;
 import com.filenet.api.property.Properties;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;;
+import java.util.logging.Logger;
 
 public class CreateFoldersAndFileBuildingInspectionReports {
 
@@ -47,19 +44,35 @@ public class CreateFoldersAndFileBuildingInspectionReports {
         LOGGER.info("=================================================");
         LOGGER.info("Object Store: " + objectStore.get_DisplayName());
 
-        // Step 1: Create root folder
+        Map<String, Folder> typeFolders = createFolderStructure(objectStore);
+
+        DocumentSet documents = queryDocuments(objectStore);
+        int totalDocs = countDocuments(documents);
+        LOGGER.info("Found " + totalDocs + " documents to organize");
+
+        LOGGER.info("Filing documents into folders...");
+        int[] counts = fileAllDocuments(objectStore, documents, typeFolders, totalDocs);
+        int processedCount = counts[0];
+        int errorCount = counts[1];
+        int dateFolderCount = counts[2];
+
+        logOrganizationSummary(totalDocs, processedCount, errorCount, dateFolderCount, typeFolders.size());
+    }
+
+    /**
+     * Create the full folder structure (root, ByDate, BuildingTypes, per-type sub-folders).
+     * Returns the map of building-type name → type folder.
+     */
+    private Map<String, Folder> createFolderStructure(ObjectStore objectStore) {
         Folder rootFolder = createOrGetFolder(objectStore, null, ROOT_FOLDER_NAME);
         LOGGER.info("✓ Root folder ready: /" + ROOT_FOLDER_NAME);
 
-        // Step 2: Create ByDate parent folder
-        Folder byDateFolder = createOrGetFolder(objectStore, rootFolder, "ByDate");
+        createOrGetFolder(objectStore, rootFolder, "ByDate");
         LOGGER.info("✓ ByDate folder ready: /" + ROOT_FOLDER_NAME + "/ByDate");
 
-        // Step 3: Create BuildingTypes parent folder
         Folder buildingTypesFolder = createOrGetFolder(objectStore, rootFolder, "BuildingTypes");
         LOGGER.info("✓ BuildingTypes folder ready: /" + ROOT_FOLDER_NAME + "/BuildingTypes");
 
-        // Step 4: Create building type folders under BuildingTypes
         LOGGER.info("Creating building type folders...");
         Map<String, Folder> typeFolders = new HashMap<>();
         for (String buildingType : BUILDING_TYPES) {
@@ -67,84 +80,87 @@ public class CreateFoldersAndFileBuildingInspectionReports {
             typeFolders.put(buildingType, typeFolder);
             LOGGER.info("  ✓ " + buildingType);
         }
+        return typeFolders;
+    }
 
-        // Step 5: Query all BuildingInspectionReport documents
-        LOGGER.info("Querying BuildingInspectionReport documents...");
-        DocumentSet documents = queryDocuments(objectStore);
+    /**
+     * Iterate over every document, filing each one by date and building type.
+     * Returns int[]{processedCount, errorCount, dateFolderCount}.
+     */
+    private int[] fileAllDocuments(ObjectStore objectStore, DocumentSet documents,
+            Map<String, Folder> typeFolders, int totalDocs) {
 
-        int totalDocs = 0;
-        Iterator<?> iterator = documents.iterator();
-        while (iterator.hasNext()) {
-            iterator.next();
-            totalDocs++;
-        }
-        LOGGER.info("Found " + totalDocs + " documents to organize");
+        Folder byDateFolder = createOrGetFolder(objectStore,
+                createOrGetFolder(objectStore, null, ROOT_FOLDER_NAME), "ByDate");
 
-        // Step 6: Process each document
-        LOGGER.info("Filing documents into folders...");
         Map<String, Folder> dateFolders = new HashMap<>();
         int processedCount = 0;
         int errorCount = 0;
 
-        iterator = documents.iterator();
+        Iterator<?> iterator = documents.iterator();
         while (iterator.hasNext()) {
             Document doc = (Document) iterator.next();
             processedCount++;
+            LOGGER.info("-------------------------------------------");
+            LOGGER.info("Processing document " + processedCount + " of " + totalDocs);
+            LOGGER.info("Document ID: " + doc.get_Id());
 
             try {
-                LOGGER.info("-------------------------------------------");
-                LOGGER.info("Processing document " + processedCount + " of " + totalDocs);
-                LOGGER.info("Document ID: " + doc.get_Id());
-
-                Properties props = doc.getProperties();
-
-                // Get InspectionDate
-                Date inspectionDate = (Date) props.getObjectValue(BuildingInspectionConstants.PROP_INSPECTION_DATE);
-                String buildingType = (String) props.getStringValue(BuildingInspectionConstants.PROP_BUILDING_TYPE);
-
-                LOGGER.info("  InspectionDate: " + (inspectionDate != null ? inspectionDate : "N/A"));
-                LOGGER.info("  BuildingType: " + (buildingType != null ? buildingType : "N/A"));
-
-                // File by date
-                if (inspectionDate != null) {
-                    String datePath = getDateFolderPath(inspectionDate);
-                    Folder dateFolder = dateFolders.get(datePath);
-
-                    if (dateFolder == null) {
-                        dateFolder = createDateFolderHierarchy(objectStore, byDateFolder, inspectionDate);
-                        dateFolders.put(datePath, dateFolder);
-                    }
-
-                    fileDocument(doc, dateFolder);
-                    LOGGER.info("  ✓ Filed in: /" + ROOT_FOLDER_NAME + "/ByDate/" + datePath);
-                }
-
-                // File by building type
-                if (buildingType != null && typeFolders.containsKey(buildingType)) {
-                    Folder typeFolder = typeFolders.get(buildingType);
-                    fileDocument(doc, typeFolder);
-                    LOGGER.info("  ✓ Filed in: /" + ROOT_FOLDER_NAME + "/BuildingTypes/" + buildingType);
-                } else if (buildingType != null) {
-                    LOGGER.info("  ⚠ Unknown building type: " + buildingType);
-                }
-
+                fileDocument(objectStore, doc, byDateFolder, dateFolders, typeFolders);
             } catch (Exception e) {
                 errorCount++;
                 LOGGER.log(Level.SEVERE, "  ✗ Error processing document: " + e.getMessage(), e);
             }
         }
 
-        // Summary
+        return new int[]{ processedCount, errorCount, dateFolders.size() };
+    }
+
+    /**
+     * File a single document into its date folder and building-type folder.
+     */
+    private void fileDocument(ObjectStore objectStore, Document doc,
+            Folder byDateFolder, Map<String, Folder> dateFolders,
+            Map<String, Folder> typeFolders) {
+
+        Properties props = doc.getProperties();
+
+        Date inspectionDate = (Date) props.getObjectValue(BuildingInspectionConstants.PROP_INSPECTION_DATE);
+        String buildingType = props.getStringValue(BuildingInspectionConstants.PROP_BUILDING_TYPE);
+
+        LOGGER.info("  InspectionDate: " + (inspectionDate != null ? inspectionDate : "N/A"));
+        LOGGER.info("  BuildingType: " + (buildingType != null ? buildingType : "N/A"));
+
+        if (inspectionDate != null) {
+            String datePath = getDateFolderPath(inspectionDate);
+            Folder dateFolder = dateFolders.computeIfAbsent(datePath,
+                    k -> createDateFolderHierarchy(objectStore, byDateFolder, inspectionDate));
+            fileDocumentIntoFolder(doc, dateFolder);
+            LOGGER.info("  ✓ Filed in: /" + ROOT_FOLDER_NAME + "/ByDate/" + datePath);
+        }
+
+        if (buildingType != null && typeFolders.containsKey(buildingType)) {
+            fileDocumentIntoFolder(doc, typeFolders.get(buildingType));
+            LOGGER.info("  ✓ Filed in: /" + ROOT_FOLDER_NAME + "/BuildingTypes/" + buildingType);
+        } else if (buildingType != null) {
+            LOGGER.info("  ⚠ Unknown building type: " + buildingType);
+        }
+    }
+
+    /**
+     * Log the final organization summary.
+     */
+    private void logOrganizationSummary(int totalDocs, int processedCount,
+            int errorCount, int dateFolderCount, int typeFolderCount) {
         LOGGER.info("=================================================");
         LOGGER.info("Organization Summary");
         LOGGER.info("=================================================");
         LOGGER.info("Total documents: " + totalDocs);
         LOGGER.info("Successfully processed: " + (processedCount - errorCount));
         LOGGER.info("Errors: " + errorCount);
-        LOGGER.info("Date folders created: " + dateFolders.size());
-        LOGGER.info("Type folders created: " + typeFolders.size());
+        LOGGER.info("Date folders created: " + dateFolderCount);
+        LOGGER.info("Type folders created: " + typeFolderCount);
         LOGGER.info("=================================================");
-
     }
 
     /**
@@ -159,25 +175,34 @@ public class CreateFoldersAndFileBuildingInspectionReports {
     }
 
     /**
+     * Count documents in a DocumentSet by iterating once.
+     */
+    private int countDocuments(DocumentSet documents) {
+        LOGGER.info("Querying BuildingInspectionReport documents...");
+        int count = 0;
+        Iterator<?> it = documents.iterator();
+        while (it.hasNext()) {
+            it.next();
+            count++;
+        }
+        return count;
+    }
+
+    /**
      * Create or get an existing folder.
      */
     private Folder createOrGetFolder(ObjectStore objectStore, Folder parentFolder, String folderName) {
         try {
-            // Try to find existing folder
             String folderPath = parentFolder == null ? "/" + folderName
                     : parentFolder.get_PathName() + "/" + folderName;
-            Folder folder = Factory.Folder.fetchInstance(objectStore, folderPath, null);
-            return folder;
+            return Factory.Folder.fetchInstance(objectStore, folderPath, null);
         } catch (EngineRuntimeException e) {
-            // Folder doesn't exist, create it
             Folder newFolder = Factory.Folder.createInstance(objectStore, null);
             newFolder.set_FolderName(folderName);
 
             if (parentFolder != null) {
-                // Set parent for subfolder
                 newFolder.set_Parent(parentFolder);
             } else {
-                // For root-level folder, get the root folder and set it as parent
                 Folder rootFolder = objectStore.get_RootFolder();
                 newFolder.set_Parent(rootFolder);
             }
@@ -200,13 +225,8 @@ public class CreateFoldersAndFileBuildingInspectionReports {
         String yearStr = String.valueOf(year);
         String monthStr = String.format("%02d", month);
 
-        // Create or get year folder
         Folder yearFolder = createOrGetFolder(objectStore, rootFolder, yearStr);
-
-        // Create or get month folder
-        Folder monthFolder = createOrGetFolder(objectStore, yearFolder, monthStr);
-
-        return monthFolder;
+        return createOrGetFolder(objectStore, yearFolder, monthStr);
     }
 
     /**
@@ -223,21 +243,19 @@ public class CreateFoldersAndFileBuildingInspectionReports {
     }
 
     /**
-     * File a document into a folder (create ReferentialContainmentRelationship).
+     * File a document into a folder (create ReferentialContainmentRelationship),
+     * skipping if the document is already filed there.
      */
-    private void fileDocument(Document doc, Folder folder) {
-        // Check if document is already filed in this folder
+    private void fileDocumentIntoFolder(Document doc, Folder folder) {
         FolderSet folders = doc.get_FoldersFiledIn();
         Iterator<?> it = folders.iterator();
         while (it.hasNext()) {
             Folder existingFolder = (Folder) it.next();
             if (existingFolder.get_Id().equals(folder.get_Id())) {
-                // Already filed in this folder
                 return;
             }
         }
 
-        // File the document
         ReferentialContainmentRelationship rcr = Factory.ReferentialContainmentRelationship.createInstance(
                 doc.getObjectStore(), null);
         rcr.set_Head(doc);
