@@ -4,7 +4,7 @@
 // custom properties) via GraphQL, and renders them.  Includes inline editing
 // of all six custom properties via the updateDocument GraphQL mutation.
 import { GraphQL, apiFetch, API } from '../api.js';
-import { esc } from '../util.js';
+import { esc, formTextField, formDateField, formSelectField } from '../util.js';
 import { subscribe, TOPICS } from '../eventBus.js';
 import { session } from '../session.js';
 import { registerCard } from './registry.js';
@@ -282,36 +282,13 @@ mutation checkinDocument($repositoryIdentifier: String!, $documentId: String!) {
     const propMap = {};
     for (const p of (doc.properties ?? [])) propMap[p.id] = p.value ?? '';
 
-    // Helper: text input row
-    const textField = (id, label, value) => `
-      <div class="form-group">
-        <label for="doc-edit-${id}">${esc(label)}</label>
-        <input type="text" id="doc-edit-${id}" value="${esc(value)}" />
-      </div>`;
-
-    // Helper: date input row (slice to YYYY-MM-DD defensively)
-    const dateField = (id, label, value) => `
-      <div class="form-group">
-        <label for="doc-edit-${id}">${esc(label)}</label>
-        <input type="date" id="doc-edit-${id}" value="${esc(String(value ?? '').slice(0, 10))}" />
-      </div>`;
-
-    // Helper: select row
-    const selectField = (id, label, options, value) => `
-      <div class="form-group">
-        <label for="doc-edit-${id}">${esc(label)}</label>
-        <select id="doc-edit-${id}">
-          ${options.map(o => `<option value="${esc(o)}"${o === value ? ' selected' : ''}>${esc(o)}</option>`).join('\n          ')}
-        </select>
-      </div>`;
-
     editForm.innerHTML = `
-      ${textField('Municipality',    'Municipality',     propMap['Municipality'])}
-      ${textField('PropertyAddress', 'Property Address', propMap['PropertyAddress'])}
-      ${textField('InspectorName',   'Inspector Name',   propMap['InspectorName'])}
-      ${dateField('InspectionDate',  'Inspection Date',  propMap['InspectionDate'])}
-      ${selectField('BuildingType',     'Building Type',     BUILDING_TYPE_OPTIONS,     propMap['BuildingType'])}
-      ${selectField('ComplianceStatus', 'Compliance Status', COMPLIANCE_STATUS_OPTIONS, propMap['ComplianceStatus'])}
+      ${formTextField('doc-edit-Municipality',    'Municipality',     propMap['Municipality'])}
+      ${formTextField('doc-edit-PropertyAddress', 'Property Address', propMap['PropertyAddress'])}
+      ${formTextField('doc-edit-InspectorName',   'Inspector Name',   propMap['InspectorName'])}
+      ${formDateField('doc-edit-InspectionDate',  'Inspection Date',  propMap['InspectionDate'])}
+      ${formSelectField('doc-edit-BuildingType',     'Building Type',     BUILDING_TYPE_OPTIONS,     propMap['BuildingType'])}
+      ${formSelectField('doc-edit-ComplianceStatus', 'Compliance Status', COMPLIANCE_STATUS_OPTIONS, propMap['ComplianceStatus'])}
 
       <h3>Content Elements</h3>
       <ul id="doc-edit-content-list">${this.buildContentListHtml(doc.contentElements)}</ul>

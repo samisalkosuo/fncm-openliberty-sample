@@ -5,7 +5,7 @@
 //   spinner id      : create-document-spinner
 //   result id       : create-document-result
 import { apiFetch, API } from '../api.js';
-import { esc, renderJson } from '../util.js';
+import { esc, renderJson, formTextField, formDateField, formSelectField } from '../util.js';
 import { registerCard } from './registry.js';
 import { BUILDING_TYPE_OPTIONS, COMPLIANCE_STATUS_OPTIONS } from './buildingInspectionConstants.js';
 
@@ -66,36 +66,12 @@ registerCard({
 
       <h3 style="margin:1rem 0 0.5rem">Custom Properties</h3>
 
-      <div class="form-group">
-        <label for="create-document-municipality">Municipality <span style="color:red">*</span></label>
-        <input type="text" id="create-document-municipality" placeholder="Enter municipality…" required />
-      </div>
-      <div class="form-group">
-        <label for="create-document-property-address">Property Address <span style="color:red">*</span></label>
-        <input type="text" id="create-document-property-address" placeholder="Enter property address…" required />
-      </div>
-      <div class="form-group">
-        <label for="create-document-inspector-name">Inspector Name <span style="color:red">*</span></label>
-        <input type="text" id="create-document-inspector-name" placeholder="Enter inspector name…" required />
-      </div>
-      <div class="form-group">
-        <label for="create-document-inspection-date">Inspection Date <span style="color:red">*</span></label>
-        <input type="date" id="create-document-inspection-date" required />
-      </div>
-      <div class="form-group">
-        <label for="create-document-building-type">Building Type <span style="color:red">*</span></label>
-        <select id="create-document-building-type" required>
-          <option value="">— select —</option>
-          ${BUILDING_TYPE_OPTIONS.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('\n          ')}
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="create-document-compliance-status">Compliance Status <span style="color:red">*</span></label>
-        <select id="create-document-compliance-status" required>
-          <option value="">— select —</option>
-          ${COMPLIANCE_STATUS_OPTIONS.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('\n          ')}
-        </select>
-      </div>
+      ${formTextField('create-document-municipality',    'Municipality',     '', { required: true, placeholder: 'Enter municipality…',     attrs: 'required' })}
+      ${formTextField('create-document-property-address','Property Address', '', { required: true, placeholder: 'Enter property address…', attrs: 'required' })}
+      ${formTextField('create-document-inspector-name',  'Inspector Name',   '', { required: true, placeholder: 'Enter inspector name…',   attrs: 'required' })}
+      ${formDateField('create-document-inspection-date', 'Inspection Date',  '', { required: true, attrs: 'required' })}
+      ${formSelectField('create-document-building-type',     'Building Type',     BUILDING_TYPE_OPTIONS,    '', { required: true, placeholder: '— select —' })}
+      ${formSelectField('create-document-compliance-status', 'Compliance Status', COMPLIANCE_STATUS_OPTIONS, '', { required: true, placeholder: '— select —' })}
 
       <h3 style="margin:1rem 0 0.5rem">Content Element</h3>
       <div class="form-group" style="display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap">

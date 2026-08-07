@@ -113,6 +113,67 @@ export function renderWithToggle(container, data, customRenderer = null, customL
   container.append(bar, customDiv, treeDiv);
 }
 
+// ── form-field builder helpers ────────────────────────────────────────────────
+
+/**
+ * Returns a `<div class="form-group">` string with a text input.
+ * @param {string} id
+ * @param {string} label
+ * @param {string} [value='']
+ * @param {{ required?: boolean, placeholder?: string, attrs?: string }} [opts]
+ */
+export function formTextField(id, label, value = '', { required = false, placeholder = '', attrs = '' } = {}) {
+  const labelHtml = required ? `${esc(label)} <span style="color:red">*</span>` : esc(label);
+  return `
+    <div class="form-group">
+      <label for="${esc(id)}">${labelHtml}</label>
+      <input type="text" id="${esc(id)}" value="${esc(value)}"${placeholder ? ` placeholder="${esc(placeholder)}"` : ''}${attrs ? ` ${attrs}` : ''} />
+    </div>`;
+}
+
+/**
+ * Returns a `<div class="form-group">` string with a date input.
+ * Value is sliced to YYYY-MM-DD defensively.
+ * @param {string} id
+ * @param {string} label
+ * @param {string} [value='']
+ * @param {{ required?: boolean, attrs?: string }} [opts]
+ */
+export function formDateField(id, label, value = '', { required = false, attrs = '' } = {}) {
+  const labelHtml = required ? `${esc(label)} <span style="color:red">*</span>` : esc(label);
+  const safeValue = esc(String(value ?? '').slice(0, 10));
+  return `
+    <div class="form-group">
+      <label for="${esc(id)}">${labelHtml}</label>
+      <input type="date" id="${esc(id)}" value="${safeValue}"${attrs ? ` ${attrs}` : ''} />
+    </div>`;
+}
+
+/**
+ * Returns a `<div class="form-group">` string with a `<select>`.
+ * @param {string} id
+ * @param {string} label
+ * @param {string[]} options
+ * @param {string} [selectedValue='']
+ * @param {{ required?: boolean, placeholder?: string }} [opts]
+ */
+export function formSelectField(id, label, options, selectedValue = '', { required = false, placeholder = '' } = {}) {
+  const labelHtml = required ? `${esc(label)} <span style="color:red">*</span>` : esc(label);
+  const placeholderOption = placeholder
+    ? `<option value="">${esc(placeholder)}</option>\n          `
+    : '';
+  const optionItems = options
+    .map(o => `<option value="${esc(o)}"${o === selectedValue ? ' selected' : ''}>${esc(o)}</option>`)
+    .join('\n          ');
+  return `
+    <div class="form-group">
+      <label for="${esc(id)}">${labelHtml}</label>
+      <select id="${esc(id)}"${required ? ' required' : ''}>
+        ${placeholderOption}${optionItems}
+      </select>
+    </div>`;
+}
+
 // ── internal helpers ──────────────────────────────────────────────────────────
 
 function _buildNode(value, isRoot = false) {
