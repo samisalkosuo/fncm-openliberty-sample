@@ -1,6 +1,6 @@
 // cards/userGroups.js — User Groups card
 import { apiFetch, API } from '../api.js';
-import { esc, renderJson } from '../util.js';
+import { renderJson, runCardAction } from '../util.js';
 import { registerCard } from './registry.js';
 
 registerCard({
@@ -16,22 +16,12 @@ registerCard({
       <div id="user-groups-result" class="card-result"></div>
     </div>`,
   init() {
-    document.getElementById('user-groups-btn').addEventListener('click', async () => {
-      const spinner   = document.getElementById('user-groups-spinner');
-      const container = document.getElementById('user-groups-result');
-      spinner.classList.remove('hidden');
-      container.innerHTML = '';
-
-      try {
+    document.getElementById('user-groups-btn').addEventListener('click', () =>
+      runCardAction('user-groups-spinner', 'user-groups-result', async container => {
         const res = await apiFetch(API.userGroups);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        renderJson(container, data);
-      } catch (err) {
-        container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
-      } finally {
-        spinner.classList.add('hidden');
-      }
-    });
+        renderJson(container, await res.json());
+      })
+    );
   },
 });

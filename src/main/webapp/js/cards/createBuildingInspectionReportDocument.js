@@ -5,7 +5,7 @@
 //   spinner id      : create-document-spinner
 //   result id       : create-document-result
 import { apiFetch, API } from '../api.js';
-import { esc, renderJson, formTextField, formDateField, formSelectField } from '../util.js';
+import { esc, renderJson, formTextField, formDateField, formSelectField, runCardAction } from '../util.js';
 import { registerCard } from './registry.js';
 import { BUILDING_TYPE_OPTIONS, COMPLIANCE_STATUS_OPTIONS } from './buildingInspectionConstants.js';
 
@@ -137,13 +137,8 @@ registerCard({
     syncPanels(); // enforce default state on mount (none — both panels hidden)
 
     document.getElementById('create-document-fill-btn').addEventListener('click', fillTestData);
-    document.getElementById('create-document-btn').addEventListener('click', async () => {
-      const spinner   = document.getElementById('create-document-spinner');
-      const container = document.getElementById('create-document-result');
-      spinner.classList.remove('hidden');
-      container.innerHTML = '';
-
-      try {
+    document.getElementById('create-document-btn').addEventListener('click', () =>
+      runCardAction('create-document-spinner', 'create-document-result', async container => {
         const municipality     = document.getElementById('create-document-municipality').value.trim();
         const propertyAddress  = document.getElementById('create-document-property-address').value.trim();
         const inspectorName    = document.getElementById('create-document-inspector-name').value.trim();
@@ -216,12 +211,8 @@ registerCard({
           const data = await res.json();
           renderJson(container, data);
         }
-      } catch (err) {
-        container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
-      } finally {
-        spinner.classList.add('hidden');
-      }
-    });
+      })
+    );
   },
 });
 

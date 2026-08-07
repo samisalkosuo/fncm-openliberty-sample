@@ -1,6 +1,6 @@
 // cards/connectionTest.js — Connection Test card
 import { apiFetch, API } from '../api.js';
-import { esc } from '../util.js';
+import { esc, runCardAction } from '../util.js';
 import { registerCard } from './registry.js';
 
 registerCard({
@@ -22,12 +22,7 @@ registerCard({
     });
   },
   async run() {
-    const spinner   = document.getElementById('connection-test-spinner');
-    const container = document.getElementById('connection-test-result');
-    spinner.classList.remove('hidden');
-    container.innerHTML = '';
-
-    try {
+    await runCardAction('connection-test-spinner', 'connection-test-result', async container => {
       const res = await apiFetch(API.connectionTest);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
@@ -38,10 +33,6 @@ registerCard({
       Object store: <b>${esc(data.objectStore)}</b><br/>
       </p>
       `;
-    } catch (err) {
-      container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
-    } finally {
-      spinner.classList.add('hidden');
-    }
+    });
   },
 });

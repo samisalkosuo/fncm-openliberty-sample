@@ -1,5 +1,5 @@
 import { apiFetch, API } from '../api.js';
-import { esc, renderJson, renderWithToggle } from '../util.js';
+import { renderJson, runCardAction } from '../util.js';
 import { registerCard } from './registry.js';
 
 registerCard({
@@ -20,30 +20,13 @@ registerCard({
     // subscribe(TOPICS.DOCUMENT_SELECTED, (payload) => { ... });
 
     //file button
-    document.getElementById('filebuildinginspectiondocs-btn').addEventListener('click', async () => {
-      const spinner   = document.getElementById('filebuildinginspectiondocs-spinner');
-      const container = document.getElementById('filebuildinginspectiondocs-result');
-      spinner.classList.remove('hidden');
-      container.innerHTML = '';
-
-      try {
-        // 1. call endpoint
-        const res = await apiFetch(API.fileBuildingInspectionDocs,{method:"POST"});
+    document.getElementById('filebuildinginspectiondocs-btn').addEventListener('click', () =>
+      runCardAction('filebuildinginspectiondocs-spinner', 'filebuildinginspectiondocs-result', async container => {
+        const res = await apiFetch(API.fileBuildingInspectionDocs, { method: 'POST' });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        // 2. render result as expandable JSON tree
-        const data = await res.json();
-        renderJson(container, data);
-        // — or, if you have a custom table/visualization —
-        // renderWithToggle(container, data, (el, d) => {
-        //   el.innerHTML = `<p>${esc(d.someField)}</p>`;
-        // });
-      } catch (err) {
-        container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
-      } finally {
-        // 3. hide spinner
-        spinner.classList.add('hidden');
-      }
-    });
+        renderJson(container, await res.json());
+      })
+    );
 
   },
 });

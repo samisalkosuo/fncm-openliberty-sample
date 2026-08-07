@@ -1,6 +1,6 @@
 // cards/listDocumentsInFolder.js — List Documents In Folder card
 import { apiFetch, API } from '../api.js';
-import { esc, renderWithToggle } from '../util.js';
+import { esc, renderWithToggle, runCardAction } from '../util.js';
 import { registerCard } from './registry.js';
 import { publish, subscribe, TOPICS } from '../eventBus.js';
 
@@ -65,23 +65,18 @@ registerCard({
 
       document.getElementById('list-documents-in-folder-btn').addEventListener('click', async () => {
         this.listDocumentInGivenFolder();
-    });
+      });
   },
   async listDocumentInGivenFolder() {
       const folder    = document.getElementById('list-documents-in-folder-path').value.trim();
-      const spinner   = document.getElementById('list-documents-in-folder-spinner');
       const container = document.getElementById('list-documents-in-folder-result');
-
 
       if (!folder) {
         container.innerHTML = `<div class="alert alert-error">Folder path is required.</div>`;
         return;
       }
 
-      spinner.classList.remove('hidden');
-      container.innerHTML = '';
-
-      try {
+      await runCardAction('list-documents-in-folder-spinner', 'list-documents-in-folder-result', async container => {
         const res = await apiFetch(
           `${API.listDocumentsInFolder}?folder=${encodeURIComponent(folder)}`
         );
@@ -106,11 +101,6 @@ registerCard({
           // Delegated click listener — one handler for all document rows
           el.querySelector('tbody')?.addEventListener('click', handleDocumentClick);
         });
-      } catch (err) {
-        container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
-      } finally {
-        spinner.classList.add('hidden');
-      }
-
+      });
   }
 });

@@ -1,6 +1,6 @@
 // cards/listFolders.js — List Folders card
 import { apiFetch, API } from '../api.js';
-import { esc, renderJson } from '../util.js';
+import { runCardAction } from '../util.js';
 import { registerCard } from './registry.js';
 import { publish,TOPICS } from '../eventBus.js';
 
@@ -17,18 +17,11 @@ registerCard({
       <div id="list-folders-result" class="card-result"></div>
     </div>`,
   init() {
-    document.getElementById('list-folders-btn').addEventListener('click', async () => {
-      const spinner   = document.getElementById('list-folders-spinner');
-      const container = document.getElementById('list-folders-result');
-      spinner.classList.remove('hidden');
-      container.innerHTML = '';
-
-      try {
+    document.getElementById('list-folders-btn').addEventListener('click', () =>
+      runCardAction('list-folders-spinner', 'list-folders-result', async container => {
         const res = await apiFetch(API.listFolders);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        const folders = data.folders;
-
+        const { folders } = await res.json();
         folders.forEach(folder => {
           const a = document.createElement('a');
           a.href = '#';
@@ -40,12 +33,7 @@ registerCard({
           container.appendChild(a);
           container.appendChild(document.createElement('br'));
         });
-
-      } catch (err) {
-        container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
-      } finally {
-        spinner.classList.add('hidden');
-      }
-    });
+      })
+    );
   },
 });

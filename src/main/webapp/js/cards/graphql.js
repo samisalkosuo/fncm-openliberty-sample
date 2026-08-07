@@ -1,6 +1,6 @@
 // cards/graphql.js — GraphQL Query card with sample query library
 import { GraphQL } from '../api.js';
-import { esc, renderJson } from '../util.js';
+import { esc, renderJson, runCardAction } from '../util.js';
 import { registerCard } from './registry.js';
 import { session } from '../session.js';
 
@@ -349,10 +349,8 @@ registerCard({
     });
 
     // Run button — collect variables from rendered param inputs and execute.
-    document.getElementById('graphql-run-btn').addEventListener('click', async () => {
-      const query     = textarea.value.trim();
-      const spinner   = document.getElementById('graphql-spinner');
-      const container = document.getElementById('graphql-result');
+    document.getElementById('graphql-run-btn').addEventListener('click', () => {
+      const query = textarea.value.trim();
 
       // Build variables object from any visible param inputs.
       const variables = {};
@@ -361,17 +359,10 @@ registerCard({
         if (paramId) variables[paramId] = input.value;
       });
 
-      spinner.classList.remove('hidden');
-      container.innerHTML = '';
-
-      try {
+      runCardAction('graphql-spinner', 'graphql-result', async container => {
         const data = await GraphQL.execute(query, variables);
         renderJson(container, data);
-      } catch (err) {
-        container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
-      } finally {
-        spinner.classList.add('hidden');
-      }
+      });
     });
   },
 });

@@ -1,6 +1,6 @@
 // cards/listDocumentClasses.js — List Document Classes card
 import { apiFetch, API } from '../api.js';
-import { esc, renderJson } from '../util.js';
+import { renderJson, runCardAction } from '../util.js';
 import { registerCard } from './registry.js';
 
 registerCard({
@@ -21,24 +21,14 @@ registerCard({
       <div id="list-document-classes-result" class="card-result"></div>
     </div>`,
   init() {
-    document.getElementById('list-document-classes-btn').addEventListener('click', async () => {
-      const spinner      = document.getElementById('list-document-classes-spinner');
-      const container    = document.getElementById('list-document-classes-result');
+    document.getElementById('list-document-classes-btn').addEventListener('click', () => {
       const includeHidden = document.getElementById('list-document-classes-hidden').checked;
-      spinner.classList.remove('hidden');
-      container.innerHTML = '';
-
-      try {
+      runCardAction('list-document-classes-spinner', 'list-document-classes-result', async container => {
         const url = API.listDocumentClasses + (includeHidden ? '?includeHidden=true' : '');
         const res = await apiFetch(url);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        renderJson(container, data);
-      } catch (err) {
-        container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
-      } finally {
-        spinner.classList.add('hidden');
-      }
+        renderJson(container, await res.json());
+      });
     });
   },
 });

@@ -141,6 +141,31 @@ export function showErrorAlert(container, err, onReloginClick = null) {
   }
 }
 
+// ── card action runner ────────────────────────────────────────────────────────
+
+/**
+ * Runs an async card action with standard spinner/container lifecycle.
+ * Shows the spinner, clears the container, awaits `asyncFn(container)`,
+ * then hides the spinner.  Any thrown error is rendered via `showErrorAlert`.
+ *
+ * @param {string}   spinnerId   ID of the spinner element
+ * @param {string}   containerId ID of the result container element
+ * @param {(container: HTMLElement) => Promise<void>} asyncFn
+ */
+export async function runCardAction(spinnerId, containerId, asyncFn) {
+  const spinner   = document.getElementById(spinnerId);
+  const container = document.getElementById(containerId);
+  spinner.classList.remove('hidden');
+  container.innerHTML = '';
+  try {
+    await asyncFn(container);
+  } catch (err) {
+    showErrorAlert(container, err);
+  } finally {
+    spinner.classList.add('hidden');
+  }
+}
+
 // ── form-field builder helpers ────────────────────────────────────────────────
 
 /**
