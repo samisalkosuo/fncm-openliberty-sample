@@ -9,11 +9,9 @@ import com.filenet.api.core.Folder;
 import com.filenet.api.core.ObjectStore;
 import com.filenet.api.property.Property;
 
-import dev.fncm.service.javaapi.service.ConnectionTestOperation;
-
 public class DeleteAllFolders {
 
-    private static final Logger LOGGER = Logger.getLogger(ConnectionTestOperation.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(DeleteAllFolders.class.getName());
 
     public String execute(ObjectStore objectStore) throws Exception {
         LOGGER.info("=================================================");
