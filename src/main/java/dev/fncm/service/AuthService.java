@@ -9,17 +9,15 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.security.cert.X509Certificate;
 import java.util.Optional;
 import java.util.logging.Logger;
 
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.json.JSONObject;
+
+import dev.fncm.utils.SslUtil;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -277,15 +275,11 @@ public class AuthService {
         }
     }
 
-    @SuppressWarnings("java:S4830")  // intentional trust-all when verification is disabled
     private HttpURLConnection openConnection(String urlStr) throws IOException {
-        
         URL connectionURL = null;
         try {
             connectionURL = new URI(urlStr).toURL();
-        }
-        catch (URISyntaxException use)
-        {
+        } catch (URISyntaxException use) {
             throw new IOException(use.getMessage());
         }
         HttpURLConnection conn = (HttpURLConnection) connectionURL.openConnection();
@@ -293,19 +287,7 @@ public class AuthService {
         conn.setReadTimeout(30_000);
 
         if (!tlsVerificationEnabled && conn instanceof HttpsURLConnection https) {
-            try {
-                SSLContext ctx = SSLContext.getInstance("TLS");
-                ctx.init(null, new TrustManager[]{new X509TrustManager() {
-                    public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
-                    public void checkClientTrusted(X509Certificate[] c, String a) {}
-                    public void checkServerTrusted(X509Certificate[] c, String a) {}
-                }}, new java.security.SecureRandom());
-                https.setSSLSocketFactory(ctx.getSocketFactory());
-                https.setHostnameVerifier((host, session) -> true);
-                LOGGER.warning("TLS certificate verification DISABLED for: " + urlStr);
-            } catch (Exception e) {
-                throw new IOException("Failed to configure trust-all SSL context", e);
-            }
+            SslUtil.applyTrustAllToConnection(https, LOGGER, urlStr);
         }
         return conn;
     }

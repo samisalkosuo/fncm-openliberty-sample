@@ -10,9 +10,10 @@ import dev.fncm.auth.TokenContext;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import javax.net.ssl.*;
+import dev.fncm.utils.SslUtil;
+
+import java.security.GeneralSecurityException;
 import java.security.PrivilegedExceptionAction;
-import java.security.cert.X509Certificate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -84,20 +85,8 @@ public class FileNetService {
 
     private void configureTrustAllSSL() {
         try {
-            LOGGER.info("Configuring SSL (trust-all — development only)");
-            TrustManager[] trustAllCerts = new TrustManager[]{
-                new X509TrustManager() {
-                    public X509Certificate[] getAcceptedIssuers() { return null; }
-                    public void checkClientTrusted(X509Certificate[] c, String a) {}
-                    public void checkServerTrusted(X509Certificate[] c, String a) {}
-                }
-            };
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
-            LOGGER.info("✓ SSL configured");
-        } catch (Exception e) {
+            SslUtil.configureGlobalTrustAll(LOGGER);
+        } catch (GeneralSecurityException e) {
             throw new RuntimeException("SSL configuration failed", e);
         }
     }
