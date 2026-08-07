@@ -1,5 +1,7 @@
 package dev.fncm.service.javaapi.service;
 
+import dev.fncm.service.javaapi.service.buildinginspectiondocs.BuildingInspectionConstants;
+
 import com.filenet.api.collection.ContentElementList;
 import com.filenet.api.constants.AutoClassify;
 import com.filenet.api.constants.CheckinType;
@@ -111,15 +113,15 @@ public class CheckinDocumentOperation implements FileNetOperation<CheckinDocumen
     private void setProperties(Document doc) throws Exception {
         var props = doc.getProperties();
 
-        props.putValue("Municipality",     municipality);
-        props.putValue("PropertyAddress",  propertyAddress);
-        props.putValue("InspectorName",    inspectorName);
-        props.putValue("BuildingType",     buildingType);
-        props.putValue("ComplianceStatus", complianceStatus);
+        props.putValue(BuildingInspectionConstants.PROP_MUNICIPALITY,      municipality);
+        props.putValue(BuildingInspectionConstants.PROP_PROPERTY_ADDRESS,  propertyAddress);
+        props.putValue(BuildingInspectionConstants.PROP_INSPECTOR_NAME,    inspectorName);
+        props.putValue(BuildingInspectionConstants.PROP_BUILDING_TYPE,     buildingType);
+        props.putValue(BuildingInspectionConstants.PROP_COMPLIANCE_STATUS, complianceStatus);
 
         Date parsed = DateUtil.parseIso8601Utc(inspectionDate);
         if (parsed != null) {
-            props.putValue("InspectionDate", parsed);
+            props.putValue(BuildingInspectionConstants.PROP_INSPECTION_DATE, parsed);
             LOGGER.info("InspectionDate set to: " + inspectionDate);
         }
     }

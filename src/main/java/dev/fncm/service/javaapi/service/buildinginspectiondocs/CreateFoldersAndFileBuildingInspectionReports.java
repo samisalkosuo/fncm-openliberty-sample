@@ -30,8 +30,8 @@ public class CreateFoldersAndFileBuildingInspectionReports {
     private static final Logger LOGGER = Logger
             .getLogger(CreateFoldersAndFileBuildingInspectionReports.class.getName());
 
-    private static final String ROOT_FOLDER_NAME = "BuildingInspectionReports";
-    private static final String DOCUMENT_CLASS = "BuildingInspectionReport";
+    private static final String ROOT_FOLDER_NAME = BuildingInspectionConstants.ROOT_FOLDER_NAME;
+    private static final String DOCUMENT_CLASS = BuildingInspectionConstants.DOC_CLASS;
 
     private static final String[] BUILDING_TYPES = {
             "Industrial",
@@ -99,8 +99,8 @@ public class CreateFoldersAndFileBuildingInspectionReports {
                 Properties props = doc.getProperties();
 
                 // Get InspectionDate
-                Date inspectionDate = (Date) props.getObjectValue("InspectionDate");
-                String buildingType = (String) props.getStringValue("BuildingType");
+                Date inspectionDate = (Date) props.getObjectValue(BuildingInspectionConstants.PROP_INSPECTION_DATE);
+                String buildingType = (String) props.getStringValue(BuildingInspectionConstants.PROP_BUILDING_TYPE);
 
                 LOGGER.info("  InspectionDate: " + (inspectionDate != null ? inspectionDate : "N/A"));
                 LOGGER.info("  BuildingType: " + (buildingType != null ? buildingType : "N/A"));

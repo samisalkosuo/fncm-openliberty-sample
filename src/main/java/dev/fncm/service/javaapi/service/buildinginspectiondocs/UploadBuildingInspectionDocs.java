@@ -26,7 +26,7 @@ public class UploadBuildingInspectionDocs {
 
     private static final Logger LOGGER = Logger.getLogger(UploadBuildingInspectionDocs.class.getName());
 
-    private static final String CLASS_SYMBOLIC_NAME = "BuildingInspectionReport";
+    private static final String CLASS_SYMBOLIC_NAME = BuildingInspectionConstants.DOC_CLASS;
     private static final String RESOURCES_BASE = "/building_inspection_sample_docs";
     private static final String JSON_RESOURCE_PATH = RESOURCES_BASE + "/extract_fields.json";
 
@@ -147,14 +147,14 @@ public class UploadBuildingInspectionDocs {
         StringBuilder title = new StringBuilder("Inspection Report ");
         title.append("(");
         // Municipality (String)
-        if (fields.has("Municipality")) {
-            String municipality = fields.get("Municipality").getAsString();
+        if (fields.has(BuildingInspectionConstants.PROP_MUNICIPALITY)) {
+            String municipality = fields.get(BuildingInspectionConstants.PROP_MUNICIPALITY).getAsString();
             title.append(municipality);
             title.append(" ");
         }        
         // InspectionDate (DateTime)
-        if (fields.has("InspectionDate")) {
-            String dateStr = fields.get("InspectionDate").getAsString();
+        if (fields.has(BuildingInspectionConstants.PROP_INSPECTION_DATE)) {
+            String dateStr = fields.get(BuildingInspectionConstants.PROP_INSPECTION_DATE).getAsString();
             Date inspectionDate = DateUtil.parseDdMmYyyy(dateStr);
             if (inspectionDate != null) {
                 title.append(new SimpleDateFormat("yyyy-MM-dd").format(inspectionDate));
@@ -171,11 +171,11 @@ public class UploadBuildingInspectionDocs {
         Properties props = doc.getProperties();
 
         // InspectionDate (DateTime)
-        if (fields.has("InspectionDate")) {
-            String dateStr = fields.get("InspectionDate").getAsString();
+        if (fields.has(BuildingInspectionConstants.PROP_INSPECTION_DATE)) {
+            String dateStr = fields.get(BuildingInspectionConstants.PROP_INSPECTION_DATE).getAsString();
             Date inspectionDate = DateUtil.parseDdMmYyyy(dateStr);
             if (inspectionDate != null) {
-                props.putValue("InspectionDate", inspectionDate);
+                props.putValue(BuildingInspectionConstants.PROP_INSPECTION_DATE, inspectionDate);
                 LOGGER.info("  InspectionDate: " + dateStr);
             }
         }
@@ -183,36 +183,36 @@ public class UploadBuildingInspectionDocs {
         // BuildingAddress (String) - maps to PropertyAddress
         if (fields.has("BuildingAddress")) {
             String address = fields.get("BuildingAddress").getAsString();
-            props.putValue("PropertyAddress", address);
+            props.putValue(BuildingInspectionConstants.PROP_PROPERTY_ADDRESS, address);
             LOGGER.info("  PropertyAddress: " + address);
         }
 
         // BuildingType (String with choice list)
-        if (fields.has("BuildingType")) {
-            String buildingType = fields.get("BuildingType").getAsString();
-            props.putValue("BuildingType", buildingType);
+        if (fields.has(BuildingInspectionConstants.PROP_BUILDING_TYPE)) {
+            String buildingType = fields.get(BuildingInspectionConstants.PROP_BUILDING_TYPE).getAsString();
+            props.putValue(BuildingInspectionConstants.PROP_BUILDING_TYPE, buildingType);
             LOGGER.info("  BuildingType: " + buildingType);
         }
 
         // InspectorName (String)
-        if (fields.has("InspectorName")) {
-            String inspectorName = fields.get("InspectorName").getAsString();
-            props.putValue("InspectorName", inspectorName);
+        if (fields.has(BuildingInspectionConstants.PROP_INSPECTOR_NAME)) {
+            String inspectorName = fields.get(BuildingInspectionConstants.PROP_INSPECTOR_NAME).getAsString();
+            props.putValue(BuildingInspectionConstants.PROP_INSPECTOR_NAME, inspectorName);
             LOGGER.info("  InspectorName: " + inspectorName);
         }
 
         // ComplianceStatus (String with choice list)
-        if (fields.has("ComplianceStatus")) {
-            String complianceStatus = fields.get("ComplianceStatus").getAsString();
-            props.putValue("ComplianceStatus", complianceStatus);
+        if (fields.has(BuildingInspectionConstants.PROP_COMPLIANCE_STATUS)) {
+            String complianceStatus = fields.get(BuildingInspectionConstants.PROP_COMPLIANCE_STATUS).getAsString();
+            props.putValue(BuildingInspectionConstants.PROP_COMPLIANCE_STATUS, complianceStatus);
             LOGGER.info("  ComplianceStatus: " + complianceStatus);
         }
 
         // Municipality (String)
-        if (fields.has("Municipality")) {
-            String inspectorName = fields.get("Municipality").getAsString();
-            props.putValue("Municipality", inspectorName);
-            LOGGER.info("  Municipality: " + inspectorName);
+        if (fields.has(BuildingInspectionConstants.PROP_MUNICIPALITY)) {
+            String municipality = fields.get(BuildingInspectionConstants.PROP_MUNICIPALITY).getAsString();
+            props.putValue(BuildingInspectionConstants.PROP_MUNICIPALITY, municipality);
+            LOGGER.info("  Municipality: " + municipality);
         }
 
     }

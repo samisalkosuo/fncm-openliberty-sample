@@ -32,7 +32,7 @@ public class CreateBuildingInspectionTypes {
     
     private static final Logger LOGGER = Logger.getLogger(CreateBuildingInspectionTypes.class.getName());
     
-    private static final String CLASS_SYMBOLIC_NAME = "BuildingInspectionReport";
+    private static final String CLASS_SYMBOLIC_NAME = BuildingInspectionConstants.DOC_CLASS;
     private static final String CLASS_DISPLAY_NAME = "Building Inspection Report";
 
     private static final String[] BUILDING_TYPE_VALUES = {
@@ -78,19 +78,19 @@ public class CreateBuildingInspectionTypes {
         newClass = Factory.DocumentClassDefinition.fetchInstance(objectStore, CLASS_SYMBOLIC_NAME, pf);
         PropertyDefinitionList propDefs = newClass.get_PropertyDefinitions();
 
-        propDefs.add(createStringProperty(objectStore, "Municipality", "Municipality", true));
-        propDefs.add(createStringProperty(objectStore, "PropertyAddress", "Property Address", true));
-        propDefs.add(createStringProperty(objectStore, "InspectorName", "Inspector Name ", true));
-        propDefs.add(createDateProperty(objectStore, "InspectionDate", "Inspection Date", true));
+        propDefs.add(createStringProperty(objectStore, BuildingInspectionConstants.PROP_MUNICIPALITY, "Municipality", true));
+        propDefs.add(createStringProperty(objectStore, BuildingInspectionConstants.PROP_PROPERTY_ADDRESS, "Property Address", true));
+        propDefs.add(createStringProperty(objectStore, BuildingInspectionConstants.PROP_INSPECTOR_NAME, "Inspector Name ", true));
+        propDefs.add(createDateProperty(objectStore, BuildingInspectionConstants.PROP_INSPECTION_DATE, "Inspection Date", true));
         propDefs.add(createChoiceListProperty(
                 objectStore,
-                "BuildingType",
+                BuildingInspectionConstants.PROP_BUILDING_TYPE,
                 "Building Type",
                 true,
                 BUILDING_TYPE_VALUES));
         propDefs.add(createChoiceListProperty(
                 objectStore,
-                "ComplianceStatus",
+                BuildingInspectionConstants.PROP_COMPLIANCE_STATUS,
                 "Compliance Status",
                 true,
                 COMPLIANCE_STATUS_VALUES));

@@ -30,7 +30,7 @@ public class DeleteBuildingInspectionTypes {
      * Add or remove names as needed.
      */
     private static final String[] DOCUMENT_CLASS_NAMES = {
-            "BuildingInspectionReport"
+            BuildingInspectionConstants.DOC_CLASS
             // "AnotherCustomDocumentClass"
     };
 
@@ -42,12 +42,12 @@ public class DeleteBuildingInspectionTypes {
      * other remaining classes.
      */
     private static final String[] PROPERTY_TEMPLATE_NAMES = {
-            "Municipality",
-            "PropertyAddress",
-            "InspectionDate",
-            "InspectorName",
-            "BuildingType",
-            "ComplianceStatus"
+            BuildingInspectionConstants.PROP_MUNICIPALITY,
+            BuildingInspectionConstants.PROP_PROPERTY_ADDRESS,
+            BuildingInspectionConstants.PROP_INSPECTION_DATE,
+            BuildingInspectionConstants.PROP_INSPECTOR_NAME,
+            BuildingInspectionConstants.PROP_BUILDING_TYPE,
+            BuildingInspectionConstants.PROP_COMPLIANCE_STATUS
             // "AnotherTemplate"
     };
 
@@ -58,11 +58,11 @@ public class DeleteBuildingInspectionTypes {
      * Usually these match the class-specific custom properties you created.
      */
     private static final String[] CLASS_PROPERTY_NAMES = {
-            "Municipality",
-            "PropertyAddress",
-            "InspectionDate",
-            "BuildingType",
-            "ComplianceStatus"
+            BuildingInspectionConstants.PROP_MUNICIPALITY,
+            BuildingInspectionConstants.PROP_PROPERTY_ADDRESS,
+            BuildingInspectionConstants.PROP_INSPECTION_DATE,
+            BuildingInspectionConstants.PROP_BUILDING_TYPE,
+            BuildingInspectionConstants.PROP_COMPLIANCE_STATUS
             // "AnotherProperty"
     };
 
@@ -72,8 +72,8 @@ public class DeleteBuildingInspectionTypes {
      * Add or remove names as needed.
      */
     private static final String[] CHOICE_LIST_NAMES = {
-            "Building Type Choices",
-            "Compliance Status Choices"
+            BuildingInspectionConstants.CHOICE_LIST_BUILDING_TYPE,
+            BuildingInspectionConstants.CHOICE_LIST_COMPLIANCE_STATUS
             // "AnotherChoiceList"
     };
 
