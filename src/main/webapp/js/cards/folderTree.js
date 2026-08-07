@@ -162,10 +162,9 @@ registerCard({
   },
 
   async getFolders() {
-    const REPOSITORY_IDENTIFIER = session.config.repositoryIdentifier;
     const graphqlQuery = `
-{
-  folders(repositoryIdentifier: "${REPOSITORY_IDENTIFIER}")
+query($repositoryIdentifier: String!) {
+  folders(repositoryIdentifier: $repositoryIdentifier)
   {
     folders {
       id
@@ -197,6 +196,8 @@ registerCard({
   }
 }
     `;
-    return GraphQL.execute(graphqlQuery);
+    return GraphQL.execute(graphqlQuery, {
+      repositoryIdentifier: session.config.repositoryIdentifier,
+    });
   },
 });

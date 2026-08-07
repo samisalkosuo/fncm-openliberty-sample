@@ -120,23 +120,24 @@ registerCard({
     publish(TOPICS.DOCUMENT_CLEARED);
   },
   async getDocuments() {
-    const REPOSITORY_IDENTIFIER = session.config.repositoryIdentifier;
     const graphqlQuery = `
-    {
+    query($repositoryIdentifier: String!) {
   documents(
-    repositoryIdentifier: "${REPOSITORY_IDENTIFIER}"
+    repositoryIdentifier: $repositoryIdentifier
     from: "BuildingInspectionReport"
     orderBy: "DocumentTitle"
     where:"[IsCurrentVersion] = True"
   ) {
-    documents {      
+    documents {
       name
       id
     }
   }
 }`;
 
-    return GraphQL.execute(graphqlQuery);
+    return GraphQL.execute(graphqlQuery, {
+      repositoryIdentifier: session.config.repositoryIdentifier,
+    });
     
   }
 });

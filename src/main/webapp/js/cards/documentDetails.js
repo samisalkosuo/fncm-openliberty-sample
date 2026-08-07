@@ -11,11 +11,6 @@ import { registerCard } from './registry.js';
 import { logout } from '../router.js';
 import { BUILDING_TYPE_OPTIONS, COMPLIANCE_STATUS_OPTIONS } from './buildingInspectionConstants.js';
 
-// Escape a string value for safe inlining inside a GraphQL argument string literal.
-function escPropValue(v) {
-  return String(v ?? '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-}
-
 // Converts a YYYY-MM-DD date string to the ISO-8601 datetime format that
 // FileNet expects: 2026-07-02T00:00:00Z (midnight UTC).
 function toFileNetDateTime(date) {
@@ -194,13 +189,11 @@ registerCard({
     this.renderEditForm(this.currentDoc);
   },
   async checkoutDocument(docId) {
-    const repo = session.config.repositoryIdentifier;
-
     const checkoutMutation = `
-    mutation checkoutDocument{
+    mutation checkoutDocument($repositoryIdentifier: String!, $documentId: String!) {
     checkoutDocument(
-        repositoryIdentifier:"${escPropValue(repo)}",
-        identifier:"${escPropValue(docId)}",
+        repositoryIdentifier: $repositoryIdentifier,
+        identifier: $documentId,
         )
       {
         id
@@ -212,7 +205,7 @@ registerCard({
           ... on ContentTransfer {
             className
             contentSize
-            retrievalName 
+            retrievalName
             downloadUrl
           }
         }
@@ -225,46 +218,50 @@ registerCard({
       }
     }
 `;
-    const result = await GraphQL.execute(checkoutMutation);
+    const result = await GraphQL.execute(checkoutMutation, {
+      repositoryIdentifier: session.config.repositoryIdentifier,
+      documentId: docId,
+    });
     const reservationId = result?.data?.checkoutDocument?.reservation?.id;
     session.setState('reservationId', reservationId);
     console.debug(`Checkout done. Reservation ID: ${reservationId}`);
   },
   async checkinDocument(docId) {
-    const repo = session.config.repositoryIdentifier;
-
     const checkinMutation = `
-mutation checkinDocument{
-  checkinDocument(repositoryIdentifier:"${escPropValue(repo)}",
-  identifier:"${escPropValue(docId)}"
-  checkinAction: {})
-  
-  {
+mutation checkinDocument($repositoryIdentifier: String!, $documentId: String!) {
+  checkinDocument(
+    repositoryIdentifier: $repositoryIdentifier,
+    identifier: $documentId,
+    checkinAction: {}
+  ) {
     id
-}
+  }
 }
 `;
-    const result = await GraphQL.execute(checkinMutation);
+    const result = await GraphQL.execute(checkinMutation, {
+      repositoryIdentifier: session.config.repositoryIdentifier,
+      documentId: docId,
+    });
     const newDocId = result?.data?.checkinDocument?.id;
     session.clearState('reservationId');
     console.debug(`Checkin done. Doc ID: ${newDocId}`);
     return newDocId;
   },
   async cancelCheckoutDocument(reservationId) {
-    const repo = session.config.repositoryIdentifier;
-
     const cancelCheckoutMutation = `
-    mutation cancelCheckout {
+    mutation cancelCheckout($repositoryIdentifier: String!, $reservationId: String!) {
       cancelDocumentCheckout(
-        repositoryIdentifier:"${escPropValue(repo)}",
-      identifier:"${escPropValue(reservationId)}",
-      ) 
-      {
+        repositoryIdentifier: $repositoryIdentifier,
+        identifier: $reservationId
+      ) {
         id
       }
     }
   `;
-    const result = await GraphQL.execute(cancelCheckoutMutation);
+    const result = await GraphQL.execute(cancelCheckoutMutation, {
+      repositoryIdentifier: session.config.repositoryIdentifier,
+      reservationId,
+    });
     const canceledReservationId = result?.data?.cancelDocumentCheckout?.id;
     session.clearState('reservationId');
     console.debug(`Checkout canceled. Canceled Reservation ID: ${canceledReservationId}`);
@@ -515,12 +512,11 @@ mutation checkinDocument{
 
   // ── GraphQL query ──────────────────────────────────────────────────────────
   async getDocumentDetails(documentId) {
-    const repo = session.config.repositoryIdentifier;
     const query = `
-      {
+      query($repositoryIdentifier: String!, $documentId: String!) {
         document(
-          repositoryIdentifier: "${repo}"
-          identifier: "${documentId}"
+          repositoryIdentifier: $repositoryIdentifier
+          identifier: $documentId
         ) {
           name
           id
@@ -528,7 +524,7 @@ mutation checkinDocument{
             id
             value
           }
-        contentElements {      
+        contentElements {
           ... on ContentTransfer {
             retrievalName
             contentType
@@ -537,6 +533,9 @@ mutation checkinDocument{
 
         }
       }`;
-    return GraphQL.execute(query);
+    return GraphQL.execute(query, {
+      repositoryIdentifier: session.config.repositoryIdentifier,
+      documentId,
+    });
   },
 });
