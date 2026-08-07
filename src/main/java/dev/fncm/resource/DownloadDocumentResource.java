@@ -39,17 +39,9 @@ public class DownloadDocumentResource extends BaseResource {
             return error(400, "retrievalName query parameter is required");
         }
 
-        try {
-            return fileNetService.run(
-                    new DownloadContentElementOperation(documentId, retrievalName),
-                    tokenContext);
-        } catch (IllegalArgumentException e) {
-            return error(404, e.getMessage());
-        } catch (IllegalStateException e) {
-            return error(503, e.getMessage());
-        } catch (Exception e) {
-            return error(500, e.getMessage());
-        }
+        return executeResponse(() -> fileNetService.run(
+                new DownloadContentElementOperation(documentId, retrievalName),
+                tokenContext));
     }
 }
 

@@ -67,6 +67,29 @@ public abstract class BaseResource {
     }
 
     /**
+     * Variant of {@link #execute(ThrowingSupplier)} for actions that already produce a
+     * fully-built {@link Response} (e.g. streaming downloads). The response is returned
+     * as-is rather than being wrapped in a new {@code 200 OK}.
+     *
+     * <ul>
+     *   <li>{@link IllegalStateException} → 503 Service Unavailable</li>
+     *   <li>Any other {@link Exception}   → 500 Internal Server Error</li>
+     * </ul>
+     *
+     * @param action supplier that produces a ready-to-send {@link Response}
+     * @return the {@link Response} from the action, or an error response
+     */
+    protected Response executeResponse(ThrowingSupplier<Response> action) {
+        try {
+            return action.get();
+        } catch (IllegalStateException e) {
+            return error(503, e.getMessage());
+        } catch (Exception e) {
+            return error(500, e.getMessage());
+        }
+    }
+
+    /**
      * Builds a JSON error response: {@code {"error":"<message>"}}.
      *
      * @param status  HTTP status code
