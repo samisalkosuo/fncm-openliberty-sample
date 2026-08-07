@@ -99,7 +99,7 @@ registerCard({
     }
   },
   onDocumentSelected(documentId) {
-    console.log('Document selected, id:', documentId);
+    console.debug('Document selected, id:', documentId);
     session.setState('selectedDocumentId', documentId);
     const idLabel = document.getElementById('documents-selected-id');
     if (idLabel) idLabel.textContent = `ID: ${documentId}`;
@@ -119,12 +119,9 @@ registerCard({
     document.getElementById('documents-clear-btn').classList.add('hidden');
     publish(TOPICS.DOCUMENT_CLEARED);
   },
-  testFunction(arg) {
-    console.log(arg);
-  },
   async getDocuments() {
     const REPOSITORY_IDENTIFIER = session.config.repositoryIdentifier;
-    var graphqlQuery = `
+    const graphqlQuery = `
     {
   documents(
     repositoryIdentifier: "${REPOSITORY_IDENTIFIER}"
@@ -138,12 +135,6 @@ registerCard({
     }
   }
 }`;
-/*
-        console.log(graphqlQuery);
-            const data = GraphQL.execute(graphqlQuery);
-            console.log(data);
-            return data;
-            */
 
     return GraphQL.execute(graphqlQuery);
     

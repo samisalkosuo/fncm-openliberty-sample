@@ -61,7 +61,6 @@ registerCard({
     init() {
       subscribe(TOPICS.FOLDER_SELECTED, (folderData) => {
         document.getElementById('list-documents-in-folder-path').value = folderData.path;
-        //this.listDocumentInGivenFolder();
       });
 
       document.getElementById('list-documents-in-folder-btn').addEventListener('click', async () => {

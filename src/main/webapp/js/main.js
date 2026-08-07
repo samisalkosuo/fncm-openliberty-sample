@@ -33,10 +33,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ── Dev convenience: pre-fill login form from server env vars ───────
   try {
     const cfgRes = await fetch('/api/config');
-    console.log(cfgRes);
+    console.debug(cfgRes);
     if (cfgRes.ok) {
       const cfg = await cfgRes.json();
-      console.log(cfg);
+      console.debug(cfg);
       if (cfg.devUsername) document.getElementById('username').value = cfg.devUsername;
       if (cfg.devPassword) document.getElementById('password').value = cfg.devPassword;
     }

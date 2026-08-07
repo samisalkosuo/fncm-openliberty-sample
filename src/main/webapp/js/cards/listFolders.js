@@ -41,8 +41,6 @@ registerCard({
           container.appendChild(document.createElement('br'));
         });
 
-        //renderJson(container, folders);
-
       } catch (err) {
         container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
       } finally {

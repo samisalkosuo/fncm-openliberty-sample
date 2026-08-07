@@ -231,7 +231,7 @@ registerCard({
     const result = await GraphQL.execute(checkoutMutation);
     const reservationId = result?.data?.checkoutDocument?.reservation?.id;
     session.setState('reservationId', reservationId);
-    console.log(`Checkout done. Reservation ID: ${reservationId}`);
+    console.debug(`Checkout done. Reservation ID: ${reservationId}`);
   },
   async checkinDocument(docId) {
     const repo = session.config.repositoryIdentifier;
@@ -250,7 +250,7 @@ mutation checkinDocument{
     const result = await GraphQL.execute(checkinMutation);
     const newDocId = result?.data?.checkinDocument?.id;
     session.clearState('reservationId');
-    console.log(`Checkin done. Doc ID: ${newDocId}`);
+    console.debug(`Checkin done. Doc ID: ${newDocId}`);
     return newDocId;
   },
   async cancelCheckoutDocument(reservationId) {
@@ -270,7 +270,7 @@ mutation checkinDocument{
     const result = await GraphQL.execute(cancelCheckoutMutation);
     const canceledReservationId = result?.data?.cancelDocumentCheckout?.id;
     session.clearState('reservationId');
-    console.log(`Checkout canceled. Canceled Reservation ID: ${canceledReservationId}`);
+    console.debug(`Checkout canceled. Canceled Reservation ID: ${canceledReservationId}`);
   },
 
   // Returns the inner HTML for the content elements <ul> used in the edit form.
@@ -483,7 +483,7 @@ mutation checkinDocument{
       if (result.status !== 'ok') {
         throw new Error(result.message ?? 'Checkin failed.');
       }
-      console.log(`Check in done: ${JSON.stringify(result)}`);
+      console.debug(`Check in done: ${JSON.stringify(result)}`);
       this.currentDocumentId = result.documentId;
 
       // Switch back to read-only and reload the newly checked-in document version
