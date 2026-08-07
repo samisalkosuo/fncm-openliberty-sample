@@ -1,8 +1,11 @@
 package dev.fncm.service.javaapi.service;
 
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
-import java.util.TimeZone;
 import java.util.logging.Logger;
 
 /**
@@ -16,16 +19,17 @@ import java.util.logging.Logger;
  *
  * <p>Both methods return {@code null} and log a warning on parse failure rather than
  * propagating an exception, keeping callers simple.
+ *
+ * <p>{@link DateTimeFormatter} instances are immutable and thread-safe; there is no shared
+ * mutable state in this class.
  */
 public final class DateUtil {
 
     private static final Logger LOGGER = Logger.getLogger(DateUtil.class.getName());
 
-    /** Format used in the building inspection JSON extract file: {@code dd.MM.yyyy}. */
-    private static final String DD_MM_YYYY = "dd.MM.yyyy";
-
-    /** ISO-8601 UTC format used in UI request payloads: {@code yyyy-MM-dd'T'HH:mm:ss'Z'}. */
-    private static final String ISO_8601_UTC = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    /** Thread-safe formatter for {@code dd.MM.yyyy} (building inspection JSON extract). */
+    private static final DateTimeFormatter FMT_DD_MM_YYYY =
+            DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     private DateUtil() {}
 
@@ -33,10 +37,19 @@ public final class DateUtil {
      * Parses a date string in {@code dd.MM.yyyy} format (e.g. {@code "02.07.2026"}).
      *
      * @param dateStr the date string to parse
-     * @return the parsed {@link Date}, or {@code null} if the string is blank or unparseable
+     * @return the parsed {@link Date} at midnight UTC, or {@code null} if the string is blank or unparseable
      */
     public static Date parseDdMmYyyy(String dateStr) {
-        return parse(dateStr, DD_MM_YYYY, null);
+        if (dateStr == null || dateStr.isBlank()) {
+            return null;
+        }
+        try {
+            LocalDate localDate = LocalDate.parse(dateStr, FMT_DD_MM_YYYY);
+            return Date.from(localDate.atStartOfDay(ZoneOffset.UTC).toInstant());
+        } catch (DateTimeParseException e) {
+            LOGGER.warning("Could not parse date '" + dateStr + "' with pattern 'dd.MM.yyyy': " + e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -46,23 +59,14 @@ public final class DateUtil {
      * @return the parsed {@link Date}, or {@code null} if the string is blank or unparseable
      */
     public static Date parseIso8601Utc(String dateStr) {
-        return parse(dateStr, ISO_8601_UTC, "UTC");
-    }
-
-    // ── private ───────────────────────────────────────────────────────────────
-
-    private static Date parse(String dateStr, String pattern, String timeZoneId) {
         if (dateStr == null || dateStr.isBlank()) {
             return null;
         }
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-            if (timeZoneId != null) {
-                sdf.setTimeZone(TimeZone.getTimeZone(timeZoneId));
-            }
-            return sdf.parse(dateStr);
-        } catch (Exception e) {
-            LOGGER.warning("Could not parse date '" + dateStr + "' with pattern '" + pattern + "': " + e.getMessage());
+            ZonedDateTime zdt = ZonedDateTime.parse(dateStr, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+            return Date.from(zdt.toInstant());
+        } catch (DateTimeParseException e) {
+            LOGGER.warning("Could not parse date '" + dateStr + "' as ISO-8601: " + e.getMessage());
             return null;
         }
     }
