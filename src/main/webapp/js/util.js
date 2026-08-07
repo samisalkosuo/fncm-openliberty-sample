@@ -113,6 +113,34 @@ export function renderWithToggle(container, data, customRenderer = null, customL
   container.append(bar, customDiv, treeDiv);
 }
 
+// ── error alert helper ────────────────────────────────────────────────────────
+
+/**
+ * Renders an error alert inside `container`.
+ * If `err.status === 401`, renders a 401 block with a "Sign in again" button
+ * wired to `onReloginClick` (when provided).
+ * Otherwise renders a plain `.alert.alert-error` block.
+ *
+ * @param {HTMLElement} container
+ * @param {Error & { status?: number }} err
+ * @param {(() => void) | null} [onReloginClick]
+ */
+export function showErrorAlert(container, err, onReloginClick = null) {
+  if (err.status === 401) {
+    container.innerHTML = `
+      <div class="alert alert-error">
+        <strong>401 Unauthorized</strong> — ${esc(err.message)}
+        <br><br>
+        <button class="relogin-btn">Sign in again</button>
+      </div>`;
+    if (onReloginClick) {
+      container.querySelector('.relogin-btn').addEventListener('click', onReloginClick);
+    }
+  } else {
+    container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
+  }
+}
+
 // ── form-field builder helpers ────────────────────────────────────────────────
 
 /**

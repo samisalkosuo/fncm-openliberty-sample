@@ -1,6 +1,6 @@
 // cards/documents.js — Documents (REST) card
 import { GraphQL,apiFetch, API } from '../api.js';
-import { esc, renderWithToggle, renderJson } from '../util.js';
+import { esc, renderWithToggle, renderJson, showErrorAlert } from '../util.js';
 import { registerCard } from './registry.js';
 import { session } from '../session.js';
 import { publish, subscribe, TOPICS } from '../eventBus.js';
@@ -82,18 +82,7 @@ registerCard({
         this.onDocumentSelected(preselectId);
       }
     } catch (err) {
-      if (err.status === 401) {
-        container.innerHTML = `
-          <div class="alert alert-error">
-            <strong>401 Unauthorized</strong> — ${esc(err.message)}
-            <br><br>
-            <button id="documents-relogin-btn">Sign in again</button>
-          </div>`;
-        document.getElementById('documents-relogin-btn')
-          .addEventListener('click', logout);
-      } else {
-        container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
-      }
+      showErrorAlert(container, err, logout);
     } finally {
       spinner.classList.add('hidden');
     }

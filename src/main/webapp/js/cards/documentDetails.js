@@ -4,7 +4,7 @@
 // custom properties) via GraphQL, and renders them.  Includes inline editing
 // of all six custom properties via the updateDocument GraphQL mutation.
 import { GraphQL, apiFetch, API } from '../api.js';
-import { esc, formTextField, formDateField, formSelectField } from '../util.js';
+import { esc, formTextField, formDateField, formSelectField, showErrorAlert } from '../util.js';
 import { subscribe, TOPICS } from '../eventBus.js';
 import { session } from '../session.js';
 import { registerCard } from './registry.js';
@@ -100,18 +100,7 @@ registerCard({
       }
       this.renderDetails(doc);
     } catch (err) {
-      if (err.status === 401) {
-        container.innerHTML = `
-          <div class="alert alert-error">
-            <strong>401 Unauthorized</strong> — ${esc(err.message)}
-            <br><br>
-            <button id="document-details-relogin-btn">Sign in again</button>
-          </div>`;
-        document.getElementById('document-details-relogin-btn')
-          .addEventListener('click', logout);
-      } else {
-        container.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
-      }
+      showErrorAlert(container, err, logout);
     } finally {
       spinner.classList.add('hidden');
     }
@@ -469,17 +458,7 @@ mutation checkinDocument($repositoryIdentifier: String!, $documentId: String!) {
       await this.fetchAndRender(this.currentDocumentId);
 
     } catch (err) {
-      if (err.status === 401) {
-        errorEl.innerHTML = `
-          <div class="alert alert-error">
-            <strong>401 Unauthorized</strong> — ${esc(err.message)}
-            <br><br>
-            <button id="doc-edit-relogin-btn">Sign in again</button>
-          </div>`;
-        document.getElementById('doc-edit-relogin-btn').addEventListener('click', logout);
-      } else {
-        errorEl.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
-      }
+      showErrorAlert(errorEl, err, logout);
     } finally {
       spinner.classList.add('hidden');
       if (saveBtn) saveBtn.disabled  = false;
