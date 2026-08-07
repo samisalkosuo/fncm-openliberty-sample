@@ -7,12 +7,7 @@
 import { apiFetch, API } from '../api.js';
 import { esc, renderJson } from '../util.js';
 import { registerCard } from './registry.js';
-
-// Choice list values for buildingType
-const BUILDING_TYPE_OPTIONS = ['Unknown','Residential', 'Commercial', 'Industrial', 'Public'];
-
-// Choice list values for complianceStatus
-const COMPLIANCE_STATUS_OPTIONS = ['Unknown','Fully Compliant','Mostly Compliant','Partially Compliant','Non-Compliant','Requires Follow-up'];
+import { BUILDING_TYPE_OPTIONS, COMPLIANCE_STATUS_OPTIONS } from './buildingInspectionConstants.js';
 
 // ── Test-data helpers ────────────────────────────────────────────────────────
 const _pick = arr => arr[Math.floor(Math.random() * arr.length)];

@@ -9,10 +9,7 @@ import { subscribe, TOPICS } from '../eventBus.js';
 import { session } from '../session.js';
 import { registerCard } from './registry.js';
 import { logout } from '../router.js';
-
-// Choice list values — kept in sync with createBuildingInspectionReportDocument.js
-const BUILDING_TYPE_OPTIONS      = ['Unknown', 'Residential', 'Commercial', 'Industrial', 'Public'];
-const COMPLIANCE_STATUS_OPTIONS  = ['Unknown', 'Fully Compliant', 'Mostly Compliant', 'Partially Compliant', 'Non-Compliant', 'Requires Follow-up'];
+import { BUILDING_TYPE_OPTIONS, COMPLIANCE_STATUS_OPTIONS } from './buildingInspectionConstants.js';
 
 // Escape a string value for safe inlining inside a GraphQL argument string literal.
 function escPropValue(v) {
