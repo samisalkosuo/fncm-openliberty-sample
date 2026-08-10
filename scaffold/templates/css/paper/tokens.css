@@ -1,0 +1,69 @@
+/* ── tokens.css — design tokens (CSS custom properties) ──────────────────────
+   paper: minimal editorial theme
+   Warm off-white background, black ink, hairline borders, serif font.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* ── Brand colours ── */
+  --color-primary:          #111111;   /* black */
+  --color-primary-hover:    #333333;   /* dark grey */
+  --color-primary-light:    #f0ede8;   /* warm off-white tint for hover/selected */
+
+  /* ── Surface colours ── */
+  --color-bg:               #faf9f6;   /* warm off-white */
+  --color-surface:          #ffffff;   /* white */
+  --color-border:           #111111;   /* black hairline */
+
+  /* ── Text colours ── */
+  --color-text:             #111111;   /* near-black */
+  --color-text-muted:       #666666;   /* medium grey */
+
+  /* ── Feedback colours ── */
+  --color-error-bg:         #fff0f0;
+  --color-error-text:       #990000;   /* dark red */
+  --color-error-border:     #cc0000;
+  --color-success-bg:       #f0f0f0;
+  --color-success-text:     #111111;
+  --color-success-border:   #333333;
+
+  /* ── Typography ── */
+  --font-family:            Georgia, "Times New Roman", serif;
+  --font-family-ui:         -apple-system, "Segoe UI", system-ui, sans-serif;
+  --font-size-base:         15px;
+  --line-height-base:       1.7;
+
+  /* ── Spacing ── */
+  --space-xs:               .3rem;
+  --space-sm:               .45rem;
+  --space-md:               .75rem;
+  --space-lg:               1rem;
+  --space-xl:               1.5rem;
+  --space-2xl:              2rem;
+
+  /* ── Borders & radius ── */
+  --radius-sm:              0px;
+  --radius-md:              0px;
+  --border:                 1px solid var(--color-border);
+
+  /* ── Header ── */
+  --header-height:          52px;
+  --header-padding:         0 var(--space-xl);
+
+  /* ── Main content area ── */
+  --main-max-width:         1200px;
+  --main-padding:           0 var(--space-lg);
+  --main-margin-top:        var(--space-2xl);
+
+  /* ── Card grid ── */
+  --grid-columns:           3;
+  --grid-min-col-width:     280px;
+  --grid-gap:               var(--space-xl);
+
+  /* ── Card ── */
+  --card-padding:           var(--space-xl);
+  --card-radius:            0px;
+
+  /* ── Button ── */
+  --btn-padding:            .45rem 1.1rem;
+  --btn-radius:             0px;
+  --btn-font-size:          0.9rem;
+}

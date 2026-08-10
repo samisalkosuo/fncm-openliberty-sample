@@ -1,0 +1,69 @@
+/* ── layout.css — page structure and card grid ───────────────────────────────
+   Controls the overall page skeleton and how cards are arranged.
+   To change the number of columns: set --grid-columns in tokens.css.
+   To change max content width: set --main-max-width in tokens.css.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* ── App shell ── */
+#app { min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ── Header ── */
+header {
+  background: #001f5b;   /* solid navy — always navy regardless of surface token */
+  border-bottom: 1px solid #1a4a8a;
+  padding: var(--header-padding);
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+header h1 { font-size: 1rem; font-weight: 600; color: #ffffff; }
+header #user-info { font-size: 0.85rem; color: #7fa8d4; }
+
+/* ── Main content ── */
+main {
+  flex: 1;
+  max-width: var(--main-max-width);
+  width: 100%;
+  margin: var(--main-margin-top) auto;
+  padding: var(--main-padding);
+}
+
+/* ── Views (login / app) ── */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ── Card grid ──────────────────────────────────────────────────────────────
+   Default: --grid-columns columns, each at least --grid-min-col-width wide.
+   Override --grid-columns in tokens.css to go 1-, 2-, or 4-column instantly.
+   ─────────────────────────────────────────────────────────────────────────── */
+.card-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(var(--grid-columns), minmax(var(--grid-min-col-width), 1fr));
+  gap: var(--grid-gap);
+  align-items: start;
+}
+
+/* ── Card size modifiers (set via data-size="…" on the .card element) ────────
+   normal  — default: 1 column × 1 row  (no attribute needed)
+   wide    — 2 columns × 1 row
+   tall    — 1 column × 2 rows
+   large   — 2 columns × 2 rows
+   full    — all columns × 1 row
+   ─────────────────────────────────────────────────────────────────────────── */
+.card                    { grid-column: span 1; grid-row: span 1; }
+.card[data-size="wide"]  { grid-column: span 2; }
+.card[data-size="tall"]  { grid-row:    span 2; }
+.card[data-size="large"] { grid-column: span 2; grid-row: span 2; }
+.card[data-size="full"]  { grid-column: 1 / -1; }

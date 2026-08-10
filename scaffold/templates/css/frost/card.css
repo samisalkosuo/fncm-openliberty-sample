@@ -1,0 +1,50 @@
+/* ── card.css — card shell appearance ────────────────────────────────────────
+   frost: frosted-glass card surface with blur, rounded corners, faint border.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--color-surface);
+  border: var(--border);
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.card h2 {
+  font-size: 1rem;
+  margin-bottom: var(--space-lg);
+  color: var(--color-primary);
+}
+
+/* ── Structural helpers used inside cards ── */
+.card-result    { margin-top: var(--space-lg); }
+.spinner-row    { margin-top: var(--space-md); }
+.card-subtitle  { font-weight: 400; color: var(--color-text-muted); font-size: 0.8rem; }
+
+/* ── Code-style textarea and result block ── */
+.code-input {
+  width: 100%;
+  font-family: monospace;
+  font-size: 0.85rem;
+  padding: var(--space-sm);
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  resize: vertical;
+  background: rgba(0,0,0,0.3);
+  color: var(--color-text);
+}
+
+.code-result {
+  margin-top: var(--space-lg);
+  background: rgba(0,0,0,0.3);
+  padding: var(--space-md);
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  overflow: auto;
+  min-height: 3rem;
+}
+
+/* ── Utility ── */
+.text-muted { color: var(--color-text-muted); font-size: 0.9rem; }

@@ -1,0 +1,68 @@
+/* ── tokens.css — design tokens (CSS custom properties) ──────────────────────
+   To change the entire look & feel, only edit values in this file.
+   No card or layout files need to be touched.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* ── Brand colours ── */
+  --color-primary:          #4d9fff;   /* bright steel blue — accent on dark bg */
+  --color-primary-hover:    #80bfff;   /* lighter blue on hover */
+  --color-primary-light:    #003580;   /* darker navy tint for hover/selected */
+
+  /* ── Surface colours ── */
+  --color-bg:               #001233;   /* deep navy page background */
+  --color-surface:          #002a6e;   /* mid navy card surface */
+  --color-border:           #1a4a8a;   /* steel navy border */
+
+  /* ── Text colours ── */
+  --color-text:             #e8eef8;   /* near-white */
+  --color-text-muted:       #7fa8d4;   /* light blue-grey muted */
+
+  /* ── Feedback colours ── */
+  --color-error-bg:         #ffe0e0;   /* light red */
+  --color-error-text:       #cc0000;   /* red */
+  --color-error-border:     #ff4444;   /* red border */
+  --color-success-bg:       #003580;   /* deep navy tint */
+  --color-success-text:     #80bfff;   /* light blue */
+  --color-success-border:   #1a4a8a;   /* steel navy */
+
+  /* ── Typography ── */
+  --font-family:            -apple-system, "Segoe UI", system-ui, sans-serif;
+  --font-size-base:         15px;
+  --line-height-base:       1.6;
+
+  /* ── Spacing ── */
+  --space-xs:               .3rem;
+  --space-sm:               .45rem;
+  --space-md:               .75rem;
+  --space-lg:               1rem;
+  --space-xl:               1.5rem;
+  --space-2xl:              2rem;
+
+  /* ── Borders & radius ── */
+  --radius-sm:              4px;
+  --radius-md:              6px;
+  --border:                 1px solid var(--color-border);
+
+  /* ── Header ── */
+  --header-height:          52px;
+  --header-padding:         0 var(--space-xl);
+
+  /* ── Main content area ── */
+  --main-max-width:         1200px;
+  --main-padding:           0 var(--space-lg);
+  --main-margin-top:        var(--space-2xl);
+
+  /* ── Card grid ── */
+  --grid-columns:           3;
+  --grid-min-col-width:     280px;
+  --grid-gap:               var(--space-xl);
+
+  /* ── Card ── */
+  --card-padding:           var(--space-xl);
+  --card-radius:            var(--radius-md);
+
+  /* ── Button ── */
+  --btn-padding:            .45rem 1.1rem;
+  --btn-radius:             var(--radius-sm);
+  --btn-font-size:          0.9rem;
+}

@@ -1,0 +1,68 @@
+/* ── tokens.css — design tokens (CSS custom properties) ──────────────────────
+   frost: glassmorphism theme
+   Deep blue-black background, frosted-glass card surfaces, cyan accent.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* ── Brand colours ── */
+  --color-primary:          #7dd3fc;   /* soft cyan */
+  --color-primary-hover:    #38bdf8;   /* brighter cyan */
+  --color-primary-light:    rgba(125,211,252,0.12); /* cyan tint for hover/selected */
+
+  /* ── Surface colours ── */
+  --color-bg:               #0f0f1e;   /* deep blue-black */
+  --color-surface:          rgba(255,255,255,0.08); /* frosted glass */
+  --color-border:           rgba(255,255,255,0.15); /* faint white border */
+
+  /* ── Text colours ── */
+  --color-text:             #e8eaf6;   /* near-white */
+  --color-text-muted:       #8892a4;   /* muted blue-grey */
+
+  /* ── Feedback colours ── */
+  --color-error-bg:         rgba(220,38,38,0.15);
+  --color-error-text:       #fca5a5;   /* soft red */
+  --color-error-border:     rgba(220,38,38,0.4);
+  --color-success-bg:       rgba(125,211,252,0.12);
+  --color-success-text:     #7dd3fc;   /* cyan */
+  --color-success-border:   rgba(125,211,252,0.35);
+
+  /* ── Typography ── */
+  --font-family:            -apple-system, "Segoe UI", system-ui, sans-serif;
+  --font-size-base:         15px;
+  --line-height-base:       1.6;
+
+  /* ── Spacing ── */
+  --space-xs:               .3rem;
+  --space-sm:               .45rem;
+  --space-md:               .75rem;
+  --space-lg:               1rem;
+  --space-xl:               1.5rem;
+  --space-2xl:              2rem;
+
+  /* ── Borders & radius ── */
+  --radius-sm:              6px;
+  --radius-md:              12px;
+  --border:                 1px solid var(--color-border);
+
+  /* ── Header ── */
+  --header-height:          52px;
+  --header-padding:         0 var(--space-xl);
+
+  /* ── Main content area ── */
+  --main-max-width:         1200px;
+  --main-padding:           0 var(--space-lg);
+  --main-margin-top:        var(--space-2xl);
+
+  /* ── Card grid ── */
+  --grid-columns:           3;
+  --grid-min-col-width:     280px;
+  --grid-gap:               var(--space-xl);
+
+  /* ── Card ── */
+  --card-padding:           var(--space-xl);
+  --card-radius:            var(--radius-md);
+
+  /* ── Button ── */
+  --btn-padding:            .45rem 1.1rem;
+  --btn-radius:             var(--radius-sm);
+  --btn-font-size:          0.9rem;
+}

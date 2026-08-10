@@ -1,0 +1,68 @@
+/* ── tokens.css — design tokens (CSS custom properties) ──────────────────────
+   sample2: green terminal theme
+   Black background, soft green text, monospace font, thin green borders.
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* ── Brand colours ── */
+  --color-primary:          #33cc33;   /* soft green */
+  --color-primary-hover:    #28a428;   /* darker green */
+  --color-primary-light:    #0a1a0a;   /* very dark green tint for hover/selected */
+
+  /* ── Surface colours ── */
+  --color-bg:               #000000;   /* black */
+  --color-surface:          #000000;   /* black */
+  --color-border:           #33cc33;   /* soft green border */
+
+  /* ── Text colours ── */
+  --color-text:             #33cc33;   /* soft green */
+  --color-text-muted:       #1f7a1f;   /* darker muted green */
+
+  /* ── Feedback colours ── */
+  --color-error-bg:         #1a0000;   /* dark red-black */
+  --color-error-text:       #ff4444;   /* bright red */
+  --color-error-border:     #cc0000;   /* red border */
+  --color-success-bg:       #001a00;   /* dark green-black */
+  --color-success-text:     #33cc33;   /* soft green */
+  --color-success-border:   #28a428;   /* darker green */
+
+  /* ── Typography ── */
+  --font-family:            "Courier New", Courier, monospace;
+  --font-size-base:         15px;
+  --line-height-base:       1.6;
+
+  /* ── Spacing ── */
+  --space-xs:               .3rem;
+  --space-sm:               .45rem;
+  --space-md:               .75rem;
+  --space-lg:               1rem;
+  --space-xl:               1.5rem;
+  --space-2xl:              2rem;
+
+  /* ── Borders & radius ── */
+  --radius-sm:              0px;
+  --radius-md:              0px;
+  --border:                 1px solid var(--color-border);
+
+  /* ── Header ── */
+  --header-height:          52px;
+  --header-padding:         0 var(--space-xl);
+
+  /* ── Main content area ── */
+  --main-max-width:         1200px;
+  --main-padding:           0 var(--space-lg);
+  --main-margin-top:        var(--space-2xl);
+
+  /* ── Card grid ── */
+  --grid-columns:           3;
+  --grid-min-col-width:     280px;
+  --grid-gap:               var(--space-xl);
+
+  /* ── Card ── */
+  --card-padding:           var(--space-xl);
+  --card-radius:            0px;
+
+  /* ── Button ── */
+  --btn-padding:            .45rem 1.1rem;
+  --btn-radius:             0px;
+  --btn-font-size:          0.9rem;
+}

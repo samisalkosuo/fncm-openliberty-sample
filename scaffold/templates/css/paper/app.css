@@ -1,0 +1,9 @@
+/* ── app.css — entry point ───────────────────────────────────────────────────
+   paper: minimal editorial theme
+   Single file referenced by index.html. Imports all layers in order.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+@import url("tokens.css");
+@import url("layout.css");
+@import url("card.css");
+@import url("components.css");

@@ -1,0 +1,254 @@
+/* ── components.css — reusable UI components ─────────────────────────────────
+   Forms, buttons, alerts, tables, spinner.
+   These are independent of layout and cards — they can appear anywhere.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── Forms ── */
+.form-group { margin-bottom: var(--space-lg); }
+
+label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: var(--space-xs);
+}
+
+input[type=text],
+input[type=password],
+select {
+  width: 100%;
+  padding: var(--space-sm) .65rem;
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+}
+input:focus,
+select:focus { outline: 2px solid var(--color-primary); border-color: transparent; }
+
+/* ── Buttons ── */
+button {
+  padding: var(--btn-padding);
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--btn-radius);
+  font-size: var(--btn-font-size);
+  cursor: pointer;
+}
+button:hover { background: var(--color-primary-hover); }
+
+.button-delete {
+  padding: var(--btn-padding);
+  background: #ff0000;
+  color: #fff;
+  border: none;
+  border-radius: var(--btn-radius);
+  font-size: var(--btn-font-size);
+  cursor: pointer;
+}
+.button-delete:hover { background: #ff4444; }
+
+/* Inline link-style button — used in table cells for clickable values */
+button.link-btn {
+  background: none;
+  color: var(--color-primary);
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+button.link-btn:hover { background: none; color: var(--color-primary-hover); }
+
+button.secondary {
+  background: var(--color-surface);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+button.secondary:hover { background: var(--color-primary-light); }
+
+#logout-btn {
+  background: none;
+  color: var(--color-text-muted);
+  border: none;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+#logout-btn:hover { color: var(--color-text); }
+
+/* ── Alerts / notifications ── */
+.alert {
+  padding: .6rem var(--space-lg);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-lg);
+  font-size: 0.9rem;
+}
+.alert-error   { background: var(--color-error-bg);   color: var(--color-error-text);   border: 1px solid var(--color-error-border); }
+.alert-success { background: var(--color-success-bg); color: var(--color-success-text); border: 1px solid var(--color-success-border); }
+
+.hidden { display: none !important; }
+
+/* ── Table ── */
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+th, td { text-align: left; padding: .5rem var(--space-md); border-bottom: var(--border); }
+th { font-weight: 600; background: var(--color-bg); }
+tr:last-child td { border-bottom: none; }
+
+/* ── Spinner ── */
+.spinner {
+  display: inline-block;
+  width: 16px; height: 16px;
+  border: 2px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  vertical-align: middle;
+  margin-right: .4rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── JSON tree ── */
+.json-tree {
+  font-family: monospace;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  overflow: auto;
+  background: var(--color-bg);
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+  margin-top: var(--space-sm);
+}
+
+.json-tree details { margin-left: 1rem; }
+.json-tree details:first-child { margin-left: 0; }
+
+.json-raw pre {
+  margin: 0;
+  white-space: pre;
+  overflow: auto;
+}
+
+.json-summary {
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  color: var(--color-text-muted);
+}
+.json-summary::before        { content: '▸ '; font-size: 0.75rem; }
+details[open] > .json-summary::before { content: '▾ '; }
+.json-summary::-webkit-details-marker { display: none; }
+
+.json-expand-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0 0.2rem;
+  margin-left: 0.4rem;
+  color: var(--color-text-muted);
+  vertical-align: middle;
+  line-height: 1;
+}
+.json-expand-btn:hover { color: var(--color-primary); }
+
+.json-row { padding-left: 1.2rem; }
+
+.json-key      { color: var(--color-primary); }
+.json-val      { }
+.json-string   { color: var(--color-success-text); }
+.json-number   { color: #b45309; }
+.json-boolean  { color: #7c3aed; }
+.json-null     { color: var(--color-text-muted); font-style: italic; }
+
+/* ── View-toggle bar (JSON tree / custom view switch) ── */
+.view-toggle {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+  margin-bottom: var(--space-sm);
+}
+
+.view-toggle button {
+  padding: .25rem .75rem;
+  font-size: 0.8rem;
+}
+
+.view-toggle button.active {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+/* ── Folder tree ── */
+.folder-tree,
+.ft-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ft-list .ft-list {
+  padding-left: 1.25rem;
+}
+
+.ft-list.ft-collapsed {
+  display: none;
+}
+
+.ft-item {
+  line-height: 1.8;
+}
+
+/* Folder row button */
+.ft-folder {
+  background: none;
+  border: none;
+  color: var(--color-text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: .1rem .3rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ft-folder:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+/* Document leaf button */
+.ft-doc {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: .1rem .3rem;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.88rem;
+}
+.ft-doc:hover {
+  background: var(--color-primary-light);
+}
+
+/* Selected document highlight */
+.ft-doc.ft-selected {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Scrollable tree container */
+.card-result .folder-tree {
+  max-height: 480px;
+  overflow-y: auto;
+  margin-top: var(--space-sm);
+}

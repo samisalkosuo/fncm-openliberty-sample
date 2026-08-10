@@ -1,0 +1,67 @@
+/* ── layout.css — page structure and card grid ───────────────────────────────
+   frost: glassmorphism theme.
+   The deep background is set on body; a gradient overlay is applied to #app
+   so the dark purple-to-blue gradient shows behind all cards.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* ── App shell — gradient backdrop ── */
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+}
+
+/* ── Header ── */
+header {
+  background: rgba(255,255,255,0.05);
+  border-bottom: var(--border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: var(--header-padding);
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+header h1 { font-size: 1rem; font-weight: 600; }
+header #user-info { font-size: 0.85rem; color: var(--color-text-muted); }
+
+/* ── Main content ── */
+main {
+  flex: 1;
+  max-width: var(--main-max-width);
+  width: 100%;
+  margin: var(--main-margin-top) auto;
+  padding: var(--main-padding);
+}
+
+/* ── Views (login / app) ── */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ── Card grid ── */
+.card-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(var(--grid-columns), minmax(var(--grid-min-col-width), 1fr));
+  gap: var(--grid-gap);
+  align-items: start;
+}
+
+/* ── Card size modifiers ── */
+.card                    { grid-column: span 1; grid-row: span 1; }
+.card[data-size="wide"]  { grid-column: span 2; }
+.card[data-size="tall"]  { grid-row:    span 2; }
+.card[data-size="large"] { grid-column: span 2; grid-row: span 2; }
+.card[data-size="full"]  { grid-column: 1 / -1; }
