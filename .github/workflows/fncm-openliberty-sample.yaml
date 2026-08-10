@@ -1,0 +1,25 @@
+name: FNCM OpenLiberty Sample container build and push
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - '**'
+      - '!*.sh'
+      - '!**.adoc'
+      - '!**.md'
+      - '!scaffold/**'
+      - '!samples/**'
+      - '!docs/**'
+jobs:
+  fncm-openliberty-sample-container-build-and-push:
+    uses: ./.github/workflows/reusable-container-build-and-push.yaml
+    with:
+      imagename: kazhar/fncm-openliberty-sample
+      tagname: $GITHUB_REF_NAME
+      dockerfile: Dockerfile
+      directory: .
+    secrets: inherit
