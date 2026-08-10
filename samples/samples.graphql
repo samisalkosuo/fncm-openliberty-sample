@@ -1,0 +1,451 @@
+query GetObjectStores {
+  domain {
+    objectStores {
+      objectStores {
+        symbolicName
+      }
+    }
+  }
+}
+
+query GetGroups {
+  secGroups(
+    realmIdentifier: null
+    searchPattern: ""
+    searchType: NONE
+    searchAttribute: SHORT_NAME
+    sortType: ASCENDING
+  ) {
+    groups {
+      id
+      shortName
+      displayName
+      distinguishedName
+    }
+  }
+}
+
+query getFilesInFolders {
+  folders(repositoryIdentifier:"OS01")
+  {
+    folders {
+      id
+      dateCreated
+      name
+      owner
+      parent {
+        id
+        name
+      }
+      subFolders {
+        folders {
+          id
+          name
+          dateCreated
+        }
+      }
+      containees {
+        
+        referentialContainmentRelationships {
+          head {
+            id
+          }
+          id
+          name
+          dateCreated
+        }
+      }
+    
+    }
+  }
+}
+
+query getFilesInFolder {
+	folder(repositoryIdentifier:"OS01"
+  identifier:"/BuildingInspectionReports/ByDate/2025/06") {
+	  id
+    name
+    pathName
+    containedDocuments {
+      documents {
+        id
+        name
+      }
+    }
+	}
+}
+
+query GetUsers {
+  secUsers(
+    realmIdentifier: null
+    searchPattern: "cpmanager"
+    searchType: CONTAINS
+    searchAttribute: SHORT_NAME
+    sortType: ASCENDING
+  ) {
+    users {
+      id
+      shortName
+      displayName
+      distinguishedName
+    }
+  }
+}
+
+query ListDocuments {
+  folder(
+    repositoryIdentifier: "OS01"
+    identifier: "/BuildingInspectionReports/ByDate/2025/04"
+  ) {
+    className
+    id
+    name
+    pathName
+    subFolders {
+      folders {
+        name
+      }
+    }
+    containedDocuments {
+      documents {
+        id
+        name
+        className
+        dateCreated
+      }
+    }
+  }
+}
+
+query getDocs {
+  documents(
+    repositoryIdentifier: "OS01"
+    from: "BuildingInspectionReport"
+    orderBy: "DocumentTitle"
+    options: "COUNT_LIMIT 5000"
+    pageSize: 20
+  ) {
+    documents {
+      dateCreated
+      id
+      name
+      majorVersionNumber
+      minorVersionNumber
+      mimeType
+    }
+    pageInfo {
+      token
+      totalCount
+    }
+  }
+}
+
+query getDocsAndProperties {
+  documents(
+    repositoryIdentifier: "OS01"
+    from: "BuildingInspectionReport"
+    orderBy: "DocumentTitle"
+  ) {
+    documents {      
+      name
+      id
+  
+    properties(includes: ["Municipality","InspectionDate","InspectorName","PropertyAddress","ComplianceStatus","BuildingType"]) {
+            id
+      value
+  }
+}
+  } }
+
+  query getDocDetails {
+  document(
+    repositoryIdentifier: "OS01"
+     identifier:"{9FD056F0-0000-CAB5-B543-30DA43BC344B}"
+    
+    
+  ) {      
+      name
+      id
+    properties(includes: ["Municipality","InspectionDate","InspectorName","PropertyAddress","ComplianceStatus","BuildingType"]) {
+            id
+      value
+  }
+        contentElements {
+      
+      ... on ContentTransfer {
+        retrievalName
+        contentType
+#        contentSize
+#        downloadUrl
+      }
+    }
+
+}
+  }
+
+
+mutation createDoc {
+  createDocument(
+    repositoryIdentifier: "OS01"
+    classIdentifier: "BuildingInspectionReport"
+    documentProperties: {name: "Inspection Report 2(Espoo 2026-07-02)", properties: [{Municipality: "Espoo"}, {PropertyAddress: "Katu 97"}, {InspectorName: "Päivi Mäkelä"}, {InspectionDate: "2026-07-02T00:00:00Z"}, {BuildingType: "Commercial"}, {ComplianceStatus: "Mostly Compliant"}]}
+    checkinAction: {}
+  ) {
+    id
+    name
+  }
+}
+
+mutation updateDocProperties {
+  updateDocument(
+    repositoryIdentifier:"OS01"
+    identifier:"{9FCB7550-0000-C1F8-BEF8-8904ECD35165}"
+    documentProperties:{
+      properties: [
+        {InspectorName: "Test Name"}
+      ]
+    }
+  )
+  {
+    name
+    id
+        properties(includes: ["Municipality","InspectionDate","InspectorName","PropertyAddress","ComplianceStatus","BuildingType"]) {
+            id
+      value
+  }
+
+  }
+}
+
+mutation checkoutDocument{
+    checkoutDocument(
+repositoryIdentifier:"OS01",
+    	identifier:"{9FB82CE0-0000-CA03-9C46-2408FCA56CED}",
+
+)
+  {
+    id
+    name
+    
+    reservation
+    {
+      
+      id
+      indexationId
+      versionStatus
+      name
+      dateCreated
+      
+    }
+    
+       currentVersion {
+            id
+            majorVersionNumber
+            minorVersionNumber
+            versionStatus
+        }
+  }
+}
+
+mutation checkinDocument{
+  checkinDocument(repositoryIdentifier:"OS01",
+  identifier:"{9FCC8D60-0000-C10C-9255-7DCC055A7225}"
+  checkinAction: {})
+  
+  {
+    id
+}
+}
+
+
+
+mutation cancelCheckout {
+  cancelDocumentCheckout(repositoryIdentifier:"OS01",
+  identifier:"{9FCBD8D0-0000-C171-8EF0-9745EF6F4FA0}") {
+    id
+  }
+}
+
+query getDocsCurrentVersion  {
+  documents(
+    repositoryIdentifier: "OS01"
+    from: "BuildingInspectionReport"
+    orderBy: "DocumentTitle"
+    where:"[IsCurrentVersion] = True"
+    
+  ) {
+    documents {      
+      name
+      id
+    }
+  }
+}
+
+query getClassDescription { 
+  classDescription(
+    repositoryIdentifier:"OS01"
+    identifier:"BuildingInspectionReport") 
+  {
+   	id
+    propertyDescriptions(filter: {isHidden:false, isSystemOwned:false})
+    {
+      name
+      dataType
+      isReadOnly
+      isOrderable
+      isSystemOwned
+      cardinality
+      settability    
+    }    
+  }
+}
+
+query ListFolders($repositoryIdentifier: String!) {
+  folder(
+    repositoryIdentifier: $repositoryIdentifier
+    identifier: "/"
+  ) {
+    subFolders {
+      folders{
+        pathName
+      id
+      name
+      
+      }
+    }
+  }
+}
+
+query ListDocumentsInFolder($repositoryIdentifier: String!, $folderPath: String!) {
+  folder(
+    repositoryIdentifier: $repositoryIdentifier
+    identifier: $folderPath
+  ) {
+ id
+    name
+    pathName
+    containedDocuments {
+      documents {
+        id
+        name
+      }
+    }
+	}  
+}
+
+query GetDocumentDetails($repositoryIdentifier: String!, $documentId: String!) {
+  document(
+    repositoryIdentifier: $repositoryIdentifier
+    identifier: $documentId
+  ) {
+    
+    id
+    name
+    dateCreated
+    dateLastModified
+        contentElements {
+      
+      ... on ContentTransfer {
+        retrievalName
+        contentType
+        contentSize
+        downloadUrl
+      }
+    }
+    creator
+    className
+  }
+}
+
+query SearchDocumentsByClass($repositoryIdentifier: String!, $className: String!) {
+  documents(
+    repositoryIdentifier: $repositoryIdentifier
+    from:  $className 
+    where:"[DateCreated] > 20180815T070000Z AND [IsCurrentVersion] = True"
+  ) {
+    documents {
+      id
+      name
+      dateCreated
+      className
+    }
+  }
+}
+
+mutation CreateGenericDocument{
+    createDocument(
+        repositoryIdentifier:"OS01" 
+        fileInFolderIdentifier: "/" 
+        documentProperties: {
+            name: "Doc with Content" 
+        }
+        checkinAction: {}
+    ) 
+    { 
+        id 
+        name 
+    } 
+}
+
+query DescribeClass {
+  classDescription(
+    	repositoryIdentifier: "OS01"
+    	identifier: "BuildingInspectionReport") 
+  {
+    name
+    displayName
+    symbolicName
+    propertyDescriptions (
+      filter: {
+        isHidden: false 
+      }) 
+    {
+      ...propDescFieldsFragment
+    }
+    hasProperSubclassProperties
+    properSubclassPropertyDescriptions(
+      filter: {
+        isHidden: false
+      }) 
+    {
+      ...propDescFieldsFragment
+    }
+  }
+}
+
+fragment propDescFieldsFragment on PropertyDescription {
+  id
+  symbolicName
+  displayName
+  descriptiveText
+  dataType
+  cardinality
+  isReadOnly
+  isValueRequired
+  settability
+  ... on PropertyDescriptionBoolean {
+    propertyDefaultBoolean
+  }
+  ... on PropertyDescriptionString {
+    propertyDefaultString
+    maximumLengthString
+  }
+  ... on PropertyDescriptionInteger32 {
+    propertyDefaultInteger32
+    propertyMinimumInteger32
+    propertyMaximumInteger32
+  }
+  ... on PropertyDescriptionId {
+    propertyDefaultId
+  }
+  ... on PropertyDescriptionDateTime {
+    propertyDefaultDateTime
+    propertyMinimumDateTime
+    propertyMaximumDateTime
+  }
+  ... on PropertyDescriptionFloat64 {
+    propertyDefaultFloat64
+    propertyMinimumFloat64
+    propertyMaximumFloat64
+  }
+}
