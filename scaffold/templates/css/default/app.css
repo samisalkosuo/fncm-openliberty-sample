@@ -1,0 +1,18 @@
+/* ── app.css — entry point ───────────────────────────────────────────────────
+   Single file referenced by index.html. Imports all layers in order.
+
+   Layer responsibilities:
+     tokens.css     — CSS custom properties (colours, spacing, radii, etc.)
+                      Edit this to change look & feel without touching anything else.
+     layout.css     — Page skeleton, card grid, and card size modifiers (data-size).
+                      Edit this to change page structure or grid behaviour.
+     card.css       — Card shell appearance (background, border, padding).
+                      Edit this to restyle cards without affecting layout or components.
+     components.css — Forms, buttons, alerts, tables, spinner.
+                      Edit this to restyle individual UI components.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+@import url("tokens.css");
+@import url("layout.css");
+@import url("card.css");
+@import url("components.css");

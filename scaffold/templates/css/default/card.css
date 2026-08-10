@@ -1,0 +1,47 @@
+/* ── card.css — card shell appearance ────────────────────────────────────────
+   Only the visual surface of cards lives here: background, border, padding.
+   Card sizing (grid spans) is in layout.css.
+   Card content/components (buttons, tables, etc.) are in components.css.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--color-surface);
+  border: var(--border);
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
+}
+
+.card h2 {
+  font-size: 1rem;
+  margin-bottom: var(--space-lg);
+}
+
+/* ── Structural helpers used inside cards ── */
+.card-result    { margin-top: var(--space-lg); }
+.spinner-row    { margin-top: var(--space-md); }
+.card-subtitle  { font-weight: 400; color: var(--color-text-muted); font-size: 0.8rem; }
+
+/* ── Code-style textarea and result block (used by GraphQL card) ── */
+.code-input {
+  width: 100%;
+  font-family: monospace;
+  font-size: 0.85rem;
+  padding: var(--space-sm);
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  resize: vertical;
+}
+
+.code-result {
+  margin-top: var(--space-lg);
+  background: var(--color-bg);
+  padding: var(--space-md);
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  overflow: auto;
+  min-height: 3rem;
+}
+
+/* ── Utility ── */
+.text-muted { color: var(--color-text-muted); font-size: 0.9rem; }
