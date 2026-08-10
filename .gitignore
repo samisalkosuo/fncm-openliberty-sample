@@ -4,6 +4,8 @@ TODO.md
 config*.env
 .vscode/
 plans/
+scaffold/backups/
+
 
 target/
 pom.xml.tag
