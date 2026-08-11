@@ -21,6 +21,7 @@ BACKUPS_DIR="${SCAFFOLD_DIR}/backups"
 WEBAPP_CSS_DIR="${SCRIPT_DIR}/src/main/webapp/css"
 CARDS_DIR="${SCRIPT_DIR}/src/main/webapp/js/cards"
 MAIN_JS="${SCRIPT_DIR}/src/main/webapp/js/main.js"
+LAYOUT_CONFIG="${SCRIPT_DIR}/src/main/webapp/js/layout-config.js"
 JAVA_ROOT="${SCRIPT_DIR}/src/main/java/dev/fncm"
 
 # ── Colour output helpers ──────────────────────────────────────────────────────
@@ -131,58 +132,83 @@ cmd_css() {
 
 # ── Sub-Task 4: Card generation command ───────────────────────────────────────
 cmd_card() {
-  local slug="$1"
+   local slug="$1"
 
-  # Validate slug is kebab-case (letters, digits, hyphens)
-  if [[ ! "$slug" =~ ^[a-z][a-z0-9-]*$ ]]; then
-    die "Card slug must be kebab-case (lowercase letters, digits, hyphens). Got: '${slug}'"
-  fi
+   # Validate slug is kebab-case (letters, digits, hyphens)
+   if [[ ! "$slug" =~ ^[a-z][a-z0-9-]*$ ]]; then
+     die "Card slug must be kebab-case (lowercase letters, digits, hyphens). Got: '${slug}'"
+   fi
 
-  header "Generating card: ${slug}"
+   header "Generating card: ${slug}"
 
-  # slug → camelCase filename  (my-feature → myFeature)
-  local camel
-  camel="$(echo "$slug" | sed -E 's/-([a-z])/\U\1/g')"
+   # slug → camelCase filename  (my-feature → myFeature)
+   local camel
+   camel="$(echo "$slug" | sed -E 's/-([a-z])/\U\1/g')"
 
-  # slug → Title Case heading  (my-feature → My Feature)
-  local title
-  title="$(echo "$slug" | awk -F'-' '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2); print}' OFS=' ')"
+   # slug → Title Case heading  (my-feature → My Feature)
+   local title
+   title="$(echo "$slug" | awk -F'-' '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2); print}' OFS=' ')"
 
-  local out_file="${CARDS_DIR}/${camel}.js"
-  [[ ! -f "$out_file" ]] || die "File already exists: ${out_file}. Aborting to avoid overwrite."
+   local out_file="${CARDS_DIR}/${camel}.js"
+   [[ ! -f "$out_file" ]] || die "File already exists: ${out_file}. Aborting to avoid overwrite."
 
-  local template="${TEMPLATES_DIR}/card/_template.js"
-  [[ -f "$template" ]] || die "Card template not found: ${template}"
+   local template="${TEMPLATES_DIR}/card/_template.js"
+   [[ -f "$template" ]] || die "Card template not found: ${template}"
 
-  # Replace template placeholders
-  local content
-  content="$(cat "$template")"
-  content="${content//my-feature/$slug}"
-  content="${content//My Feature/$title}"
+   # Replace template placeholders
+   local content
+   content="$(cat "$template")"
+   content="${content//my-feature/$slug}"
+   content="${content//My Feature/$title}"
 
-  printf '%s\n' "$content" > "$out_file"
-  success "Created card: ${out_file}"
+   printf '%s\n' "$content" > "$out_file"
+   success "Created card: ${out_file}"
 
-  # Insert import into main.js before the marker comment
-  local import_line="import './cards/${camel}.js';"
-  local marker="// To add a new card:"
+   # Insert import into main.js before the marker comment
+   local import_line="import './cards/${camel}.js';"
+   local marker="// To add a new card:"
 
-  if grep -qF "$import_line" "$MAIN_JS"; then
-    warn "Import already present in main.js — skipping: ${import_line}"
-  else
-    # Use sed to insert the import line before the marker line
-    sed -i.bak "s|${marker}|${import_line}\n${marker}|" "$MAIN_JS"
-    rm -f "${MAIN_JS}.bak"
-    success "Inserted import into main.js: ${import_line}"
-  fi
+   if grep -qF "$import_line" "$MAIN_JS"; then
+     warn "Import already present in main.js — skipping: ${import_line}"
+   else
+     # Use sed to insert the import line before the marker line
+     sed -i.bak "s|${marker}|${import_line}\n${marker}|" "$MAIN_JS"
+     rm -f "${MAIN_JS}.bak"
+     success "Inserted import into main.js: ${import_line}"
+   fi
 
-  echo ""
-  echo "  New file : ${out_file}"
-  echo "  main.js  : added → ${import_line}"
-  echo ""
-  echo "  Next steps:"
-  echo "    1. Edit ${out_file} — replace the placeholder API call / HTML"
-  echo "    2. Add the REST endpoint to src/main/webapp/js/api.js if needed"
+   # Add card entry to layout-config.js (find highest row, add to end)
+   # Card IDs in config are usually kebab-case or camelCase, matching the card definition's 'id' property
+   # We'll use the slug as the card ID (developer can adjust if their card.id is different)
+   if grep -qF "'${slug}'" "$LAYOUT_CONFIG"; then
+     warn "Card '${slug}' already present in layout-config.js — skipping."
+   else
+     # Build the card entry with proper line breaks
+     # We use a temp file and sed to insert multi-line content BEFORE the closing },
+     local temp_entry=$(mktemp)
+     cat > "$temp_entry" <<EOF
+   '${slug}': {
+     row: 99,  // FIXME: Update row/column to position this card in the grid
+     column: 1,
+     size: 'normal',
+   },
+EOF
+     # Insert the temp file before the closing }, using sed with the 'e' flag to execute insertion
+     # The -i'' syntax works on both GNU and BSD sed (macOS)
+     sed -i.bak "/^  },$/e cat ${temp_entry}" "$LAYOUT_CONFIG"
+     rm -f "$temp_entry" "${LAYOUT_CONFIG}.bak"
+     success "Added card to layout-config.js: '${slug}' (row: 99, FIXME: adjust position)"
+   fi
+
+   echo ""
+   echo "  New file      : ${out_file}"
+   echo "  main.js       : added → ${import_line}"
+   echo "  layout-config : added → '${slug}' (row: 99, needs manual positioning)"
+   echo ""
+   echo "  Next steps:"
+   echo "    1. Edit ${out_file} — replace the placeholder API call / HTML"
+   echo "    2. Add the REST endpoint to src/main/webapp/js/api.js if needed"
+   echo "    3. Edit layout-config.js and set row/column for '${slug}' (currently row: 99 is a placeholder)"
 }
 
 # ── Full-feature command: Java slice + JS card + API entry ────────────────────
@@ -261,7 +287,7 @@ cmd_feature() {
 
   # Insert import into main.js before the marker comment
   local import_line="import './cards/${camel}.js';"
-  local marker="// To add a new card:"
+  local marker="// ── Add new card imports above this line ──"
 
   if grep -qF "$import_line" "$MAIN_JS"; then
     warn "Import already present in main.js — skipping: ${import_line}"
@@ -286,6 +312,29 @@ cmd_feature() {
     success "Added API entry to api.js: ${api_key}: '${api_path}'"
   fi
 
+  # ── 4. Card entry in layout-config.js ──────────────────────────────────
+  # Use kebab-case slug as card ID (matching the card's id in registerCard)
+  # Most cards in layout-config use kebab-case IDs (e.g., 'connection-test', 'list-folders')
+  if grep -qF "'${slug}'" "$LAYOUT_CONFIG"; then
+    warn "Card '${slug}' already present in layout-config.js — skipping."
+  else
+    # Build the card entry with proper line breaks
+    # We use a temp file to generate the multi-line entry, then use sed to insert it BEFORE the closing },
+    local temp_entry=$(mktemp)
+    cat > "$temp_entry" <<EOF
+    '${slug}': {
+      row: 99,  // FIXME: Update row/column to position this card in the grid
+      column: 1,
+      size: 'normal',
+    },
+EOF
+    # Insert the temp file before the closing }, using sed with the 'e' flag
+    # The -i'' syntax works on both GNU and BSD sed (macOS)
+    sed -i.bak "/^  },$/e cat ${temp_entry}" "$LAYOUT_CONFIG"
+    rm -f "$temp_entry" "${LAYOUT_CONFIG}.bak"
+    success "Added card to layout-config.js: '${slug}' (row: 99, FIXME: adjust position)"
+  fi
+
   # ── Summary ───────────────────────────────────────────────────────────
   echo ""
   echo "  Java files:"
@@ -294,14 +343,16 @@ cmd_feature() {
   echo "    ${f_service}"
   echo "    ${f_operation}"
   echo ""
-  echo "  JS card  : ${out_file}"
-  echo "  main.js  : added → ${import_line}"
-  echo "  api.js   : added → ${api_key}: '${api_path}'"
+  echo "  JS card       : ${out_file}"
+  echo "  main.js       : added → ${import_line}"
+  echo "  api.js        : added → ${api_key}: '${api_path}'"
+  echo "  layout-config : added → '${slug}' (row: 99, needs manual positioning)"
   echo ""
   echo "  Next steps:"
   echo "    1. Edit ${pascal}Result.java — add record components for your data"
   echo "    2. Edit ${pascal}Operation.java — implement the FileNet logic"
   echo "    3. Edit ${out_file} — customise the card HTML / rendering"
+  echo "    4. Edit layout-config.js and set row/column for '${slug}' (currently row: 99 is a placeholder)"
 }
 
 # ── Sub-Task 5: Java vertical-slice command ────────────────────────────────────
@@ -433,6 +484,21 @@ cmd_remove_feature() {
     removed_any=1
   else
     warn "API path '${api_path}' not found in api.js (skipping)."
+  fi
+
+  # ── 5. Remove card entry from layout-config.js ─────────────────────────
+  # Remove the entire card entry for this card from layoutConfig.cards
+  # Use kebab-case slug to match the card ID in layout-config
+  if grep -qF "'${slug}'" "$LAYOUT_CONFIG"; then
+    # Use sed to remove the multi-line entry
+    # Find the line with '${slug}': and delete from there until the closing },
+    # Using \s* to handle variable indentation
+    sed -i.bak "/^[[:space:]]*'${slug}':/,/^[[:space:]]*},/d" "$LAYOUT_CONFIG"
+    rm -f "${LAYOUT_CONFIG}.bak"
+    success "Removed card entry from layout-config.js: '${slug}'"
+    removed_any=1
+  else
+    warn "Card '${slug}' not found in layout-config.js (skipping)."
   fi
 
   # ── Summary ───────────────────────────────────────────────────────────

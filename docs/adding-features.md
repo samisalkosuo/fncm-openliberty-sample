@@ -46,8 +46,9 @@ Scaffold.sh derives all file and symbol names from a single **kebab-case slug**:
 
 | File | Change |
 |---|---|
-| `src/main/webapp/js/main.js` | Adds `import './cards/myInspection.js';` |
+| `src/main/webapp/js/main.js` | Adds `import './cards/myInspection.js';` (above the marker `// ── Add new card imports above this line ──`) |
 | `src/main/webapp/js/api.js` | Adds `myInspection: '/api/myinspection',` to the `API` map |
+| `src/main/webapp/js/layout-config.js` | Adds card entry with `row: 99` (placeholder — you must update this to position the card) |
 
 ---
 
@@ -209,6 +210,7 @@ registerCard({
 [ ] Edit MyInspectionOperation.java — implement FileNet logic
 [ ] Edit MyInspectionResource.java — add query/body params if needed
 [ ] Edit myInspection.js  — customise card HTML and rendering
+[ ] Edit layout-config.js — set row and column for 'my-inspection' (currently row: 99 is a placeholder)
 [ ] Run: mvn package && mvn liberty:run  (or docker build + run)
 [ ] Open http://localhost:9080, log in, find the card, click Load
 ```
@@ -303,7 +305,7 @@ Also replace `API.myEndpoint` with `API.myInspection`.
 
 ### Step 5 — Register the Card Import in main.js
 
-Open `src/main/webapp/js/main.js` and add this line **before** the comment `// To add a new card:`:
+Open `src/main/webapp/js/main.js` and add this line **before** the marker comment `// ── Add new card imports above this line ──`:
 
 ```js
 import './cards/myInspection.js';
@@ -316,6 +318,20 @@ Open `src/main/webapp/js/api.js` and add this line to the `API` object (before t
 ```js
 myInspection:              '/api/myinspection',
 ```
+
+### Step 7 — Add Card Entry in layout-config.js
+
+Open `src/main/webapp/js/layout-config.js` and add this entry to the `layoutConfig.cards` object (before the closing `},`):
+
+```js
+'my-inspection': {
+  row: 1,           // FIXME: Update row/column to position this card in the grid
+  column: 1,
+  size: 'normal',
+},
+```
+
+**Important**: Update `row` and `column` to position the card in your grid. See [Layout Configuration in Frontend documentation](frontend.md#layout-configuration) for details.
 
 ---
 
@@ -371,7 +387,11 @@ Multiple options can be combined in one call:
 
 ## Removing a Feature
 
-`--remove-feature` is the exact inverse of `--feature`. It deletes all four Java files, the JS card file, and removes the import from `main.js` and the API entry from `api.js`:
+`--remove-feature` is the exact inverse of `--feature`. It deletes all four Java files, the JS card file, and removes:
+
+- The import from `src/main/webapp/js/main.js`
+- The API entry from `src/main/webapp/js/api.js`
+- The card entry from `src/main/webapp/js/layout-config.js`
 
 ```bash
 ./scaffold.sh --remove-feature my-inspection
