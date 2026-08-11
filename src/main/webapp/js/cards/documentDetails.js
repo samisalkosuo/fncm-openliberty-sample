@@ -22,7 +22,6 @@ function toFileNetDateTime(date) {
 
 registerCard({
   id: 'document-details',
-  size: 'normal',
   html: () => `
     <div class="card" id="card-document-details">
       <h2>Document Details</h2>

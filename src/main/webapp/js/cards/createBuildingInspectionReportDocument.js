@@ -54,7 +54,6 @@ function fillTestData() {
 
 registerCard({
   id: 'create-document',
-  size: 'wide',
   html: () => `
     <div class="card" id="card-create-document">
       <h2>Create Building Inspection Report Document</h2>

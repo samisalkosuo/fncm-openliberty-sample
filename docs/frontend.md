@@ -60,6 +60,8 @@ registerCard({
 |---|---|---|---|
 | `id` | string | ✅ | Kebab-case slug; should match the card wrapper's `id="card-{id}"` |
 | `size` | string | No | Grid span modifier (see table below) |
+| `row` | number | No | Optional explicit grid row (1-indexed); overridden by `layoutConfig` if present |
+| `column` | number | No | Optional explicit grid column (1-indexed); overridden by `layoutConfig` if present |
 | `html` | `() => string` | ✅ | Returns the card's inner HTML (called once at mount time) |
 | `init` | `() => void` | ✅ | Wires up event listeners after the HTML is in the DOM |
 | `runAfterLogin` | boolean | No | If `true`, `run()` is called automatically after a successful login |
@@ -79,15 +81,95 @@ The card grid supports five sizes controlled by the `data-size` attribute set by
 
 ### Card Mount Lifecycle
 
-1. Each card module is imported in [`main.js`](../src/main/webapp/js/main.js) (import order = display order in the grid).
+1. Each card module is imported in [`main.js`](../src/main/webapp/js/main.js).
 2. At import time the module calls `registerCard(…)`, adding its definition to an internal array in `registry.js`.
-3. On `DOMContentLoaded`, `main.js` calls `mountAllCards(gridEl)`:
-   - For each registered card: creates a wrapper, sets `card.html()` as `innerHTML`, appends the element to the grid, calls `card.init()`.
+3. On `DOMContentLoaded`, `main.js` calls `mountAllCards(gridEl, layoutConfig)`:
+   - [`layout-config.js`](../src/main/webapp/js/layout-config.js) defines card visibility, positions, and grid structure
+   - For each registered card: **only mount if the card is in `layoutConfig.cards`**
+   - Cards in config: create wrapper, set `card.html()` as `innerHTML`, apply positioning and sizing, append to grid, call `card.init()`
+   - Cards **not** in config: **skipped entirely** (not mounted, not displayed)
 4. After a successful login, `main.js` calls `runPostLoginCards()`, which calls `run()` on every card that has `runAfterLogin: true`.
 
 ### Display Order
 
-Cards appear in the grid in the order their import lines appear in [`main.js`](../src/main/webapp/js/main.js). To reorder cards, reorder the import lines.
+Cards appear in the grid according to the positions defined in [`layout-config.js`](../src/main/webapp/js/layout-config.js). Import order in [`main.js`](../src/main/webapp/js/main.js) no longer controls display order. To reorder cards without modifying source code, update their `row` and `column` values in `layout-config.js`.
+
+---
+
+## Layout Configuration
+
+Card positions and grid structure are managed by [`layout-config.js`](../src/main/webapp/js/layout-config.js), a centralized configuration file that replaces import-order-based positioning. This allows developers to rearrange cards, create intentional gaps, and adjust grid dimensions without modifying `main.js` or individual card definitions.
+
+### How It Works
+
+1. **Centralized Config**: [`layout-config.js`](../src/main/webapp/js/layout-config.js) exports a `layoutConfig` object defining grid structure, card visibility, and card positions.
+2. **Visibility Control**: Only cards listed in `layoutConfig.cards` are mounted and displayed. Cards not in the config are **completely hidden** (not mounted in the DOM).
+3. **Position & Size**: Cards in the config use their `row`, `column`, and `size` properties to control grid placement and span.
+4. **Size Management**: Sizes (`normal`, `wide`, `tall`, `large`, `full`) can be defined in layout config or card definition (config takes precedence).
+
+### Layout Config Schema
+
+```js
+export const layoutConfig = {
+  gridRows: 'auto',      // 'auto' for unlimited, or a number for fixed height
+  gridColumns: 3,        // Number of columns (default: 3)
+  cards: {
+    'card-id': {
+      row: 1,            // 1-indexed starting row
+      column: 1,         // 1-indexed starting column
+      size: 'normal',    // 'normal' | 'wide' | 'tall' | 'large' | 'full'
+    },
+    // … more cards
+  },
+};
+```
+
+### Modifying Card Positions and Visibility
+
+**To move a card** without changing import order or source code:
+1. Open [`layout-config.js`](../src/main/webapp/js/layout-config.js)
+2. Find the card's entry in `layoutConfig.cards`
+3. Update its `row` and `column` values
+4. Save and reload the app
+
+**Example**: Move 'documents' card from (row 2, column 3) to (row 1, column 3):
+```js
+'documents': {
+  row: 1,    // Changed from 2
+  column: 3,
+  size: 'normal',
+},
+```
+
+**To hide a card** (remove from UI):
+- Delete or comment out the card's entry in `layoutConfig.cards`
+- The card will not be mounted or displayed (even though it's imported in main.js)
+
+**To show a card** (add back to UI):
+- Uncomment or add the card's entry back to `layoutConfig.cards` with row/column/size
+
+### Creating Intentional Gaps
+
+Reserve grid cells for future features or create visual spacing by simply not assigning any card to those cells. The grid will leave them empty, and other cards will flow around them.
+
+**Example**: Leave rows 4–5 empty by positioning all subsequent cards starting at row 6:
+```js
+'list-folders': {
+  row: 6,    // Skips rows 4–5
+  column: 1,
+  size: 'normal',
+},
+```
+
+### Visibility & Configuration
+
+**Important**: Only cards present in `layoutConfig.cards` are mounted and displayed. This provides complete control over which cards are visible without needing to modify `main.js`.
+
+- **To control visibility**: Add or remove card entries from `layoutConfig.cards`
+- **To control position**: Update the `row` and `column` values
+- **To control size**: Set the `size` property (`normal`, `wide`, `tall`, `large`, `full`)
+
+There is no auto-flow or backward compatibility mode. Every card that should be displayed **must** have an entry in `layoutConfig.cards`.
 
 ---
 

@@ -43,7 +43,6 @@ function handleDocumentClick(e) {
 
 registerCard({
   id: 'list-documents-in-folder',
-  size: 'full',
   html: () => `
     <div class="card" id="card-list-documents-in-folder">
       <h2>List Documents in Folder</h2>

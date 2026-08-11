@@ -286,7 +286,6 @@ function resolveSessionValue(sessionKey) {
 
 registerCard({
   id: 'graphql',
-  size: 'large',
   html: () => `
     <div class="card" id="card-graphql">
       <h2>GraphQL Query</h2>

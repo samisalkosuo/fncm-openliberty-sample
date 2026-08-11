@@ -5,8 +5,12 @@ import { enterApp, logout } from './router.js';
 import { API }       from './api.js';
 import { showAlert } from './util.js';
 import { mountAllCards, runPostLoginCards } from './cards/registry.js';
+import { layoutConfig } from './layout-config.js';
 
-// ── Card imports (self-registering; order here = display order in the grid) ──
+// ── Card imports (self-registering) ──
+// NOTE: Import order no longer controls display order (that's now controlled by layout-config.js).
+//       Cards are shown/hidden and positioned via layout-config.js entries.
+//       To add a new card: 1) create js/cards/myFeature.js, 2) import it here, 3) add to layout-config.js.
 import './cards/buildingInspectionDocs.js';
 import './cards/fileBuildingInspectionDocs.js';
 import './cards/connectionTest.js';
@@ -21,14 +25,12 @@ import './cards/listDocumentsInFolder.js';
 import './cards/folderDetails.js';
 import './cards/createBuildingInspectionReportDocument.js';
 
-// To add a new card: create js/cards/myFeature.js and add one import line above.
-
 document.addEventListener('DOMContentLoaded', async () => {
   // ── Restore session first so cards can read state during init ───────
   const hasSession = session.load();
 
   // ── Mount cards into the grid ───────────────────────────────────────
-  mountAllCards(document.querySelector('.card-grid'));
+  mountAllCards(document.querySelector('.card-grid'), layoutConfig);
 
   // ── Dev convenience: pre-fill login form from server env vars ───────
   try {

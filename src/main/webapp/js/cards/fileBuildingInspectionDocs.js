@@ -4,7 +4,6 @@ import { registerCard } from './registry.js';
 
 registerCard({
   id: 'filebuildinginspectiondocs',
-  size: 'normal',   // 'normal' | 'wide' | 'tall' | 'large' | 'full'
   html: () => `
     <div class="card" id="card-filebuildinginspectiondocs">
       <h2>File Building Inspection Documents</h2>

@@ -5,7 +5,6 @@ import { registerCard } from './registry.js';
 
 registerCard({
   id: 'user-groups',
-  size: 'normal',
   html: () => `
     <div class="card" id="card-user-groups">
       <h2>User Groups</h2>

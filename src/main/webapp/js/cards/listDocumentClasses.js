@@ -5,7 +5,6 @@ import { registerCard } from './registry.js';
 
 registerCard({
   id: 'list-document-classes',
-  size: 'normal',
   html: () => `
     <div class="card" id="card-list-document-classes">
       <h2>List Document Classes</h2>

@@ -9,7 +9,6 @@ import { registerCard } from './registry.js';
 
 registerCard({
   id: 'folder-details',
-  size: 'normal',
   html: () => `
     <div class="card" id="card-folder-details">
       <h2>Folder Details</h2>

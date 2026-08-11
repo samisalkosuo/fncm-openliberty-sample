@@ -9,7 +9,6 @@ import { logout } from '../router.js';
 
 registerCard({
   id: 'documents',
-  size: 'normal',
   html: () => `
     <div class="card" id="card-documents">
       <h2>Documents</h2>

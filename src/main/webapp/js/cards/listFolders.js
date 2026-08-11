@@ -6,7 +6,6 @@ import { publish,TOPICS } from '../eventBus.js';
 
 registerCard({
   id: 'list-folders',
-  size: 'normal',
   html: () => `
     <div class="card" id="card-list-folders">
       <h2>List Folders</h2>
