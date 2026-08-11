@@ -24,6 +24,7 @@ import './cards/userGroups.js';
 import './cards/listDocumentsInFolder.js';
 import './cards/folderDetails.js';
 import './cards/createBuildingInspectionReportDocument.js';
+// ── Add new card imports above this line ──
 
 document.addEventListener('DOMContentLoaded', async () => {
   // ── Restore session first so cards can read state during init ───────

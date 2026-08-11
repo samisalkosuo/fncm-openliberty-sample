@@ -5,7 +5,7 @@ config*.env
 .vscode/
 plans/
 scaffold/backups/
-
+local/
 
 target/
 pom.xml.tag
