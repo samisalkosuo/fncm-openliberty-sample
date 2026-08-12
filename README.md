@@ -103,8 +103,6 @@ Create a `config.env` file based on `config.env.sample`. All variables are requi
 | `FILENET_CP4BAHOST` | CP4BA platform host (e.g. `https://cpd-cp4ba.example.com`). | ✅ |
 | `FILENET_URL` | Content Platform Engine WSI endpoint (e.g. `https://…/cpe/wsi/FNCEWS40MTOM/`). | ✅ |
 | `FILENET_GRAPHQL_URL` | Content Services GraphQL API URL (e.g. `https://…/content-services-graphql/graphql`). | ✅ |
-| `FILENET_USERNAME` | FileNet service account username used by the application backend. | ✅ |
-| `FILENET_PASSWORD` | FileNet service account password. | ✅ |
 | `FILENET_DOMAIN` | FileNet P8 domain name (e.g. `P8DOMAIN`). | ✅ |
 | `FILENET_OBJECTSTORE` | Object store symbolic name (e.g. `OS1`). | ✅ |
 | `FILENET_STANZA` | JACE login stanza name. Default: `FileNetP8WSI`. | Optional |

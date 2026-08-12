@@ -32,15 +32,6 @@ cp config.env.sample config.env
 | `FILENET_IAMHOST` | `iam.host` | — | ✅ | IAM identity provider base URL. On CP4BA < 25.0.1 this is the `cp-console.…` hostname. On CP4BA 25.0.1+ it is the same as `FILENET_CP4BAHOST`. |
 | `FILENET_CP4BAHOST` | `cp4ba.host` | — | ✅ | CP4BA platform base URL (e.g. `https://cpd-cp4ba.example.com`). Used for the Zen token exchange step. |
 
-### FileNet Credentials
-
-| Variable | Config Key | Default | Required | Description |
-|---|---|---|---|---|
-| `FILENET_USERNAME` | `filenet.username` | — | ✅ | Service account username. Used by the application to authenticate to the Content Platform Engine via JACE. |
-| `FILENET_PASSWORD` | `filenet.password` | — | ✅ | Service account password. |
-
-> **Note**: `FILENET_USERNAME` and `FILENET_PASSWORD` are the backend service account credentials used by JACE. They are not the user's login credentials — users log in with their own CP4BA username and password through the browser. JACE operations run as the **logged-in user** via `OpenTokenCredentials` (token auth), not as the service account.
-
 ### Content Platform Engine (JACE)
 
 | Variable | Config Key | Default | Required | Description |
@@ -110,8 +101,6 @@ Full mapping of every config key used in the application:
 |---|---|---|---|
 | `iam.host` | `FILENET_IAMHOST` | — | `AuthService` |
 | `cp4ba.host` | `FILENET_CP4BAHOST` | — | `AuthService` |
-| `filenet.username` | `FILENET_USERNAME` | — | Not currently injected via CDI — retained for future use |
-| `filenet.password` | `FILENET_PASSWORD` | — | Not currently injected via CDI — retained for future use |
 | `filenet.cpe.url` | `FILENET_URL` | — | `FileNetConfig` |
 | `filenet.domain` | `FILENET_DOMAIN` | — | `FileNetConfig` |
 | `filenet.objectstore` | `FILENET_OBJECTSTORE` | — | `FileNetConfig` |
