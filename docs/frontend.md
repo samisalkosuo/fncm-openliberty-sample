@@ -30,6 +30,7 @@ graph TD
     cards --> api["js/api.js\napiFetch + GraphQL.execute"]
     cards --> util["js/util.js\nDOM helpers + JSON viewer"]
     cards --> session
+    cards --> eventBus["js/eventBus.js\npublish / subscribe"]
     api --> session
 ```
 
@@ -284,6 +285,128 @@ session.clearState('selectedDocumentId');
 ```
 
 This is how the `folderTree` card communicates a selected folder path to the `documentDetails` card, for example.
+
+---
+
+## eventBus.js — Inter-Card Communication
+
+[`eventBus.js`](../src/main/webapp/js/eventBus.js) is a lightweight publish/subscribe (pub/sub) message bus that lets cards communicate without holding direct references to each other. A card that produces data **publishes** an event; any number of other cards that care about that data **subscribe** to it. Neither side knows the other exists, which keeps each card self-contained and independently testable.
+
+### Concept
+
+Without a bus, card A would need to import card B and call a function on it directly — creating a hard coupling that makes cards harder to reorder, hide, or replace. With the bus, card A publishes a topic when something happens; card B reacts to that topic if it is loaded. Cards are added and removed from the layout without touching any other card.
+
+```
+  Card A (publisher)          eventBus          Card B (subscriber)
+  ─────────────────    ──────────────────────   ──────────────────
+  publish(TOPICS.X, …) ──▶  notifies all      ──▶ handler({ … })
+                             subscribers of X
+```
+
+### TOPICS Registry
+
+All topic name strings are centralized in the `TOPICS` export. **Always import `TOPICS` and use its keys** — never use raw string literals. This ensures typos are caught at module load time and all topics are discoverable in one place.
+
+| Key | Topic string | Typical payload |
+|---|---|---|
+| `TOPICS.DOCUMENT_SELECTED` | `fncmopenlibertysample:document:selected` | `{ id, name, className, … }` |
+| `TOPICS.DOCUMENT_ID` | `fncmopenlibertysample:document:id` | document ID string |
+| `TOPICS.DOCUMENT_CLEARED` | `fncmopenlibertysample:document:cleared` | *(none)* |
+| `TOPICS.FOLDER_SELECTED` | `fncmopenlibertysample:folder:selected` | folder object |
+| `TOPICS.FOLDER_ID` | `fncmopenlibertysample:folder:id` | folder ID string |
+
+To add a new topic, append an entry to the `TOPICS` object in [`eventBus.js`](../src/main/webapp/js/eventBus.js) following the naming convention:
+
+```js
+// Key: SCREAMING_SNAKE_CASE
+// Value: 'fncmopenlibertysample:<noun>:<verb>'
+PROPERTY_UPDATED: `${TOPIC_PREFIX}:property:updated`,
+```
+
+### Publishing an Event
+
+Call `publish(topic, payload)` whenever card-level state changes that other cards might care about. Handlers are called **synchronously** in subscription order.
+
+```js
+import { publish, TOPICS } from '../eventBus.js';
+
+// Inside a card's init() or event listener:
+publish(TOPICS.DOCUMENT_SELECTED, {
+  id: doc.id,
+  name: doc.name,
+  className: doc.className,
+});
+
+// Publishing with no payload (e.g. clearing state):
+publish(TOPICS.DOCUMENT_CLEARED);
+```
+
+### Subscribing to an Event
+
+Call `subscribe(topic, handler)` inside a card's `init()`. The return value is a convenience **unsubscribe function** — call it when you need to stop listening (e.g., in a teardown path).
+
+```js
+import { subscribe, TOPICS } from '../eventBus.js';
+
+init() {
+  subscribe(TOPICS.DOCUMENT_SELECTED, ({ id, name }) => {
+    document.getElementById('my-card-title').textContent = name;
+    loadDocumentDetails(id);
+  });
+
+  subscribe(TOPICS.DOCUMENT_CLEARED, () => {
+    document.getElementById('my-card-title').textContent = '—';
+  });
+},
+```
+
+If you need to unsubscribe later (uncommon in always-mounted cards):
+
+```js
+const off = subscribe(TOPICS.FOLDER_SELECTED, (folder) => { … });
+// …later…
+off(); // removes this handler only
+```
+
+### Real-World Wiring Example
+
+The following shows how three cards interact without knowing about each other:
+
+```
+listFolders card          listDocumentsInFolder card       documentDetails card
+──────────────────        ─────────────────────────────    ──────────────────────
+User clicks folder   ──▶  publish(TOPICS.FOLDER_SELECTED)
+                          (subscribes to FOLDER_SELECTED) ◀──  reacts: fetches docs
+User clicks document ──▶  publish(TOPICS.DOCUMENT_ID)
+                                                           ──▶  (subscribes to DOCUMENT_ID)
+                                                                reacts: fetches details
+```
+
+- [`listFolders.js`](../src/main/webapp/js/cards/listFolders.js) publishes `TOPICS.FOLDER_SELECTED` when a folder row is clicked.
+- [`listDocumentsInFolder.js`](../src/main/webapp/js/cards/listDocumentsInFolder.js) subscribes to `TOPICS.FOLDER_SELECTED` and loads the folder's documents. When the user then clicks a document it publishes `TOPICS.DOCUMENT_ID` and `TOPICS.DOCUMENT_SELECTED`.
+- [`documentDetails.js`](../src/main/webapp/js/cards/documentDetails.js) subscribes to `TOPICS.DOCUMENT_ID` and fetches the full document details, and to `TOPICS.DOCUMENT_CLEARED` to reset its display.
+
+None of these cards import each other. Any of them can be hidden via `layout-config.js` without breaking the others.
+
+### Debugging
+
+All bus activity is logged at `console.debug` level under the `[EventBus]` prefix:
+
+```
+[EventBus] subscribe  "fncmopenlibertysample:document:selected" — 1 listener(s)
+[EventBus] publish    "fncmopenlibertysample:document:selected" { id: "…", name: "…" }
+```
+
+Enable **Verbose** in the browser DevTools console filter to see these messages.
+
+### Adding EventBus Support to a New Card
+
+The card template ([`_template.js`](../src/main/webapp/js/cards/_template.js)) already includes the commented-out import and usage hints. When scaffolding a new card:
+
+1. Uncomment the `import` line at the top of the generated card file.
+2. Call `subscribe(...)` inside `init()` for any topics the card should react to.
+3. Call `publish(...)` inside event handlers whenever the card produces data for others.
+4. If you need a new topic, add it to `TOPICS` in [`eventBus.js`](../src/main/webapp/js/eventBus.js) before using it.
 
 ---
 
