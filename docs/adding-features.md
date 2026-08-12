@@ -199,6 +199,7 @@ registerCard({
 - Update `size` if the card needs more space (`'wide'`, `'large'`, `'full'`).
 - Replace `renderJson(container, data)` with `renderWithToggle(container, data, renderer)` for a custom table/list view.
 - Add form inputs in `html()` and read them in `init()`.
+- **Wire inter-card communication** with `eventBus.js`: if this card should react to another card's selection (e.g. a document ID picked in a sibling card), call `subscribe(TOPICS.DOCUMENT_ID, handler)` inside `init()`. If it produces data that other cards need, call `publish(TOPICS.DOCUMENT_SELECTED, payload)` in its event handlers. The card template ([`_template.js`](../src/main/webapp/js/cards/_template.js)) includes the commented-out import as a starting point. See [Frontend → eventBus.js](frontend.md#eventbusjs--inter-card-communication) for the full API and topic registry.
 
 ---
 
@@ -210,6 +211,7 @@ registerCard({
 [ ] Edit MyInspectionOperation.java — implement FileNet logic
 [ ] Edit MyInspectionResource.java — add query/body params if needed
 [ ] Edit myInspection.js  — customise card HTML and rendering
+[ ] (Optional) Add eventBus subscribe/publish calls to myInspection.js if the card communicates with others
 [ ] Edit layout-config.js — set row and column for 'my-inspection' (currently row: 99 is a placeholder)
 [ ] Run: mvn package && mvn liberty:run  (or docker build + run)
 [ ] Open http://localhost:9080, log in, find the card, click Load

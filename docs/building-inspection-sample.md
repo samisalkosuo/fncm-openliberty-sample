@@ -174,6 +174,14 @@ The **File Building Inspection Docs** card reads the 16 Markdown files from `src
 
 ## Frontend Cards
 
+The three browse-and-view cards — [`listFolders.js`](../src/main/webapp/js/cards/listFolders.js), [`listDocumentsInFolder.js`](../src/main/webapp/js/cards/listDocumentsInFolder.js), and [`documentDetails.js`](../src/main/webapp/js/cards/documentDetails.js) — communicate through [`eventBus.js`](../src/main/webapp/js/eventBus.js) without holding direct references to each other:
+
+- `listFolders.js` publishes `TOPICS.FOLDER_SELECTED` when a folder row is clicked.
+- `listDocumentsInFolder.js` subscribes to `TOPICS.FOLDER_SELECTED` and loads the folder's documents; when the user clicks a document it publishes `TOPICS.DOCUMENT_ID` and `TOPICS.DOCUMENT_SELECTED`.
+- `documentDetails.js` subscribes to `TOPICS.DOCUMENT_ID` to fetch full document details, and to `TOPICS.DOCUMENT_CLEARED` to reset its display.
+
+This means any of these cards can be hidden via `layout-config.js` without breaking the others. See [Frontend → eventBus.js](frontend.md#eventbusjs--inter-card-communication) for the full pub/sub API and topic registry.
+
 ### Building Inspection Documents Setup (`buildingInspectionDocs.js`)
 
 **Card ID**: `addbuildinginspectiondocs`  

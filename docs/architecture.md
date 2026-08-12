@@ -130,8 +130,11 @@ graph TD
     main --> cards["js/cards/*.js\none file per feature"]
     cards --> api["js/api.js\ncentralized fetch + Bearer header"]
     cards --> session["js/session.js\nsessionStorage state"]
+    cards --> eventBus["js/eventBus.js\npublish / subscribe"]
     main --> router["js/router.js\nview switching"]
 ```
+
+Cards communicate with each other through [`eventBus.js`](../src/main/webapp/js/eventBus.js) — a lightweight pub/sub bus. A card that produces data publishes a topic; any card that cares about that data subscribes to it. Neither side holds a reference to the other, so cards can be added, removed, or reordered without touching any other card. See [Frontend → eventBus.js](frontend.md#eventbusjs--inter-card-communication) for the full API and topic registry.
 
 See [Frontend](frontend.md) for the full details.
 
