@@ -21,6 +21,9 @@ select {
   border: var(--border);
   border-radius: var(--radius-sm);
   font-size: 0.95rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-family);
 }
 input:focus,
 select:focus { outline: 2px solid var(--color-primary); border-color: transparent; }

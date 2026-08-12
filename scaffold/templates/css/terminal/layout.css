@@ -67,3 +67,9 @@ main {
 .card[data-size="tall"]  { grid-row:    span 2; }
 .card[data-size="large"] { grid-column: span 2; grid-row: span 2; }
 .card[data-size="full"]  { grid-column: 1 / -1; }
+
+/* ── Explicit positioning via inline styles (gridRowStart/gridColumnStart) ──
+   Positioning is applied via JavaScript using gridRowStart/gridColumnStart,
+   which allows the size modifiers to work correctly (size sets span, position sets start).
+   This approach is browser-compatible and doesn't require CSS attr() support.
+   ───────────────────────────────────────────────────────────────────────────── */
