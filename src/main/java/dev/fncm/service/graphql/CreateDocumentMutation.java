@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import dev.fncm.service.FileUploadOperation;
-import dev.fncm.service.javaapi.service.buildinginspectiondocs.CreateBuildingInspectionDocumentOperation;
 
 /**
  * GraphQL {@code createDocument} mutation with optional file content upload.
