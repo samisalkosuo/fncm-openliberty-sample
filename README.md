@@ -158,3 +158,14 @@ Full documentation lives in the [`docs/`](docs/) directory:
 - [`lib/README.md`](lib/README.md) — how to obtain the FileNet JARs
 - [`scaffold/README.md`](scaffold/README.md) — scaffolding directory layout
 - [`samples/samples.graphql`](samples/samples.graphql) — GraphQL query examples
+
+## Images
+
+![Sample app with default CSS](images/fncm-openliberty-sample-1.jpg)
+*Default CSS*
+
+![Sample app with default CSS](images/fncm-openliberty-sample-2.jpg)
+*Navy CSS*
+
+![Sample app with default CSS](images/fncm-openliberty-sample-3.jpg)
+*Terminal CSS*
