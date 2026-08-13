@@ -23,11 +23,9 @@ Use it as a learning reference, a starting point for your own FNCM integration, 
 The FileNet Java Client API (JACE) is not in Maven Central. Download the JARs from your CP4BA instance:
 
 1. Open the **FileNet Administration Console for Content Engine (ACCE)**.
-2. Navigate to **Help → Download client files**.
+2. Navigate to **<DOMAIN> → Client API Download → Java CEWS Client**.
 3. Download `Jace.jar` and `p8cel10n.jar`.
 4. Place both files in the `lib/` directory of this repository.
-
-> See [`lib/README.md`](lib/README.md) for more detail.
 
 ---
 
