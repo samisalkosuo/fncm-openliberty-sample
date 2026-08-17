@@ -14,8 +14,8 @@ The building inspection domain models a **municipal building inspection workflow
 The application includes:
 - A custom FileNet document class (`BuildingInspectionReport`) with 6 domain-specific properties.
 - 16 sample inspection reports as Markdown files, ready to be uploaded to CP4BA.
-- Three UI cards for managing this data.
-- A full set of Java backend classes demonstrating JACE class creation, document upload, and GraphQL-based document creation.
+- Four UI cards for managing and searching this data.
+- A full set of Java backend classes demonstrating JACE class creation, document upload, GraphQL-based document creation, and full-text metadata search.
 
 ---
 
@@ -70,7 +70,7 @@ The companion file [`extract_fields.json`](../src/main/resources/building_inspec
 
 ## Backend — Operations Map
 
-The building inspection module has the most complex backend in the application, with 10 classes in `service/javaapi/service/buildinginspectiondocs/`:
+The building inspection module has the most complex backend in the application, with 11 classes in `service/javaapi/service/buildinginspectiondocs/`:
 
 | Class | What it does |
 |---|---|
@@ -84,6 +84,7 @@ The building inspection module has the most complex backend in the application, 
 | [`DeleteBuildingInspectionDocsOperation`](../src/main/java/dev/fncm/service/javaapi/service/buildinginspectiondocs/DeleteBuildingInspectionDocsOperation.java) | Deletes all `BuildingInspectionReport` documents and the document class |
 | [`DeleteBuildingInspectionTypes`](../src/main/java/dev/fncm/service/javaapi/service/buildinginspectiondocs/DeleteBuildingInspectionTypes.java) | Deletes choice lists and property definitions |
 | [`FileNetQueryUtil`](../src/main/java/dev/fncm/service/javaapi/service/buildinginspectiondocs/FileNetQueryUtil.java) | Shared JACE query helpers (find templates by symbolic name, SQL escape) |
+| [`SearchBuildingInspectionOperation`](../src/main/java/dev/fncm/service/javaapi/service/buildinginspectiondocs/SearchBuildingInspectionOperation.java) | Searches all `BuildingInspectionReport` documents whose custom metadata matches a user-supplied string via SQL `LIKE` |
 
 ---
 
@@ -219,6 +220,40 @@ This is the most feature-complete card in the application. It demonstrates:
 
 The card reads the choice list values from [`buildingInspectionConstants.js`](../src/main/webapp/js/cards/buildingInspectionConstants.js) to keep the frontend and backend in sync.
 
+### Search Building Inspection Reports (`searchBuildingInspection.js`)
+
+**Card ID**: `search-building-inspection`
+**Size**: wide
+**API**: `GET /api/searchbuildinginspection?q=<text>`
+
+A single-field search card that queries all custom metadata properties of `BuildingInspectionReport` documents for a user-supplied string. Typing and pressing Enter or clicking the Search button executes the query.
+
+**What it searches**: the five custom string properties — `Municipality`, `PropertyAddress`, `InspectorName`, `BuildingType`, and `ComplianceStatus` — using a SQL `LIKE '%<text>%'` predicate joined with `OR`. Results are ordered by `DateCreated DESC` and capped at 100.
+
+> **Note**: FileNet SQL `LIKE` matching is case-sensitive. Search for `espoo` and `Espoo` will produce different results.
+
+Results are displayed in a six-column table (Title, Municipality, Address, Inspector, Building Type, Compliance) with a JSON-tree toggle. Clicking a document row publishes `TOPICS.DOCUMENT_ID` and `TOPICS.DOCUMENT_SELECTED` so the `document-details` card updates automatically — the same wiring used by `listDocumentsInFolder.js`.
+
+**Backend vertical slice**:
+
+```mermaid
+graph LR
+    Card["searchBuildingInspection.js\nsearch input + Search button"] --> REST["GET /api/searchbuildinginspection?q=...\nSearchBuildingInspectionResource"]
+    REST --> FileNetService
+    FileNetService --> Op["SearchBuildingInspectionOperation\nJACE SearchSQL + SearchScope"]
+    Op --> FileNet["CP4BA Object Store\nBuildingInspectionReport class"]
+    FileNet --> REST
+    REST --> Card
+```
+
+**Resource** — [`SearchBuildingInspectionResource`](../src/main/java/dev/fncm/resource/SearchBuildingInspectionResource.java): accepts a `q` query parameter, returns 400 if absent or blank, delegates to `SearchBuildingInspectionOperation` via `FileNetService.run()`.
+
+**Operation** — [`SearchBuildingInspectionOperation`](../src/main/java/dev/fncm/service/javaapi/service/buildinginspectiondocs/SearchBuildingInspectionOperation.java): builds a `SearchSQL` with `LIKE` predicates across all five custom string properties, uses `FileNetQueryUtil.escapeSql()` to sanitise the input, and returns a `SearchBuildingInspectionResult` containing the matched `SearchBuildingInspectionItem` list.
+
+**Result types**:
+- [`SearchBuildingInspectionResult`](../src/main/java/dev/fncm/model/SearchBuildingInspectionResult.java) — `{ count, query, documents[] }`
+- [`SearchBuildingInspectionItem`](../src/main/java/dev/fncm/model/SearchBuildingInspectionItem.java) — `{ id, documentTitle, municipality, propertyAddress, inspectorName, buildingType, complianceStatus, inspectionDate, dateCreated }`
+
 ---
 
 ## How This Relates to the Patterns
@@ -233,6 +268,8 @@ The card reads the choice list values from [`buildingInspectionConstants.js`](..
 | `buildingInspectionDocs.js` | Card with `runCardAction` + `renderJson` pattern |
 | `createBuildingInspectionReportDocument.js` | Complex card with forms, validation, multipart upload |
 | `BuildingInspectionConstants` | Shared constants — good practice for any domain module |
+| `SearchBuildingInspectionOperation` | JACE `SearchSQL` / `SearchScope` query with `LIKE` predicates |
+| `searchBuildingInspection.js` | Card with search input, table rendering, and eventBus publish |
 
 The building inspection module is the reference implementation for a "real" feature. When in doubt about how to structure a new domain feature, use the building inspection classes as a model.
 
