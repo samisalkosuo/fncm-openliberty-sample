@@ -17,6 +17,7 @@ export const API = {
   checkinDocument:                          '/api/checkindocument',
   downloadDocument:                         '/api/downloaddocument',
   updateContentElement:                     '/api/contentElement',
+  searchBuildingInspection:                 '/api/searchbuildinginspection',
 };
 
 export async function apiFetch(url, options = {}) {

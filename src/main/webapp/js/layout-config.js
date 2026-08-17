@@ -104,6 +104,12 @@ export const layoutConfig = {
       column: 3,
       size: 'normal',
     },
+    // row 6
+    'search-building-inspection': {
+      row: 6,
+      column: 1,
+      size: 'wide',
+    },
   },
 };
 
